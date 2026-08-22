@@ -191,8 +191,8 @@ app refuses to do, and the mark finally draws itself on the end card over a butt
 reading `installe-le depuis ton navigateur`. The lockup is the signature, not the
 greeting — at the head it means nothing to anyone.
 
-The beats are 2.5 to 5.8 seconds, on purpose. A film where every shot lasts the same
-four seconds has no rhythm, and the eye leaves before the argument does.
+The beats run from 2.5 to 6.2 seconds, on purpose. A film where every shot lasts the
+same four seconds has no rhythm, and the eye leaves before the argument does.
 
 It is built in three passes. **Shooting**: Playwright plays each shot in the real app,
 one browser context per shot so every clip starts and ends where the edit wants it.
