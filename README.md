@@ -52,20 +52,33 @@ React 18, TypeScript strict, CSS Modules and custom properties. `react` and
 `react-dom` are the only runtime dependencies — no CSS framework, no state
 library, no i18n library, no chart library.
 
-Four layouts (portrait, landscape, tablet, desktop), two themes, four accents,
-French and English, all persisted and applied without a reload.
+Four layouts (portrait, landscape, tablet, desktop), three theme settings, four
+accents, French and English, all persisted and applied without a reload. `system`
+is the default theme and tracks `prefers-color-scheme` live — the app turns with
+the device, mid-session, without a reload.
+
+The lengths and the daily goal are settings, not constants: the focus session
+(5–90 min), the break (1–30 min) and the goal (1–12 sessions) decide what the app
+arms on launch, what it offers when a session ends, and how many dots the stats
+draw. The timer screen still overrides the current session without touching them.
+
+The stats read out a day at a time. Every week bar carries its count, and every
+bar and heatmap cell is a button: picking one states that day's date, sessions and
+total focus time under the charts; picking it again goes back to today.
 
 ## Verified
 
-183 unit tests, 4 end-to-end. Lighthouse on the production build: Performance
-100 desktop / 99 mobile, Best practices 100. Installable — `getInstallabilityErrors`
-returns empty, service worker active, manifest clean.
+237 unit tests, 4 end-to-end, on Chromium.
 
+The figures below were measured on the build that preceded the settings and stats
+work, and have **not** been re-run since. Lighthouse on the production build:
+Performance 100 desktop / 99 mobile, Best practices 100. Installable —
+`getInstallabilityErrors` returns empty, service worker active, manifest clean.
 Offline was checked by killing the server and reloading, deep link included.
 Across 224 rendered states (4 layouts × 2 themes × 4 accents × 2 languages ×
 {timer, settings} × {idle, running}): no overflow, 2040 interactive elements
 enumerated with none under 44×44px, and no visible text below its contrast
-threshold.
+threshold. That last count no longer holds — see the deviation below.
 
 ## Known deviations
 
@@ -87,6 +100,14 @@ opacity ramp is specified; raising it would rewrite the chart's visual weight.
 Every cell and bar carries an accessible label, and the footers restate the
 totals, so nothing is available only to a sighted user — but the levels are
 distinguished visually by colour, and the low steps are faint by design.
+
+**The stats targets are under 44px wide.** Making a day selectable makes each week
+bar and each heatmap cell a button, and seven of them share the width of the card:
+in portrait a bar is roughly 38×90px and a cell roughly 38×22px. Widening them
+would mean scrolling the week or dropping days from the grid, and the readout they
+feed is the point of the change. The bars clear 44px in one dimension; the cells
+clear it in neither. Every day of the current week is reachable from the taller
+bars, and every cell states its date and its count to a screen reader.
 
 **Only tested on Chromium.** WebKit's Linux build needs system packages that were
 not installed, so the matrix, the offline proof, the drift test and Lighthouse all

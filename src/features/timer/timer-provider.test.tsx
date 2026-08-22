@@ -1,8 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
+import { DEFAULT_SETTINGS, SETTINGS_STORAGE_KEY, type Settings } from '../../types';
 import { SettingsProvider } from '../../shared/settings/settings-provider';
 import { TimerProvider, useTimer } from './timer-provider';
+
+function seedSettings(settings: Partial<Settings>): void {
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ ...DEFAULT_SETTINGS, ...settings }));
+}
 
 function wrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
@@ -84,6 +89,68 @@ describe('suggestion', () => {
 
     expect(result.current.state).toMatchObject({ phase: 'idle', mode: 'focus', minutes: 25 });
     expect(result.current.suggestion).toBeNull();
+  });
+});
+
+describe('the settable lengths', () => {
+  it('arms the configured focus session on a first launch', () => {
+    seedSettings({ focusMinutes: 40 });
+    const { result } = mountTimer();
+
+    expect(result.current.state).toMatchObject({ phase: 'idle', mode: 'focus', minutes: 40 });
+    expect(result.current.remainingMs).toBe(40 * 60_000);
+  });
+
+  it('leaves a session already under way alone', () => {
+    const first = mountTimer();
+    act(() => first.result.current.setMinutes(15));
+    act(() => first.result.current.start());
+    first.unmount();
+
+    seedSettings({ focusMinutes: 40 });
+    const { result } = mountTimer();
+
+    expect(result.current.state).toMatchObject({ phase: 'running', minutes: 15 });
+  });
+
+  it('suggests the break the settings hold, not a fixed five minutes', () => {
+    seedSettings({ breakMinutes: 12 });
+    const { result } = mountTimer();
+
+    act(() => result.current.setMinutes(1));
+    act(() => result.current.start());
+    act(() => void vi.advanceTimersByTime(60_000 + 300));
+
+    expect(result.current.suggestion).toEqual({ mode: 'break', minutes: 12 });
+
+    act(() => result.current.acceptSuggestion());
+    expect(result.current.state).toMatchObject({ mode: 'break', minutes: 12 });
+  });
+
+  it('suggests the configured focus session after a break', () => {
+    seedSettings({ focusMinutes: 50 });
+    const { result } = mountTimer();
+
+    act(() => result.current.setMinutes(1));
+    act(() => result.current.start());
+    act(() => void vi.advanceTimersByTime(60_000 + 300));
+    act(() => result.current.acceptSuggestion());
+    act(() => result.current.start());
+    act(() => void vi.advanceTimersByTime(5 * 60_000 + 300));
+
+    expect(result.current.suggestion).toEqual({ mode: 'focus', minutes: 50 });
+  });
+
+  it('falls back to the configured focus session when the suggestion is dismissed', () => {
+    seedSettings({ focusMinutes: 30 });
+    const { result } = mountTimer();
+
+    act(() => result.current.setMinutes(1));
+    act(() => result.current.start());
+    act(() => void vi.advanceTimersByTime(60_000 + 300));
+    act(() => result.current.dismissSuggestion());
+
+    expect(result.current.state).toMatchObject({ phase: 'idle', mode: 'focus', minutes: 30 });
   });
 });
 

@@ -27,6 +27,16 @@ describe('initialTimerState', () => {
   it('returns a fresh object each time', () => {
     expect(initialTimerState()).not.toBe(initialTimerState());
   });
+
+  it('starts on the length it is handed', () => {
+    expect(initialTimerState(50)).toMatchObject({ minutes: 50, remainingMs: 50 * MINUTE });
+  });
+
+  it('clamps a length that could not be armed', () => {
+    expect(initialTimerState(0).minutes).toBe(1);
+    expect(initialTimerState(900).minutes).toBe(90);
+    expect(initialTimerState(Number.NaN).minutes).toBe(1);
+  });
 });
 
 describe('setMinutes', () => {

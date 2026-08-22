@@ -10,8 +10,8 @@ const PRESETS: readonly PresetAccentKey[] = ['red', 'green', 'blue'];
 
 export function AccentSection(): JSX.Element {
   const { t } = useI18n();
-  const { settings, setAccentKey } = useSettings();
-  const { theme, accentKey, customColor } = settings;
+  const { settings, theme, setAccentKey } = useSettings();
+  const { accentKey, customColor } = settings;
   const current = accentKey === 'custom' ? customColor : t(`settings.accent.${accentKey}`);
 
   return (

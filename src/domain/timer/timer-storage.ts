@@ -24,17 +24,18 @@ function toStoredRemaining(value: unknown, minutes: number): number | null {
   return Math.min(minutes * MS_PER_MINUTE, Math.max(0, value));
 }
 
-export function restoreTimerState(raw: unknown, now: number): TimerState {
-  if (!isRecord(raw)) return initialTimerState();
+export function restoreTimerState(raw: unknown, now: number, focusMinutes?: number): TimerState {
+  const blank = (): TimerState => initialTimerState(focusMinutes);
+  if (!isRecord(raw)) return blank();
 
   const { phase, mode, endsAt } = raw;
-  if (!isPhase(phase) || !isMode(mode)) return initialTimerState();
+  if (!isPhase(phase) || !isMode(mode)) return blank();
 
   const minutes = toStoredMinutes(raw.minutes);
-  if (minutes === null) return initialTimerState();
+  if (minutes === null) return blank();
 
   const remainingMs = toStoredRemaining(raw.remainingMs, minutes);
-  if (remainingMs === null) return initialTimerState();
+  if (remainingMs === null) return blank();
 
   const armed: TimerState = {
     phase: 'idle',
@@ -93,13 +94,13 @@ export function loadElapsedWhileAway(now: number): ElapsedSession | null {
   }
 }
 
-export function loadTimerState(now: number): TimerState {
+export function loadTimerState(now: number, focusMinutes?: number): TimerState {
   try {
     const raw = globalThis.localStorage.getItem(TIMER_STORAGE_KEY);
-    if (raw === null) return initialTimerState();
-    return restoreTimerState(JSON.parse(raw), now);
+    if (raw === null) return initialTimerState(focusMinutes);
+    return restoreTimerState(JSON.parse(raw), now, focusMinutes);
   } catch {
-    return initialTimerState();
+    return initialTimerState(focusMinutes);
   }
 }
 

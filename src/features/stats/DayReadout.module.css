@@ -1,0 +1,17 @@
+.readout {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.day {
+  font-weight: 600;
+  color: var(--text);
+}
+
+:global(html[data-layout='tablet']) .readout,
+:global(html[data-layout='desktop']) .readout {
+  font-size: 14px;
+}

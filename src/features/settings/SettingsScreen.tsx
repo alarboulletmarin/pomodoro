@@ -6,9 +6,12 @@ import { AboutPage } from './AboutPage';
 import { AccentSection } from './AccentSection';
 import { AppearanceSection } from './AppearanceSection';
 import { BackIcon } from './BackIcon';
+import { DurationsSection } from './DurationsSection';
+import { GoalSection } from './GoalSection';
 import { InstallSection } from './InstallSection';
 import { LanguageSection } from './LanguageSection';
 import { LegalPage } from './LegalPage';
+import { MethodPage } from './MethodPage';
 import { PagesSection, type SubPage } from './PagesSection';
 import { SoundSection } from './SoundSection';
 import styles from './SettingsScreen.module.css';
@@ -21,6 +24,7 @@ type Page = 'root' | SubPage;
 
 const TITLES: Record<Page, MessageKey> = {
   root: 'settings.title',
+  method: 'method.title',
   about: 'about.title',
   legal: 'legal.title',
 };
@@ -56,6 +60,8 @@ export function SettingsScreen({ onClose }: SettingsScreenProps): JSX.Element {
           <>
             <AppearanceSection />
             <AccentSection />
+            <DurationsSection />
+            <GoalSection />
             <LanguageSection />
             <SoundSection />
             <InstallSection />
@@ -63,6 +69,7 @@ export function SettingsScreen({ onClose }: SettingsScreenProps): JSX.Element {
             <p className={styles.version}>{t('settings.version', { version: __APP_VERSION__ })}</p>
           </>
         ) : null}
+        {page === 'method' ? <MethodPage /> : null}
         {page === 'about' ? <AboutPage /> : null}
         {page === 'legal' ? <LegalPage /> : null}
       </div>

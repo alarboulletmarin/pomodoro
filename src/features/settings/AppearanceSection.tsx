@@ -1,53 +1,59 @@
-import { ACCENT_PALETTE, type Theme } from '../../types';
+import { ACCENT_PALETTE, type Theme, type ThemeChoice } from '../../types';
 import { useI18n } from '../../shared/i18n/i18n';
 import { useSettings } from '../../shared/settings/settings-provider';
 import { Section } from './Section';
 import { THEME_BG, THEME_INK, type StyleVars } from './theme-colors';
 import styles from './AppearanceSection.module.css';
 
-const THEMES: readonly Theme[] = ['light', 'dark'];
+const CHOICES: readonly ThemeChoice[] = ['system', 'light', 'dark'];
+const SIDES: readonly Theme[] = ['light', 'dark'];
 
 export function AppearanceSection(): JSX.Element {
   const { t } = useI18n();
   const { settings, setTheme } = useSettings();
   const { theme, accentKey, customColor } = settings;
 
+  const previewFor = (side: Theme): StyleVars => ({
+    '--preview-bg': THEME_BG[side],
+    '--preview-ink': THEME_INK[side],
+    '--preview-accent': accentKey === 'custom' ? customColor : ACCENT_PALETTE[accentKey][side],
+  });
+
   return (
     <Section label={t('settings.appearance')}>
       <div className={styles.tiles}>
-        {THEMES.map((option) => {
-          const selected = option === theme;
-          const preview: StyleVars = {
-            '--preview-bg': THEME_BG[option],
-            '--preview-ink': THEME_INK[option],
-            '--preview-accent':
-              accentKey === 'custom' ? customColor : ACCENT_PALETTE[accentKey][option],
-          };
+        {CHOICES.map((choice) => {
+          const selected = choice === theme;
+          // The system tile shows both halves, since it is both depending on the hour.
+          const sides = choice === 'system' ? SIDES : [choice];
 
           return (
             <button
-              key={option}
+              key={choice}
               type="button"
               className={selected ? `${styles.tile} ${styles.selected}` : styles.tile}
               aria-pressed={selected}
-              onClick={() => setTheme(option)}
+              onClick={() => setTheme(choice)}
             >
-              <span className={styles.preview} style={preview} aria-hidden="true">
-                <span className={styles.barInk} />
-                <span className={styles.barAccent} />
-              </span>
-              <span className={styles.foot}>
-                <span className={styles.name}>{t(`settings.theme.${option}`)}</span>
-                {selected ? (
-                  <span className={styles.check} aria-hidden="true">
-                    ✓
+              <span className={styles.preview} aria-hidden="true">
+                {sides.map((side) => (
+                  <span key={side} className={styles.half} style={previewFor(side)}>
+                    <span className={styles.barInk} />
+                    <span className={styles.barAccent} />
                   </span>
-                ) : null}
+                ))}
               </span>
+              <span className={styles.name}>{t(`settings.theme.${choice}`)}</span>
+              {selected ? (
+                <span className={styles.check} aria-hidden="true">
+                  ✓
+                </span>
+              ) : null}
             </button>
           );
         })}
       </div>
+      {theme === 'system' ? <p className={styles.hint}>{t('settings.theme.systemHint')}</p> : null}
     </Section>
   );
 }

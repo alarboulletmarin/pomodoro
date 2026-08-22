@@ -24,9 +24,9 @@ function syncThemeColor(theme: Theme): void {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }): JSX.Element {
-  const { settings, accentHex } = useSettings();
+  const { settings, theme, accentHex } = useSettings();
   const layout = useMediaLayout();
-  const { theme, accentKey } = settings;
+  const { accentKey } = settings;
 
   useLayoutEffect(() => {
     const root = document.documentElement;
