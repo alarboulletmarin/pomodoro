@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#E7E2D9;font-family:'Clash Display',Helvetica,sans-serif;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+  a{color:#F0464E}a:hover{color:#c9353c}
+  [data-sc-name="Settings"]{display:flex;flex-direction:column;flex:1 1 auto;width:100%;height:100%;min-width:0;min-height:0}
+  input[type=color]{-webkit-appearance:none;appearance:none}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:14px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+
+<div style="padding:56px;display:flex;flex-direction:column;gap:44px;background:#E7E2D9;min-height:100vh">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;max-width:1440px">
+    <div>
+      <div style="font-size:34px;font-weight:600;color:#221E1A;letter-spacing:-.8px">pomodoro · système responsive</div>
+      <div style="font-size:15px;color:#6B625A;margin-top:6px;max-width:52ch">Même tâche, quatre contextes. La durée est un réglage, l'action primaire reste unique et au même endroit dans chaque format.</div>
+    </div>
+    <div style="display:flex;gap:6px;padding:5px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(34,30,26,.1)">
+      <div onClick="{{ setLight }}" role="button" aria-pressed="{{ isLight }}" style="height:40px;padding:0 20px;border-radius:12px;display:flex;align-items:center;font-size:15px;font-weight:600;cursor:pointer;background:{{ lightTabBg }};color:{{ lightTabFg }}">clair</div>
+      <div onClick="{{ setDark }}" role="button" aria-pressed="{{ isDark }}" style="height:40px;padding:0 20px;border-radius:12px;display:flex;align-items:center;font-size:15px;font-weight:600;cursor:pointer;background:{{ darkTabBg }};color:{{ darkTabFg }}">sombre</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B625A;letter-spacing:.5px">PHONE · PORTRAIT · 393×852</div>
+      <div data-screen-label="Phone portrait" style="width:393px;height:852px;border-radius:52px;overflow:hidden;position:relative;background:{{ bg }};box-shadow:0 30px 60px -24px rgba(58,40,30,.5),0 0 0 10px #0d0d0f,0 0 0 12px #33312e;display:flex;flex-direction:column">
+        <div style="height:54px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 4px;color:{{ text }};font-size:15px;font-weight:600">
+          <div>9:41</div>
+          <div style="display:flex;gap:5px;align-items:center"><div style="width:20px;height:10px;border-radius:3px;border:1.5px solid {{ text }};padding:1.5px"><div style="width:70%;height:100%;background:{{ text }};border-radius:1px"></div></div></div>
+        </div>
+        <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0d0d0f;z-index:5"></div>
+
+        <sc-if value="{{ showTimer }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:{{ colJustify }};padding:14px 20px 26px;gap:12px;min-height:0">
+          <div style="display:{{ chromeFlex }};align-items:baseline;justify-content:space-between;padding:0 4px">
+            <div>
+              <div style="font-size:25px;font-weight:600;color:{{ text }};letter-spacing:-.5px">{{ heading }}</div>
+              <div style="font-size:13px;color:{{ muted }};margin-top:3px">{{ subhead }}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:13px;color:{{ muted }};font-weight:500">{{ modeLabel }}</div>
+              <div onClick="{{ openPortrait }}" role="button" aria-label="{{ t_settings }}" style="width:34px;height:34px;flex:none;border-radius:99px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px {{ hairline }};cursor:pointer" style-hover="opacity:.6">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="{{ muted }}" stroke-width="1.9"/><path d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7M18.6 18.6l-1.7-1.7M7.1 7.1L5.4 5.4" stroke="{{ muted }}" stroke-width="1.9" stroke-linecap="round"/></svg>
+            </div>
+            </div>
+          </div>
+
+          <div style="background:{{ surface }};border-radius:26px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:{{ cardShadow }}">
+            <sc-if value="{{ showPresets }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                  <div onClick="{{ p.onClick }}" role="button" aria-pressed="{{ p.selected }}" style="flex:1;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ p.bg }};color:{{ p.fg }};box-shadow:inset 0 0 0 1.5px {{ p.border }};font-size:15px;font-weight:600">{{ p.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;touch-action:none;user-select:none;cursor:{{ scrubCursor }}">
+              <div style="font-size:24px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostUp }}</div>
+              <div style="font-size:72px;font-weight:600;line-height:1;color:{{ text }};letter-spacing:-3px;font-variant-numeric:tabular-nums">{{ clock }}</div>
+              <div style="font-size:24px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostDown }}</div>
+              <div style="font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:{{ muted }};height:15px">{{ scrubHint }}</div>
+            </div>
+
+            <div style="height:6px;border-radius:99px;background:{{ track }};overflow:hidden"><div style="height:100%;width:{{ elapsedPct }};background:{{ accent }};border-radius:99px;transition:width .5s linear"></div></div>
+
+            <div onClick="{{ primaryAction }}" role="button" style="height:58px;border-radius:18px;background:{{ primaryBg }};color:{{ primaryFg }};box-shadow:{{ primaryRing }};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;cursor:pointer">{{ primaryLabel }}</div>
+            <sc-if value="{{ showSecondary }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ secondaryAction }}" role="button" style="height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:15px;color:{{ muted }};cursor:pointer">{{ secondaryLabel }}</div>
+            </sc-if>
+          </div>
+
+          <div style="background:{{ surface }};border-radius:26px;padding:16px;flex:none;display:{{ chromeFlex }};flex-direction:column;gap:12px;box-shadow:{{ cardShadow }}">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-size:16px;font-weight:600;color:{{ text }}">{{ todayLine }}</div>
+              <div style="font-size:13px;color:{{ muted }}">{{ weekLine }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="6">
+                <div aria-label="{{ s.label }}" style="height:10px;border-radius:99px;background:{{ s.bg }};box-shadow:inset 0 0 0 1.5px {{ hairline }}"></div>
+              </sc-for>
+            </div>
+            <div style="height:132px;flex:none;display:flex;gap:10px">
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <div style="font-size:11px;color:{{ muted }};font-family:ui-monospace,Menlo,monospace">{{ weekCaption }}</div>
+                <div style="flex:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;align-items:end;min-height:0">
+                  <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;min-width:0;justify-content:flex-end">
+                      <div style="width:100%;background:{{ d.color }};border-radius:7px;height:{{ d.h }}"></div>
+                      <div style="font-size:10px;color:{{ d.labelColor }};font-weight:{{ d.labelWeight }};max-width:100%;overflow:hidden;white-space:nowrap">{{ d.dayShort }}</div>
+                    <div style="width:4px;height:4px;flex:none;border-radius:99px;background:{{ d.dot }}"></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="width:1px;background:{{ hairline }}"></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+                <div style="font-size:11px;color:{{ muted }};font-family:ui-monospace,Menlo,monospace">{{ monthLabel }}</div>
+                <div style="flex:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:1fr;gap:4px;min-height:0">
+                  <sc-for list="{{ month }}" as="c" hint-placeholder-count="35">
+                    <div aria-label="{{ c.label }}" style="border-radius:99px;background:{{ c.color }}"></div>
+                  </sc-for>
+                </div>
+                <div style="font-size:10px;color:{{ muted }}">{{ monthFooter }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+          <dc-import name="Settings" v="{{ settingsVals }}" hint-size="100%,100%" style="flex:1;min-height:0"></dc-import>
+        </sc-if>
+        <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:136px;height:5px;border-radius:3px;background:{{ handle }}"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B625A;letter-spacing:.5px">PHONE · PAYSAGE · 852×393 — une main, écran posé</div>
+      <div data-screen-label="Phone paysage" style="width:852px;height:393px;border-radius:46px;overflow:hidden;position:relative;background:{{ bg }};box-shadow:0 30px 60px -24px rgba(58,40,30,.5),0 0 0 10px #0d0d0f,0 0 0 12px #33312e;display:flex;padding:22px 40px 22px 68px;gap:26px">
+        <div style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:34px;height:118px;border-radius:20px;background:#0d0d0f"></div>
+        <div style="position:absolute;right:9px;top:50%;transform:translateY(-50%);width:5px;height:120px;border-radius:3px;background:{{ handle }}"></div>
+
+        <div style="flex:1.25;display:{{ landTimer }};flex-direction:column;justify-content:{{ colSpread }};gap:{{ colGap }};padding:2px 10px 6px;min-width:0">
+          <div style="display:{{ chromeBlock }};flex:none">
+            <div style="display:flex;align-items:baseline;gap:12px">
+              <div style="font-size:24px;font-weight:600;color:{{ text }};letter-spacing:-.5px">{{ heading }}</div>
+              <div style="font-size:13px;color:{{ muted }}">{{ modeLabel }}</div>
+              <div onClick="{{ openLandscape }}" role="button" aria-label="{{ t_settings }}" style="width:30px;height:30px;flex:none;border-radius:99px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px {{ hairline }};cursor:pointer" style-hover="opacity:.6"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="{{ muted }}" stroke-width="1.9"/><path d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7M18.6 18.6l-1.7-1.7M7.1 7.1L5.4 5.4" stroke="{{ muted }}" stroke-width="1.9" stroke-linecap="round"/></svg></div>
+            </div>
+            <div style="font-size:14px;color:{{ muted }};margin-top:3px">{{ subhead }}</div>
+          </div>
+          <sc-if value="{{ showPresets }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px;flex:none;justify-content:center">
+              <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                <div onClick="{{ p.onClick }}" role="button" aria-pressed="{{ p.selected }}" style="height:42px;padding:0 20px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ p.bg }};color:{{ p.fg }};box-shadow:inset 0 0 0 1.5px {{ p.border }};font-size:15px;font-weight:600">{{ p.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="display:flex;flex-direction:column;align-items:center;gap:0px;flex:none;touch-action:none;user-select:none;cursor:{{ scrubCursor }}">
+              <div style="font-size:18px;font-weight:600;line-height:1.15;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostUp }}</div>
+              <div style="font-size:76px;font-weight:600;line-height:1.02;color:{{ text }};letter-spacing:-3px;font-variant-numeric:tabular-nums">{{ clock }}</div>
+              <div style="font-size:18px;font-weight:600;line-height:1.15;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostDown }}</div>
+              <div style="font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:{{ muted }};height:13px;margin-top:2px">{{ scrubHint }}</div>
+            </div>
+          <div style="height:6px;flex:none;border-radius:99px;background:{{ track }};overflow:hidden;width:82%;margin:0 auto"><div style="height:100%;width:{{ elapsedPct }};background:{{ accent }};border-radius:99px;transition:width .5s linear"></div></div>
+          <div style="display:flex;gap:10px;flex:none;align-items:center;justify-content:center">
+            <div onClick="{{ primaryAction }}" role="button" style="height:52px;flex:1;max-width:250px;padding:0 26px;border-radius:18px;background:{{ primaryBg }};color:{{ primaryFg }};box-shadow:{{ primaryRing }};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;cursor:pointer">{{ primaryLabel }}</div>
+            <sc-if value="{{ showSecondary }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ secondaryAction }}" role="button" style="height:52px;padding:0 20px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:15px;color:{{ muted }};cursor:pointer">{{ secondaryLabel }}</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ landSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;background:{{ surface }};border-radius:24px;overflow:hidden;box-shadow:{{ cardShadow }};min-width:0;display:flex"><dc-import name="Settings" v="{{ settingsVals }}" hint-size="100%,100%" style="flex:1;min-height:0"></dc-import></div>
+        </sc-if>
+        <div style="flex:1;background:{{ surface }};border-radius:24px;padding:18px;display:{{ landStats }};flex-direction:column;gap:14px;box-shadow:{{ cardShadow }};min-width:0">
+          <div style="display:flex;align-items:baseline;justify-content:space-between">
+            <div style="font-size:16px;font-weight:600;color:{{ text }}">{{ todayLine }}</div>
+            <div style="font-size:13px;color:{{ muted }}">{{ weekLine }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px">
+            <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="6">
+              <div aria-label="{{ s.label }}" style="height:9px;border-radius:99px;background:{{ s.bg }};box-shadow:inset 0 0 0 1.5px {{ hairline }}"></div>
+            </sc-for>
+          </div>
+          <div style="flex:1;min-height:124px;display:flex;gap:14px">
+            <div style="flex:1.1;display:flex;flex-direction:column;gap:6px;min-width:0">
+              <div style="font-size:11px;color:{{ muted }};font-family:ui-monospace,Menlo,monospace">{{ weekCaption }}</div>
+              <div style="flex:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;align-items:end;min-height:0">
+                <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;min-width:0;justify-content:flex-end">
+                    <div style="font-size:11px;color:{{ muted }}">{{ d.count }}</div>
+                    <div style="width:100%;background:{{ d.color }};border-radius:8px;height:{{ d.h }}"></div>
+                    <div style="font-size:11px;color:{{ d.labelColor }};font-weight:{{ d.labelWeight }};max-width:100%;overflow:hidden;white-space:nowrap">{{ d.dayShort }}</div>
+                    <div style="width:4px;height:4px;flex:none;border-radius:99px;background:{{ d.dot }}"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="width:1px;background:{{ hairline }}"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0">
+              <div style="font-size:11px;color:{{ muted }};font-family:ui-monospace,Menlo,monospace">{{ monthLabel }}</div>
+              <div style="flex:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:1fr;gap:4px;min-height:0">
+                <sc-for list="{{ month }}" as="c" hint-placeholder-count="35">
+                  <div aria-label="{{ c.label }}" style="border-radius:99px;background:{{ c.color }}"></div>
+                </sc-for>
+              </div>
+              <div style="font-size:10px;color:{{ muted }}">{{ monthFooter }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B625A;letter-spacing:.5px">TABLETTE · 1112×834 — le minuteur reste une colonne, la marge sert de calme</div>
+    <div data-screen-label="Tablette" style="width:1112px;height:834px;border-radius:34px;overflow:hidden;position:relative;background:{{ bg }};box-shadow:0 30px 60px -24px rgba(58,40,30,.5),0 0 0 12px #0d0d0f,0 0 0 14px #33312e;display:flex;flex-direction:column;padding:34px 56px 40px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div style="font-size:18px;font-weight:600;color:{{ text }}">{{ appName }}</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:15px;color:{{ muted }}">{{ modeLabel }} · {{ todayLine }}</div>
+          <div onClick="{{ openTablet }}" role="button" aria-label="{{ t_settings }}" style="width:36px;height:36px;flex:none;border-radius:99px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px {{ hairline }};cursor:pointer" style-hover="opacity:.6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="{{ muted }}" stroke-width="1.9"/><path d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7M18.6 18.6l-1.7-1.7M7.1 7.1L5.4 5.4" stroke="{{ muted }}" stroke-width="1.9" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:56px;min-height:0">
+        <div style="width:520px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:{{ chromeBlock }}">
+            <div style="font-size:40px;font-weight:600;color:{{ text }};letter-spacing:-1px">{{ heading }}</div>
+            <div style="font-size:17px;color:{{ muted }};margin-top:6px">{{ subhead }}</div>
+          </div>
+          <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;touch-action:none;user-select:none;cursor:{{ scrubCursor }}">
+              <div style="font-size:38px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostUp }}</div>
+              <div style="font-size:150px;font-weight:600;line-height:1;color:{{ text }};letter-spacing:-7px;font-variant-numeric:tabular-nums">{{ clock }}</div>
+              <div style="font-size:38px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostDown }}</div>
+              <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:{{ muted }};height:16px">{{ scrubHint }}</div>
+            </div>
+          <sc-if value="{{ showPresets }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px;justify-content:center">
+              <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                <div onClick="{{ p.onClick }}" role="button" aria-pressed="{{ p.selected }}" style="height:50px;padding:0 26px;border-radius:16px;display:flex;align-items:center;cursor:pointer;background:{{ p.bg }};color:{{ p.fg }};box-shadow:inset 0 0 0 1.5px {{ p.border }};font-size:16px;font-weight:600">{{ p.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="height:8px;border-radius:99px;background:{{ track }};overflow:hidden"><div style="height:100%;width:{{ elapsedPct }};background:{{ accent }};border-radius:99px;transition:width .5s linear"></div></div><div style="display:flex;gap:12px;align-items:center;justify-content:center">
+            
+            <sc-if value="{{ showSecondary }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ secondaryAction }}" role="button" style="height:62px;padding:0 24px;border-radius:20px;display:flex;align-items:center;font-size:16px;color:{{ muted }};cursor:pointer">{{ secondaryLabel }}</div>
+            </sc-if>
+          <div onClick="{{ primaryAction }}" role="button" style="height: 62px; padding: 0 40px; border-radius: 20px; background: {{ primaryBg }}; color: {{ primaryFg }}; box-shadow: {{ primaryRing }}; display: flex; align-items: center; font-size: 19px; font-weight: 600; cursor: pointer; text-align: center">{{ primaryLabel }}</div></div>
+          
+        </div>
+
+        <sc-if value="{{ tabSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="width:352px;flex:none;height:100%;background:{{ surface }};border-radius:30px;overflow:hidden;box-shadow:{{ cardShadow }};display:flex"><dc-import name="Settings" v="{{ settingsVals }}" hint-size="100%,100%" style="flex:1;min-height:0"></dc-import></div>
+        </sc-if>
+        <div style="width:352px;background:{{ surface }};border-radius:30px;padding:26px;display:{{ tabStats }};flex-direction:column;gap:20px;box-shadow:{{ cardShadow }}">
+          <div style="display:flex;align-items:baseline;justify-content:space-between">
+            <div style="font-size:19px;font-weight:600;color:{{ text }}">{{ todayLine }}</div>
+            <div style="font-size:14px;color:{{ muted }}">{{ weekLine }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px">
+            <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="6">
+              <div aria-label="{{ s.label }}" style="height:11px;border-radius:99px;background:{{ s.bg }};box-shadow:inset 0 0 0 1.5px {{ hairline }}"></div>
+            </sc-for>
+          </div>
+          <div style="height:186px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;align-items:end">
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;min-width:0;justify-content:flex-end">
+                <div style="font-size:12px;color:{{ muted }}">{{ d.count }}</div>
+                <div style="width:100%;background:{{ d.color }};border-radius:9px;height:{{ d.h }}"></div>
+                <div style="font-size:12px;color:{{ d.labelColor }};font-weight:{{ d.labelWeight }};max-width:100%;overflow:hidden;white-space:nowrap">{{ d.day }}</div>
+                    <div style="width:4px;height:4px;flex:none;border-radius:99px;background:{{ d.dot }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:13px;color:{{ muted }}">{{ weekFooter }}</div>
+          <div style="height:1px;background:{{ hairline }}"></div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-size:15px;font-weight:600;color:{{ text }}">{{ monthLabel }}</div>
+              <div style="font-size:13px;color:{{ muted }}">{{ totalLine }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:22px;gap:6px">
+              <sc-for list="{{ month }}" as="c" hint-placeholder-count="35">
+                <div aria-label="{{ c.label }}" style="border-radius:99px;background:{{ c.color }}"></div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;color:{{ muted }}">{{ monthFooter }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B625A;letter-spacing:.5px">DESKTOP · 1440×900 — fenêtre d'appoint, l'écran n'est pas là pour être regardé</div>
+    <div data-screen-label="Desktop" style="width:1440px;height:900px;border-radius:16px;overflow:hidden;background:{{ bg }};box-shadow:0 30px 60px -24px rgba(58,40,30,.45),0 0 0 1px rgba(34,30,26,.12);display:flex;flex-direction:column">
+      <div style="height:52px;flex:none;display:flex;align-items:center;gap:9px;padding:0 20px;background:{{ chrome }};box-shadow:inset 0 -1px 0 {{ hairline }}">
+        <div style="width:12px;height:12px;border-radius:99px;background:#F0605C"></div>
+        <div style="width:12px;height:12px;border-radius:99px;background:#F5BE4F"></div>
+        <div style="width:12px;height:12px;border-radius:99px;background:#5FC454"></div>
+        <div style="margin-left:14px;font-size:14px;color:{{ muted }}">{{ appName }}</div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+          <div style="font-size:13px;color:{{ muted }}">{{ modeLabel }}</div>
+          <div style="width:6px;height:6px;border-radius:99px;background:{{ accent }}"></div>
+          <div style="font-size:13px;color:{{ muted }}">{{ todayLine }}</div>
+          <div onClick="{{ openDesktop }}" role="button" aria-label="{{ t_settings }}" style="width:28px;height:28px;flex:none;border-radius:99px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px {{ hairline }};cursor:pointer" style-hover="opacity:.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="{{ muted }}" stroke-width="1.9"/><path d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7M18.6 18.6l-1.7-1.7M7.1 7.1L5.4 5.4" stroke="{{ muted }}" stroke-width="1.9" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+
+      <div style="flex:1;display:flex;min-height:0">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:40px">
+          <div style="display:{{ chromeBlock }};text-align:center">
+            <div style="font-size:44px;font-weight:600;color:{{ text }};letter-spacing:-1.1px">{{ heading }}</div>
+            <div style="font-size:18px;color:{{ muted }};margin-top:8px">{{ subhead }}</div>
+          </div>
+          <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;touch-action:none;user-select:none;cursor:{{ scrubCursor }}">
+              <div style="font-size:48px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostUp }}</div>
+              <div style="font-size:196px;font-weight:600;line-height:1;color:{{ text }};letter-spacing:-10px;font-variant-numeric:tabular-nums">{{ clock }}</div>
+              <div style="font-size:48px;font-weight:600;line-height:1;color:{{ text }};opacity:{{ ghostOpacity }};font-variant-numeric:tabular-nums">{{ ghostDown }}</div>
+              <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:{{ muted }};height:16px">{{ scrubHint }}</div>
+            </div>
+          <sc-if value="{{ showPresets }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px;justify-content:center">
+              <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                <div onClick="{{ p.onClick }}" role="button" aria-pressed="{{ p.selected }}" style="height:48px;padding:0 26px;border-radius:16px;display:flex;align-items:center;cursor:pointer;background:{{ p.bg }};color:{{ p.fg }};box-shadow:inset 0 0 0 1.5px {{ p.border }};font-size:16px;font-weight:600">{{ p.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="width:520px;height:8px;border-radius:99px;background:{{ track }};overflow:hidden"><div style="height:100%;width:{{ elapsedPct }};background:{{ accent }};border-radius:99px;transition:width .5s linear"></div></div>
+          <div style="display:flex;gap:12px;align-items:center;justify-content:center">
+            <div onClick="{{ primaryAction }}" role="button" style="height:64px;padding:0 44px;border-radius:20px;background:{{ primaryBg }};color:{{ primaryFg }};box-shadow:{{ primaryRing }};display:flex;align-items:center;font-size:19px;font-weight:600;cursor:pointer">{{ primaryLabel }}</div>
+            <sc-if value="{{ showSecondary }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ secondaryAction }}" role="button" style="height:64px;padding:0 26px;border-radius:20px;display:flex;align-items:center;font-size:16px;color:{{ muted }};cursor:pointer">{{ secondaryLabel }}</div>
+            </sc-if>
+          </div>
+          <div style="font-size:13px;color:{{ muted }}">{{ deskHint }}</div>
+        </div>
+
+        <sc-if value="{{ deskSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="width:404px;flex:none;background:{{ surface }};box-shadow:inset 1px 0 0 {{ hairline }};padding:14px 18px;display:flex"><dc-import name="Settings" v="{{ settingsVals }}" hint-size="100%,100%" style="flex:1;min-height:0"></dc-import></div>
+        </sc-if>
+        <div style="width:404px;flex:none;background:{{ surface }};box-shadow:inset 1px 0 0 {{ hairline }};padding:36px 32px;display:{{ deskRail }};flex-direction:column;gap:26px">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:{{ text }}">{{ todayLine }}</div>
+            <div style="font-size:14px;color:{{ muted }};margin-top:4px">{{ weekLine }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px">
+            <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="6">
+              <div aria-label="{{ s.label }}" style="height:11px;border-radius:99px;background:{{ s.bg }};box-shadow:inset 0 0 0 1.5px {{ hairline }}"></div>
+            </sc-for>
+          </div>
+          <div style="height:196px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end">
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:7px;height:100%;min-width:0;justify-content:flex-end">
+                <div style="font-size:12px;color:{{ muted }}">{{ d.count }}</div>
+                <div style="width:100%;background:{{ d.color }};border-radius:9px;height:{{ d.h }}"></div>
+                <div style="font-size:12px;color:{{ d.labelColor }};font-weight:{{ d.labelWeight }};max-width:100%;overflow:hidden;white-space:nowrap">{{ d.day }}</div>
+                    <div style="width:4px;height:4px;flex:none;border-radius:99px;background:{{ d.dot }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:14px;color:{{ muted }};line-height:1.5">{{ weekFooter }}</div>
+          <div style="height:1px;background:{{ hairline }}"></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-size:17px;font-weight:600;color:{{ text }}">{{ monthLabel }}</div>
+              <div style="font-size:14px;color:{{ muted }}">{{ totalLine }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:24px;gap:7px">
+              <sc-for list="{{ month }}" as="c" hint-placeholder-count="35">
+                <div aria-label="{{ c.label }}" style="border-radius:99px;background:{{ c.color }}"></div>
+              </sc-for>
+            </div>
+            <div style="font-size:13px;color:{{ muted }}">{{ monthFooter }}</div>
+          </div>
+          <div style="margin-top:auto;font-size:13px;color:{{ muted }};line-height:1.5">{{ deskNotice }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#6B625A;letter-spacing:.5px">RÉGLAGES · 393×852 — poussé depuis l'engrenage de l'écran minuteur</div>
+    <div data-screen-label="Réglages" style="width:393px;height:852px;border-radius:52px;overflow:hidden;position:relative;background:{{ bg }};box-shadow:0 30px 60px -24px rgba(58,40,30,.5),0 0 0 10px #0d0d0f,0 0 0 12px #33312e;display:flex;flex-direction:column">
+      <div style="height:54px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 4px;color:{{ text }};font-size:15px;font-weight:600">
+        <div>9:41</div>
+        <div style="width:20px;height:10px;border-radius:3px;border:1.5px solid {{ text }};padding:1.5px"><div style="width:70%;height:100%;background:{{ text }};border-radius:1px"></div></div>
+      </div>
+      <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:34px;border-radius:20px;background:#0d0d0f;z-index:5"></div>
+
+      <dc-import name="Settings" v="{{ settingsVals }}" hint-size="100%,100%" style="flex:1;min-height:0"></dc-import>
+      <div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:136px;height:5px;border-radius:3px;background:{{ handle }}"></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fr&quot;,&quot;en&quot;],&quot;default&quot;:&quot;fr&quot;,&quot;tsType&quot;:&quot;'fr' | 'en'&quot;},&quot;accentKey&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;,&quot;violet&quot;,&quot;amber&quot;,&quot;teal&quot;,&quot;pink&quot;],&quot;default&quot;:&quot;red&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { phase: 'idle', mode: 'focus', mins: 25, secs: 0, total: 1500, done: 2, theme: 'light', lang: 'fr', accentKey: 'red', customColor: '#7A4BD0', settingsPage: 'root', settingsOn: null, showCustom: false };
+  colorRef = React.createRef();
+
+  componentDidMount() {
+    const init = {};
+    if (this.props.theme) init.theme = this.props.theme;
+    if (this.props.lang) init.lang = this.props.lang;
+    if (this.props.accentKey) init.accentKey = this.props.accentKey;
+    if (Object.keys(init).length) this.setState(init);
+    this.iv = setInterval(() => {
+      if (this.state.phase !== 'running') return;
+      this.setState(s => {
+        const t = s.mins * 60 + s.secs - 1;
+        if (t <= 0) return { mins: 0, secs: 0, phase: 'finished', done: s.mode === 'focus' ? Math.min(6, s.done + 1) : s.done };
+        return { mins: Math.floor(t / 60), secs: t % 60 };
+      });
+    }, 1000);
+    this.syncColor();
+    this.onKey = e => {
+      if (e.code === 'Space') { e.preventDefault(); this.togglePrimary(); }
+      if (e.key === 'Escape') this.set(this.state.mode === 'focus' ? 25 : 5);
+      if (e.key === 'ArrowUp') { e.preventDefault(); this.bump(1); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); this.bump(-1); }
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { clearInterval(this.iv); window.removeEventListener('keydown', this.onKey); }
+
+  pad(n) { return String(n).padStart(2, '0'); }
+  set(minutes, mode) { this.setState({ mins: minutes, secs: 0, total: minutes * 60, phase: 'idle', mode: mode || this.state.mode }); }
+  bump(d) {
+    if (this.state.phase !== 'idle') return;
+    this.setState(s => {
+      const v = Math.min(90, Math.max(1, s.mins + d));
+      return { mins: v, secs: 0, total: v * 60 };
+    });
+  }
+  dragStart(e) {
+    if (this.state.phase !== 'idle') return;
+    this._drag = { y: e.clientY, mins: this.state.mins };
+    if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  dragMove(e) {
+    if (!this._drag) return;
+    const v = Math.min(90, Math.max(1, this._drag.mins + Math.round((this._drag.y - e.clientY) / 9)));
+    if (v !== this.state.mins) this.setState({ mins: v, secs: 0, total: v * 60 });
+  }
+  dragEnd() { this._drag = null; }
+
+  togglePrimary() {
+    const s = this.state;
+    if (s.phase === 'running') this.setState({ phase: 'paused' });
+    else if (s.phase === 'finished') s.mode === 'focus' ? this.set(5, 'break') : this.set(25, 'focus');
+    else this.setState({ phase: 'running', total: s.phase === 'idle' ? s.mins * 60 + s.secs : s.total });
+  }
+
+  syncColor() {
+    const el = this.colorRef.current;
+    if (!el) return;
+    if (el.value.toLowerCase() !== this.state.customColor.toLowerCase()) el.value = this.state.customColor;
+    if (el.__wired) return;
+    el.__wired = true;
+    el.addEventListener('input', e => this.pickColor(e.target.value));
+  }
+  pickColor(hex) {
+    if (!hex) return;
+    this.setState({ customColor: hex.toUpperCase(), accentKey: 'custom' });
+  }
+  componentDidUpdate() { this.syncColor(); }
+
+  L() {
+    const fr = {
+      settings: 'réglages', back: 'retour', appearance: 'apparence', light: 'clair', dark: 'sombre',
+      accentTitle: 'couleur d’accent', custom: 'personnaliser', customHint: 'ta couleur, choisie dans la palette du système', language: 'langue', french: 'français', english: 'anglais',
+      red: 'rouge', green: 'vert', blue: 'bleu', violet: 'violet', amber: 'ambre', teal: 'sarcelle', pink: 'rose',
+      about: 'à propos', legal: 'mentions légales', version: 'version 1.0 · 2026',
+      appName: 'pomodoro', weekCaption: 'semaine', month: 'juin', focus: 'focus', pauseMode: 'pause',
+      days: ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'],
+      hIdle: 'prêt à démarrer', hIdleBreak: 'temps de pause', hRun: 'concentration', hRunBreak: 'pause', hPaused: 'en pause', hDone: 'session terminée', hDoneBreak: 'pause terminée',
+      sIdle: 'choisis ta durée, puis démarre', sIdleBreak: 'lève-toi, bois un verre d’eau', sRun: 'plus rien à faire ici, reviens à ton travail', sPaused: 'reprends quand tu veux', sDone: 'c’est fini — tu peux fermer l’app', sDoneBreak: 'tu peux repartir sur une session',
+      start: 'démarrer', startBreak: 'démarrer la pause', pause: 'mettre en pause', resume: 'reprendre',
+      break5: 'pause de 5 min', new25: 'nouvelle session de 25 min', endSession: 'terminer la session', doneToday: 'c’est bon pour aujourd’hui',
+      scrub: 'glisse pour régler', deskIdle: '↑ ↓ ou glisse pour régler · espace pour démarrer', deskRun: 'espace pour mettre en pause · échap pour terminer',
+      notice: 'Pas de notification pendant une session. Rien ne t’attend ici quand elle est finie.',
+      today: n => n + ' sessions aujourd’hui', goal: 'objectif 4', weekFooter: 'vendredi · 4 sessions, comme ta moyenne',
+      monthFooter: d => d + ' jours actifs sur 30 · 78 sessions', total: '78 sessions ce mois-ci',
+      doneLbl: 'session terminée', todoLbl: 'session à venir', noDay: 'jour sans session', nDay: n => n + ' sessions',
+      aboutParas: ['Un minuteur, rien d’autre.', '25 minutes de travail, 5 minutes de pause, six sessions par jour au maximum. Pas de notification, pas de série à ne pas briser, rien à faire ici quand ta session est finie.', 'Tes sessions restent sur cet appareil.'],
+      legalPairs: [['Éditeur', 'Pomodoro — maquette de démonstration. Aucune société, aucun service en ligne.'], ['Données', 'Les sessions sont stockées localement. Aucune collecte, aucun traceur, aucun compte.'], ['Licences', 'Clash Display (Fontshare). Icônes SF Symbols, Apple Inc. — usage soumis à leurs conditions.']]
+    };
+    const en = {
+      settings: 'settings', back: 'back', appearance: 'appearance', light: 'light', dark: 'dark',
+      accentTitle: 'accent color', custom: 'customize', customHint: 'your own colour, picked from the system palette', language: 'language', french: 'french', english: 'english',
+      red: 'red', green: 'green', blue: 'blue', violet: 'violet', amber: 'amber', teal: 'teal', pink: 'pink',
+      about: 'about', legal: 'legal notice', version: 'version 1.0 · 2026',
+      appName: 'pomodoro', weekCaption: 'week', month: 'june', focus: 'focus', pauseMode: 'break',
+      days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      hIdle: 'ready to start', hIdleBreak: 'break time', hRun: 'focus', hRunBreak: 'break', hPaused: 'paused', hDone: 'session done', hDoneBreak: 'break over',
+      sIdle: 'pick a length, then start', sIdleBreak: 'stand up, get some water', sRun: 'nothing to do here, get back to work', sPaused: 'resume whenever you want', sDone: 'that’s it — you can close the app', sDoneBreak: 'you can start another session',
+      start: 'start', startBreak: 'start the break', pause: 'pause', resume: 'resume',
+      break5: '5 min break', new25: 'new 25 min session', endSession: 'end session', doneToday: 'done for today',
+      scrub: 'swipe to set', deskIdle: '↑ ↓ or drag to set · space to start', deskRun: 'space to pause · esc to end',
+      notice: 'No notifications during a session. Nothing waits for you here when it ends.',
+      today: n => n + ' sessions today', goal: 'goal 4', weekFooter: 'friday · 4 sessions, right on your average',
+      monthFooter: d => d + ' active days out of 30 · 78 sessions', total: '78 sessions this month',
+      doneLbl: 'completed session', todoLbl: 'upcoming session', noDay: 'day with no session', nDay: n => n + ' sessions',
+      aboutParas: ['A timer, nothing else.', '25 minutes of work, 5 minutes of break, six sessions a day at most. No notifications, no streak to protect, nothing to do here once your session is over.', 'Your sessions stay on this device.'],
+      legalPairs: [['Publisher', 'Pomodoro — demo mockup. No company, no online service.'], ['Data', 'Sessions are stored locally. No collection, no tracker, no account.'], ['Licences', 'Clash Display (Fontshare). SF Symbols icons, Apple Inc. — subject to their terms.']]
+    };
+    return this.state.lang === 'en' ? en : fr;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const t = this.L();
+    const PAL = {
+      red: { light: '#F0464E', dark: '#FF6F6F' }, green: { light: '#2E8B62', dark: '#5FCB92' }, blue: { light: '#2F6FE0', dark: '#7FA9FF' },
+      violet: { light: '#7A4BD0', dark: '#B18AFF' }, amber: { light: '#A9700F', dark: '#F0B04A' }, teal: { light: '#127C82', dark: '#54C7CE' }, pink: { light: '#C2427E', dark: '#FF8FBE' },
+      custom: { light: s.customColor, dark: s.customColor }
+    };
+    const dark = s.theme === 'dark';
+    const accentHex = PAL[s.accentKey][dark ? 'dark' : 'light'];
+    const T = dark
+      ? { bg: '#151311', surface: '#201D1A', chrome: '#1A1714', text: '#F5F0E8', muted: '#A79C90', hairline: 'rgba(245,240,232,.14)', track: 'rgba(245,240,232,.1)', accent: accentHex, handle: 'rgba(245,240,232,.5)', cardShadow: '0 1px 0 rgba(245,240,232,.05)' }
+      : { bg: '#FBF6EE', surface: '#FFFFFF', chrome: '#F2ECE3', text: '#221E1A', muted: '#6B625A', hairline: 'rgba(34,30,26,.13)', track: 'rgba(34,30,26,.09)', accent: accentHex, handle: 'rgba(34,30,26,.55)', cardShadow: '0 1px 0 rgba(34,30,26,.06),0 14px 32px -26px rgba(34,30,26,.6)' };
+
+    const left = s.mins * 60 + s.secs;
+    const pct = s.total > 0 ? Math.min(100, ((s.total - left) / s.total) * 100) : 0;
+    const isFocus = s.mode === 'focus';
+    const idle = s.phase === 'idle';
+
+    const presets = (isFocus ? [15, 25, 45] : [5, 10, 15]).map(v => {
+      const sel = s.mins === v && s.secs === 0;
+      return {
+        label: v + ' min', selected: sel,
+        bg: sel ? T.accent + '1F' : 'transparent',
+        fg: sel ? T.accent : T.muted,
+        border: sel ? T.accent : T.hairline,
+        onClick: () => this.set(v)
+      };
+    });
+
+    const headings = { idle: isFocus ? t.hIdle : t.hIdleBreak, running: isFocus ? t.hRun : t.hRunBreak, paused: t.hPaused, finished: isFocus ? t.hDone : t.hDoneBreak };
+    const subheads = { idle: isFocus ? t.sIdle : t.sIdleBreak, running: t.sRun, paused: t.sPaused, finished: isFocus ? t.sDone : t.sDoneBreak };
+
+    const primary = {
+      idle: { label: isFocus ? t.start : t.startBreak, bg: T.accent, fg: dark ? '#1A1310' : '#fff', ring: 'none' },
+      running: { label: t.pause, bg: dark ? 'rgba(245,240,232,.08)' : 'rgba(34,30,26,.05)', fg: T.text, ring: 'inset 0 0 0 1.5px ' + T.hairline },
+      paused: { label: t.resume, bg: T.accent, fg: dark ? '#1A1310' : '#fff', ring: 'none' },
+      finished: { label: isFocus ? t.break5 : t.new25, bg: T.accent, fg: dark ? '#1A1310' : '#fff', ring: 'none' }
+    }[s.phase];
+
+    const secondaryLabel = s.phase === 'finished' ? t.doneToday : (s.phase === 'idle' ? '' : t.endSession);
+
+    const counts = [4, 2, 5, 3, 4, 1, 0];
+    const days = t.days;
+    const todayIdx = 4;
+    const week = counts.map((c, i) => ({
+      count: c === 0 ? '–' : c,
+      h: Math.max(6, (c / 5) * 100) + '%',
+      color: i === todayIdx ? T.accent : T.hairline,
+      day: days[i],
+      dayShort: days[i].charAt(0).toUpperCase(),
+      dot: i === todayIdx ? T.accent : 'transparent',
+      labelColor: i === todayIdx ? T.text : T.muted,
+      labelWeight: i === todayIdx ? 600 : 500
+    }));
+
+    const june = [0,2,4,1,3,5,0,0,4,4,2,0,3,1,0,5,3,4,2,4,0,0,2,5,3,4,4,1,0,0,3,5,2,0,0];
+    const shade = c => c === 0 ? T.hairline : c <= 2 ? T.accent + '4D' : c <= 3 ? T.accent + '99' : T.accent;
+    const month = june.map(c => ({ color: shade(c), label: c === 0 ? t.noDay : t.nDay(c) }));
+    const activeDays = june.filter(c => c > 0).length;
+
+    const A = k => PAL[k][dark ? 'dark' : 'light'];
+    const swatch = k => ({
+      color: A(k), label: t[k], selected: s.accentKey === k,
+      tint: s.accentKey === k ? A(k) + '1F' : 'transparent',
+      ring: s.accentKey === k ? '1.5px ' + A(k) : '1.5px ' + T.hairline,
+      onClick: () => this.setState({ accentKey: k })
+    });
+    const themeTiles = ['light', 'dark'].map(k => ({
+      label: t[k], selected: s.theme === k,
+      tint: s.theme === k ? T.accent + '1F' : 'transparent',
+      ring: s.theme === k ? '1.5px ' + T.accent : '1.5px ' + T.hairline,
+      fg: T.text, check: s.theme === k ? '✓' : '', checkColor: T.accent,
+      previewBg: k === 'dark' ? '#151311' : '#FBF6EE',
+      previewInk: k === 'dark' ? 'rgba(245,240,232,.45)' : 'rgba(34,30,26,.32)',
+      previewAccent: PAL[s.accentKey][k],
+      onClick: () => this.setState({ theme: k })
+    }));
+    const langs = [['fr', 'french'], ['en', 'english']].map(p => ({
+      label: t[p[1]], selected: s.lang === p[0],
+      tint: s.lang === p[0] ? T.accent + '1F' : 'transparent',
+      fg: s.lang === p[0] ? T.accent : T.muted,
+      ring: s.lang === p[0] ? '1.5px ' + T.accent : '1.5px ' + T.hairline,
+      onClick: () => this.setState({ lang: p[0] })
+    }));
+    const pages = [['about', t.about], ['legal', t.legal]].map((p, i) => ({
+      label: p[1], divider: i === 0 ? 'inset 0 -1px 0 ' + T.hairline : 'none',
+      onClick: () => this.setState({ settingsPage: p[0] })
+    }));
+    let detailParas = [];
+    if (s.settingsPage === 'about') detailParas = t.aboutParas.map((p, i) => ({ text: p, size: i === 0 ? '19px' : '15px', weight: i === 0 ? 600 : 400, color: i === 0 ? T.text : T.muted }));
+    if (s.settingsPage === 'legal') t.legalPairs.forEach(p => {
+      detailParas.push({ text: p[0], size: '12px', weight: 600, color: T.muted });
+      detailParas.push({ text: p[1], size: '15px', weight: 400, color: T.text });
+    });
+
+    return {
+      ...T,
+      week,
+      month,
+      monthLabel: t.month,
+      monthFooter: t.monthFooter(activeDays),
+      totalLine: t.total,
+      appName: t.appName, weekCaption: t.weekCaption, deskNotice: t.notice,
+      themeTiles, langs, pages, detailParas,
+      accents: ['red', 'green', 'blue'].map(swatch),
+      customColor: s.customColor,
+      colorRef: this.colorRef,
+      customRing: s.accentKey === 'custom' ? '2.5px ' + s.customColor : '1.5px ' + T.hairline,
+      customHint: t.customHint,
+      setCustomColor: e => this.pickColor(e.target.value),
+      accentName: s.accentKey === 'custom' ? s.customColor : t[s.accentKey],
+      showCustom: s.showCustom,
+      customChevron: s.showCustom ? '▾' : '›',
+      toggleCustom: () => this.setState({ showCustom: !s.showCustom }),
+      setRoot: s.settingsPage === 'root',
+      setDetail: s.settingsPage !== 'root',
+      showTimer: s.settingsOn !== 'portrait',
+      settingsOpen: s.settingsOn === 'portrait',
+      landSettings: s.settingsOn === 'landscape',
+      landTimer: s.settingsOn === 'landscape' ? 'none' : 'flex',
+      tabSettings: s.settingsOn === 'tablet',
+      deskSettings: s.settingsOn === 'desktop',
+      landStats: s.settingsOn === 'landscape' ? 'none' : (idle || s.phase === 'finished' ? 'flex' : 'none'),
+      tabStats: s.settingsOn === 'tablet' ? 'none' : (idle || s.phase === 'finished' ? 'flex' : 'none'),
+      deskRail: s.settingsOn === 'desktop' ? 'none' : (idle || s.phase === 'finished' ? 'flex' : 'none'),
+      openPortrait: () => this.setState({ settingsOn: 'portrait', settingsPage: 'root' }),
+      openLandscape: () => this.setState({ settingsOn: 'landscape', settingsPage: 'root' }),
+      openTablet: () => this.setState({ settingsOn: 'tablet', settingsPage: 'root' }),
+      openDesktop: () => this.setState({ settingsOn: 'desktop', settingsPage: 'root' }),
+      paneTitle: s.settingsPage === 'root' ? t.settings : (s.settingsPage === 'about' ? t.about : t.legal),
+      backAction: () => this.setState(p => p.settingsPage !== 'root' ? { settingsPage: 'root' } : { settingsOn: null }),
+      openSettings: () => this.setState({ settingsOn: 'portrait', settingsPage: 'root' }),
+      t_settings: t.settings, t_back: t.back, t_appearance: t.appearance, t_accent: t.accentTitle,
+      t_custom: t.custom, t_language: t.language, t_version: t.version,
+      isLight: !dark, isDark: dark,
+      lightTabBg: dark ? 'transparent' : '#221E1A', lightTabFg: dark ? '#6B625A' : '#FBF6EE',
+      darkTabBg: dark ? '#221E1A' : 'transparent', darkTabFg: dark ? '#FBF6EE' : '#6B625A',
+      setLight: () => this.setState({ theme: 'light' }),
+      setDark: () => this.setState({ theme: 'dark' }),
+      heading: headings[s.phase], subhead: subheads[s.phase],
+      modeLabel: isFocus ? t.focus : t.pauseMode,
+      showPresets: s.phase === 'idle',
+      presets,
+      clock: this.pad(s.mins) + ':' + this.pad(s.secs),
+      elapsedPct: pct + '%',
+      primaryLabel: primary.label, primaryBg: primary.bg, primaryFg: primary.fg, primaryRing: primary.ring,
+      primaryAction: () => this.togglePrimary(),
+      showSecondary: s.phase !== 'idle',
+      secondaryLabel,
+      secondaryAction: () => this.set(isFocus ? 25 : 5, 'focus'),
+      chromeFlex: idle || s.phase === 'finished' ? 'flex' : 'none',
+      chromeBlock: idle || s.phase === 'finished' ? 'block' : 'none',
+      colJustify: idle || s.phase === 'finished' ? 'flex-start' : 'center',
+      colSpread: idle || s.phase === 'finished' ? 'space-between' : 'center',
+      colGap: idle || s.phase === 'finished' ? '8px' : '20px',
+      ghostUp: this.pad(Math.min(90, s.mins + 1)) + ':00',
+      ghostDown: this.pad(Math.max(1, s.mins - 1)) + ':00',
+      ghostOpacity: idle ? 0.16 : 0,
+      scrubCursor: idle ? 'ns-resize' : 'default',
+      scrubHint: idle ? t.scrub : '',
+      deskHint: idle ? t.deskIdle : t.deskRun,
+      dragStart: e => this.dragStart(e),
+      dragMove: e => this.dragMove(e),
+      dragEnd: () => this.dragEnd(),
+      stepCursor: s.phase === 'idle' ? 'pointer' : 'default',
+      stepOpacity: s.phase === 'idle' ? 1 : 0.25,
+      stepEvents: s.phase === 'idle' ? 'auto' : 'none',
+      minsUp: () => this.bump(1), minsDown: () => this.bump(-1),
+      sessions: Array.from({ length: 6 }, (_, i) => ({ bg: i < s.done ? T.accent : 'transparent', label: i < s.done ? t.doneLbl : t.todoLbl })),
+      todayLine: t.today(s.done),
+      weekLine: t.goal,
+      weekFooter: t.weekFooter,
+      settingsVals: {
+        bg: T.bg, surface: T.surface, text: T.text, muted: T.muted, hairline: T.hairline, cardShadow: T.cardShadow,
+        tBack: t.back, tAppearance: t.appearance, tAccent: t.accentTitle, tCustom: t.custom, tLanguage: t.language, tVersion: t.version,
+        paneTitle: s.settingsPage === 'root' ? t.settings : (s.settingsPage === 'about' ? t.about : t.legal),
+        setRoot: s.settingsPage === 'root', setDetail: s.settingsPage !== 'root',
+        backAction: () => this.setState(p => p.settingsPage !== 'root' ? { settingsPage: 'root' } : { settingsOn: null }),
+        themeTiles, langs, pages, detailParas,
+        accents: ['red', 'green', 'blue'].map(swatch),
+        accentName: s.accentKey === 'custom' ? s.customColor : t[s.accentKey],
+        showCustom: s.showCustom,
+        customChevron: s.showCustom ? '▾' : '›',
+        toggleCustom: () => this.setState(p => ({ showCustom: !p.showCustom })),
+        customColor: s.customColor,
+        colorRef: this.colorRef,
+        customRing: s.accentKey === 'custom' ? '2.5px ' + s.customColor : '1.5px ' + T.hairline,
+        customHint: t.customHint,
+        setCustomColor: e => this.pickColor(e.target.value)
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

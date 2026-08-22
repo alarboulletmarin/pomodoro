@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Clash Display',Helvetica,sans-serif;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+  input[type=color]{-webkit-appearance:none;appearance:none}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:14px}
+</style>
+</helmet>
+<div style="height:100%;display:flex;flex-direction:column;padding:12px 20px 20px;gap:14px;min-height:0;font-family:'Clash Display',Helvetica,sans-serif">
+  <div style="display:flex;align-items:center;gap:12px;flex:none">
+    <div onClick="{{ v.backAction }}" role="button" aria-label="{{ v.tBack }}" style="width:38px;height:38px;flex:none;border-radius:99px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px {{ v.hairline }};cursor:pointer" style-hover="opacity:.6">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 4L7 12l7.5 8" stroke="{{ v.text }}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="font-size:26px;font-weight:600;color:{{ v.text }};letter-spacing:-.5px">{{ v.paneTitle }}</div>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+    <sc-if value="{{ v.setRoot }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:{{ v.surface }};border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:{{ v.cardShadow }}">
+          <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:{{ v.muted }}">{{ v.tAppearance }}</div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ v.themeTiles }}" as="o" hint-placeholder-count="2">
+              <div onClick="{{ o.onClick }}" role="button" aria-pressed="{{ o.selected }}" style="flex:1;border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:{{ o.tint }};box-shadow:inset 0 0 0 {{ o.ring }}">
+                <div style="height:48px;border-radius:12px;background:{{ o.previewBg }};box-shadow:inset 0 0 0 1px {{ v.hairline }};display:flex;flex-direction:column;justify-content:center;gap:5px;padding:10px">
+                  <div style="height:7px;width:60%;border-radius:99px;background:{{ o.previewInk }}"></div>
+                  <div style="height:6px;width:36%;border-radius:99px;background:{{ o.previewAccent }}"></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="font-size:15px;font-weight:600;color:{{ o.fg }}">{{ o.label }}</div>
+                  <div style="font-size:14px;color:{{ o.checkColor }};font-weight:700">{{ o.check }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:{{ v.surface }};border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:{{ v.cardShadow }}">
+          <div style="display:flex;align-items:baseline;justify-content:space-between">
+            <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:{{ v.muted }}">{{ v.tAccent }}</div>
+            <div style="font-size:14px;color:{{ v.text }};font-weight:600">{{ v.accentName }}</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ v.accents }}" as="a" hint-placeholder-count="3">
+              <div onClick="{{ a.onClick }}" role="button" aria-label="{{ a.label }}" aria-pressed="{{ a.selected }}" style="flex:1;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ a.tint }};box-shadow:inset 0 0 0 {{ a.ring }}">
+                <div style="width:22px;height:22px;border-radius:99px;background:{{ a.color }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div onClick="{{ v.toggleCustom }}" role="button" aria-expanded="{{ v.showCustom }}" style="height:40px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+            <div style="font-size:15px;color:{{ v.text }}">{{ v.tCustom }}</div>
+            <div style="font-size:15px;color:{{ v.muted }}">{{ v.customChevron }}</div>
+          </div>
+          <sc-if value="{{ v.showCustom }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="color" ref="{{ v.colorRef }}" onInput="{{ v.setCustomColor }}" onChange="{{ v.setCustomColor }}" aria-label="{{ v.tCustom }}" style="width:54px;height:54px;flex:none;border:none;padding:0;border-radius:16px;background:transparent;cursor:pointer;box-shadow:inset 0 0 0 {{ v.customRing }}">
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <div style="font-size:15px;font-weight:600;color:{{ v.text }};font-family:ui-monospace,Menlo,monospace">{{ v.customColor }}</div>
+                <div style="font-size:13px;color:{{ v.muted }};line-height:1.35">{{ v.customHint }}</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="background:{{ v.surface }};border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:{{ v.cardShadow }}">
+          <div style="font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:{{ v.muted }}">{{ v.tLanguage }}</div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ v.langs }}" as="l" hint-placeholder-count="2">
+              <div onClick="{{ l.onClick }}" role="button" aria-pressed="{{ l.selected }}" style="flex:1;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ l.tint }};color:{{ l.fg }};box-shadow:inset 0 0 0 {{ l.ring }};font-size:15px;font-weight:600">{{ l.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:{{ v.surface }};border-radius:24px;padding:2px 14px;display:flex;flex-direction:column;box-shadow:{{ v.cardShadow }}">
+          <sc-for list="{{ v.pages }}" as="p" hint-placeholder-count="2">
+            <div onClick="{{ p.onClick }}" role="button" style="height:54px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:{{ p.divider }}" style-hover="opacity:.65">
+              <div style="font-size:16px;color:{{ v.text }}">{{ p.label }}</div>
+              <div style="font-size:17px;color:{{ v.muted }}">›</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="text-align:center;font-size:12px;color:{{ v.muted }};padding-bottom:4px">{{ v.tVersion }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ v.setDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="background:{{ v.surface }};border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:{{ v.cardShadow }}">
+        <sc-for list="{{ v.detailParas }}" as="p" hint-placeholder-count="4">
+          <div style="font-size:{{ p.size }};line-height:1.55;color:{{ p.color }};font-weight:{{ p.weight }}">{{ p.text }}</div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:393,&quot;height&quot;:760},&quot;v&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;}}"></script>
+</body>
+</html>
