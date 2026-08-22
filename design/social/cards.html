@@ -1,0 +1,302 @@
+<!doctype html>
+<!-- Les trois visuels que l'application distribue d'elle-même, sur une seule planche.
+
+     - #og    1200×630  — la carte qu'un lien collé déplie (public/og.png)
+     - #wide  1920×1080 — 16:9, pour un post, une vignette, une bannière
+     - #tall  1080×1920 — 9:16, pour une story
+
+     Rendu par `npm run social`, qui capture chaque planche à sa taille exacte.
+     Les trois vivent dans le même fichier pour qu'on les voie ensemble : trois
+     gabarits séparés dérivent, et une identité se juge côte à côte. -->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-500.woff2') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../public/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 400 600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+        padding: 40px;
+        background: #e7e0d5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Chaque planche porte son unité. Tout ce qui suit est exprimé en `em` de cette
+         unité, si bien qu'un format se recadre en changeant une seule valeur — et que
+         rien ne peut passer sous le plancher de lisibilité par accident. */
+      .board {
+        flex: none;
+        display: flex;
+        font-family: 'Clash Display', sans-serif;
+        background: #fbf6ee;
+        color: #221e1a;
+        overflow: hidden;
+      }
+
+      #og {
+        width: 1200px;
+        height: 630px;
+        padding: 56px;
+        font-size: 12px;
+      }
+
+      #wide {
+        width: 1920px;
+        height: 1080px;
+        padding: 92px;
+        font-size: 19px;
+      }
+
+      #tall {
+        width: 1080px;
+        height: 1920px;
+        padding: 72px;
+        font-size: 17px;
+      }
+
+      .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 4.4em 5em;
+        border-radius: 2.5em;
+        background: #ffffff;
+        box-shadow:
+          0 1px 0 rgba(34, 30, 26, 0.06),
+          0 2.5em 5em -3.4em rgba(34, 30, 26, 0.8);
+      }
+
+      #tall .card {
+        padding: 5.6em 4.6em;
+      }
+
+      /* Le logotype : la marque, puis le nom. Le mot est en Clash — c'est la police
+         d'affichage de l'app, et le nom s'écrit comme les titres qu'il annonce. */
+      .logotype {
+        display: flex;
+        align-items: center;
+        gap: 0.72em;
+        color: #6b625a;
+      }
+
+      .mark {
+        flex: none;
+        width: 2.75em;
+        height: 2.75em;
+        color: #d63e45;
+      }
+
+      .name {
+        font-family: 'Clash Display', sans-serif;
+        font-size: 2.2em;
+        font-weight: 500;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      /* La phrase et l'horloge vont ensemble : l'une dit, l'autre montre. Les séparer
+         aux deux bouts d'une planche de 1920 px de haut casserait le lien. C'est le
+         groupe, et non chacun de ses membres, que la carte répartit. */
+      .body {
+        display: flex;
+        flex-direction: column;
+        gap: 2.8em;
+      }
+
+      /* Le 9:16 a mille pixels de haut de plus que de contenu. Plutôt que d'étirer
+         les écarts, il grossit : le logotype devient une enseigne, la phrase et
+         l'horloge un bloc centré. Le blanc qui reste est du blanc voulu. */
+      #tall .logotype {
+        gap: 0.95em;
+      }
+
+      #tall .mark {
+        width: 6.2em;
+        height: 6.2em;
+      }
+
+      #tall .name {
+        font-size: 4.2em;
+      }
+
+      #tall .body {
+        flex: 1;
+        justify-content: center;
+        gap: 4.2em;
+      }
+
+      #tall .clock {
+        font-size: 9em;
+      }
+
+      /* La phrase est le message, et elle doit survivre à un aperçu de 350 px de large
+         dans une conversation : c'est le plus gros élément de la planche, en Inter,
+         aligné à gauche. L'horloge est l'illustration, pas le titre. */
+      .lead {
+        font-family: 'Inter Variable', sans-serif;
+        max-width: 75em;
+        font-size: 6.35em;
+        font-weight: 600;
+        line-height: 1.14;
+        letter-spacing: -0.021em;
+      }
+
+      #tall .lead {
+        font-size: 7.2em;
+      }
+
+      .device {
+        display: flex;
+        align-items: center;
+        gap: 2.7em;
+      }
+
+      .clock {
+        flex: none;
+        font-size: 7.7em;
+        font-weight: 600;
+        letter-spacing: -0.055em;
+        line-height: 0.9;
+      }
+
+      .bar {
+        flex: 1;
+        height: 1.2em;
+        border-radius: 999px;
+        background: rgba(34, 30, 26, 0.09);
+        overflow: hidden;
+      }
+
+      .fill {
+        width: 38%;
+        height: 100%;
+        border-radius: 999px;
+        background: #d63e45;
+      }
+
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5em;
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 2.25em;
+        font-weight: 400;
+        color: #6b625a;
+      }
+
+      .dot {
+        color: rgba(34, 30, 26, 0.3);
+      }
+
+      /* Le 9:16 est lu à bout de bras, plein écran, quelques secondes : il a de la
+         hauteur à revendre et personne pour s'arrêter dessus. Les mentions s'empilent
+         plutôt que de se lire en une ligne ponctuée. */
+      #tall .foot {
+        flex-direction: column;
+        gap: 0.5em;
+        font-size: 2.7em;
+      }
+
+      #tall .foot .dot {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- prettier-ignore -->
+    <template id="mark">
+      <svg class="mark" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="48.64" stroke-linecap="round" aria-hidden="true">
+        <path d="M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079" />
+        <path d="M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278" />
+      </svg>
+    </template>
+
+    <section class="board" id="og">
+      <div class="card">
+        <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
+        <div class="body">
+          <p class="lead">Un minuteur de travail<br />qui te laisse partir.</p>
+          <div class="device">
+            <p class="clock">25:00</p>
+            <div class="bar"><div class="fill"></div></div>
+          </div>
+        </div>
+        <div class="foot">
+          <span>pas de notification</span><span class="dot">·</span>
+          <span>pas de compte</span><span class="dot">·</span>
+          <span>rien ne sort de ton appareil</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" id="wide">
+      <div class="card">
+        <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
+        <div class="body">
+          <p class="lead">Un minuteur de travail<br />qui te laisse partir.</p>
+          <div class="device">
+            <p class="clock">25:00</p>
+            <div class="bar"><div class="fill"></div></div>
+          </div>
+        </div>
+        <div class="foot">
+          <span>pas de notification</span><span class="dot">·</span>
+          <span>pas de compte</span><span class="dot">·</span>
+          <span>rien ne sort de ton appareil</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" id="tall">
+      <div class="card">
+        <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
+        <div class="body">
+          <p class="lead">Un minuteur de travail qui te laisse partir.</p>
+          <div class="device">
+            <p class="clock">25:00</p>
+            <div class="bar"><div class="fill"></div></div>
+          </div>
+        </div>
+        <div class="foot">
+          <span>pas de notification</span>
+          <span>pas de compte</span>
+          <span>pas de série à tenir</span>
+          <span>rien ne sort de ton appareil</span>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // La marque est écrite une fois et clonée : trois copies d'un même chemin SVG
+      // finissent par ne plus être le même chemin.
+      const mark = document.getElementById('mark').content.firstElementChild;
+      for (const slot of document.querySelectorAll('.slot')) {
+        slot.replaceWith(mark.cloneNode(true));
+      }
+    </script>
+  </body>
+</html>
