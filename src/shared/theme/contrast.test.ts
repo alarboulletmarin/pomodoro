@@ -45,8 +45,11 @@ describe('contrastRatio', () => {
     );
   });
 
-  it('flags the light preset accents as too low for white body text', () => {
-    expect(contrastRatio(ACCENT_PALETTE.red.light, '#FFFFFF')).toBeLessThan(4.5);
+  it('keeps every preset accent readable under its on-accent colour', () => {
+    for (const palette of Object.values(ACCENT_PALETTE)) {
+      expect(contrastRatio(palette.light, ON_ACCENT.light)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(palette.dark, ON_ACCENT.dark)).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });
 

@@ -234,8 +234,8 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 export const ACCENT_PALETTE: Record<PresetAccentKey, AccentPalette> = {
-  red: { light: '#F0464E', dark: '#FF6F6F' },
-  green: { light: '#2E8B62', dark: '#5FCB92' },
+  red: { light: '#D63E45', dark: '#FF6F6F' },
+  green: { light: '#2C855E', dark: '#5FCB92' },
   blue: { light: '#2F6FE0', dark: '#7FA9FF' },
 };
 
