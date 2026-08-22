@@ -67,7 +67,6 @@ export const en: Messages = {
   'stats.day.sun': 'sun',
 
   'settings.title': 'settings',
-  'settings.back': 'back',
   'settings.appearance': 'appearance',
   'settings.theme.light': 'light',
   'settings.theme.dark': 'dark',

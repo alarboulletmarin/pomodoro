@@ -172,7 +172,6 @@ interface SingularMessages {
   'stats.day.sun': string;
 
   'settings.title': string;
-  'settings.back': string;
   'settings.appearance': string;
   'settings.theme.light': string;
   'settings.theme.dark': string;

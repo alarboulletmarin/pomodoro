@@ -68,7 +68,6 @@ export const fr: Messages = {
   'stats.day.sun': 'dim',
 
   'settings.title': 'réglages',
-  'settings.back': 'retour',
   'settings.appearance': 'apparence',
   'settings.theme.light': 'clair',
   'settings.theme.dark': 'sombre',
