@@ -1,0 +1,35 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--hit-min);
+  min-width: 0;
+}
+
+.version {
+  min-width: 0;
+  font-size: 15px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action {
+  flex: none;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+/* Désactivé veut dire « rien à faire », pas « refusé » : le bouton reste lisible. */
+.action:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--muted);
+}

@@ -1,0 +1,50 @@
+/* Posé au-dessus de la surface, jamais dedans : il ne pousse rien et ne
+   déplace pas ce qu'on était en train de lire. */
+.banner {
+  position: fixed;
+  right: calc(var(--safe-right) + 16px);
+  bottom: calc(var(--safe-bottom) + 16px);
+  left: calc(var(--safe-left) + 16px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 14px 14px 12px;
+  border-radius: var(--radius-card-sm);
+  background: var(--surface);
+  box-shadow:
+    var(--hairline-ring),
+    0 18px 40px -28px rgba(34, 30, 26, 0.9);
+}
+
+.text {
+  padding: 0 2px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.later,
+.reload {
+  min-height: var(--hit-min);
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+:global(html[data-layout='desktop']) .banner,
+:global(html[data-layout='tablet']) .banner {
+  right: auto;
+  left: calc(var(--safe-left) + 24px);
+  bottom: calc(var(--safe-bottom) + 24px);
+  margin: 0;
+}

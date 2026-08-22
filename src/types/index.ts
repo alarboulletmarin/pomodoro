@@ -231,6 +231,8 @@ interface SingularMessages {
   'settings.install.title': string;
   'settings.install.hint': string;
   'settings.install.action': string;
+  'settings.update.title': string;
+  'settings.update.hint': string;
   'settings.method': string;
   'settings.about': string;
   'settings.legal': string;
@@ -271,6 +273,13 @@ interface SingularMessages {
   'legal.data.body': string;
   'legal.licences.title': string;
   'legal.licences.body': string;
+
+  'update.ready': string;
+  'update.reload': string;
+  'update.later': string;
+  'update.check': string;
+  'update.checking': string;
+  'update.upToDate': string;
 
   'a11y.openSettings': string;
   'a11y.back': string;

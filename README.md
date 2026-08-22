@@ -87,6 +87,30 @@ The stats read out a day at a time. Every week bar carries its count, and every
 bar and heatmap cell is a button: picking one states that day's date, sessions and
 total focus time under the charts; picking it again goes back to today.
 
+## Getting the new version
+
+An installed app runs from its own copy of the files, which is what makes it work
+with the network off — and what makes a deploy invisible until something replaces
+that copy. On a phone there is no reload button and no obvious way to clear it.
+
+So the service worker is registered in `prompt` mode: a new version installs and
+then waits. Nothing is swapped under a session in progress. When one is ready, a
+quiet notice offers the reload — never over a running session, never on top of the
+settings, which carry the same button. The settings also hold the check itself:
+`version 0.1.0` with a button that asks the server, and answers `à jour` when there
+is nothing. That row is the reload button that a phone does not otherwise have.
+
+The app also asks by itself: every hour it is left open, and whenever it comes back
+on screen after fifteen minutes away — an installed app can sit for days otherwise,
+and would never learn that anything shipped.
+
+One trap, found by shipping two builds against a running instance and watching:
+`updateServiceWorker(true)` promises to reload the page and does not, when that page
+was already controlled by a worker. The new worker takes over, the screen keeps the
+old bundle, and the reload button appears to do nothing. The reload is therefore
+done here, on `controllerchange`, with a timeout for the worker that never announces
+itself.
+
 ## The link
 
 A pasted link has to explain itself before anyone taps it, so `index.html` carries

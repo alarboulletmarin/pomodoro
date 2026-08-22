@@ -14,6 +14,7 @@ import { LegalPage } from './LegalPage';
 import { MethodPage } from './MethodPage';
 import { PagesSection, type SubPage } from './PagesSection';
 import { SoundSection } from './SoundSection';
+import { UpdateSection } from './UpdateSection';
 import styles from './SettingsScreen.module.css';
 
 export type SettingsPage = 'root' | SubPage;
@@ -71,7 +72,7 @@ export function SettingsScreen({
             <SoundSection />
             <InstallSection />
             <PagesSection onOpen={setPage} />
-            <p className={styles.version}>{t('settings.version', { version: __APP_VERSION__ })}</p>
+            <UpdateSection />
           </>
         ) : null}
         {page === 'method' ? <MethodPage /> : null}

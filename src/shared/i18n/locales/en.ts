@@ -109,6 +109,9 @@ export const en: Messages = {
   'settings.install.title': 'install the app',
   'settings.install.hint': 'to open it from your home screen, offline',
   'settings.install.action': 'install',
+  'settings.update.title': 'version',
+  'settings.update.hint':
+    'An installed app keeps its own copy of the files, and checks by itself now and then whether there is a better one. You can ask here, without going through your phone’s settings.',
   'settings.method': 'the method',
   'settings.about': 'about',
   'settings.legal': 'legal notice',
@@ -160,6 +163,13 @@ export const en: Messages = {
   'legal.licences.title': 'Licences',
   'legal.licences.body':
     'Clash Display (Fontshare), under the Fontshare licence. Inter (rsms.me/inter), under the SIL Open Font License 1.1.',
+
+  'update.ready': 'A new version is ready.',
+  'update.reload': 'reload',
+  'update.later': 'later',
+  'update.check': 'check',
+  'update.checking': 'checking…',
+  'update.upToDate': 'up to date',
 
   'a11y.openSettings': 'settings',
   'a11y.back': 'back',

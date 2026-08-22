@@ -34,8 +34,11 @@ export default defineConfig({
     },
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      // « prompt » plutôt qu'« autoUpdate » : une nouvelle version ne remplace
+      // jamais l'app sous les doigts de quelqu'un. Une session armée à 45 min ou
+      // en cours de réglage disparaîtrait sans un mot.
+      registerType: 'prompt',
+      injectRegister: null,
       includeManifestIcons: false,
       manifest: {
         name: 'Pomodoro',
@@ -62,8 +65,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
+        // clientsClaim sans skipWaiting : le premier chargement prend la main
+        // tout de suite (donc hors ligne dès la première visite), mais une
+        // version suivante attend qu'on la demande.
         clientsClaim: true,
-        skipWaiting: true,
       },
     }),
   ],

@@ -8,6 +8,7 @@ import { TimerScreen } from '../features/timer/TimerScreen';
 import { useTimer } from '../features/timer/timer-provider';
 import { useMediaLayout } from '../shared/hooks/use-media-layout';
 import { ShellHeader } from './ShellHeader';
+import { UpdateBanner } from './UpdateBanner';
 import styles from './App.module.css';
 
 /** `?intro` reopens the first screen on a device that has already seen it. */
@@ -89,6 +90,10 @@ export function App(): JSX.Element {
           </div>
         )}
       </main>
+
+      {/* Une session qui tourne n'a rien d'autre à l'écran, et les réglages portent
+          déjà le même bouton : le bandeau ne double ni ne recouvre. */}
+      {active || settingsOpen ? null : <UpdateBanner />}
     </div>
   );
 }

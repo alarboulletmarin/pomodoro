@@ -109,6 +109,9 @@ export const fr: Messages = {
   'settings.install.title': 'installer l’application',
   'settings.install.hint': 'pour l’ouvrir depuis l’écran d’accueil, hors ligne',
   'settings.install.action': 'installer',
+  'settings.update.title': 'version',
+  'settings.update.hint':
+    'Une app installée garde sa propre copie des fichiers, et vérifie d’elle-même de temps en temps s’il y a mieux. Tu peux le demander ici sans passer par les réglages du téléphone.',
   'settings.method': 'la méthode',
   'settings.about': 'à propos',
   'settings.legal': 'mentions légales',
@@ -161,6 +164,13 @@ export const fr: Messages = {
   'legal.licences.title': 'Licences',
   'legal.licences.body':
     'Clash Display (Fontshare), sous licence Fontshare. Inter (rsms.me/inter), sous licence SIL Open Font 1.1.',
+
+  'update.ready': 'Une nouvelle version est prête.',
+  'update.reload': 'recharger',
+  'update.later': 'plus tard',
+  'update.check': 'vérifier',
+  'update.checking': 'vérification…',
+  'update.upToDate': 'à jour',
 
   'a11y.openSettings': 'réglages',
   'a11y.back': 'retour',
