@@ -101,6 +101,39 @@ describe('drift', () => {
     expect(result.current.progressRatio).toBe(1);
   });
 
+  it('logs and settles a session that ran to term while the app was closed', () => {
+    const first = mountTimer();
+    act(() => first.result.current.setMinutes(1));
+    act(() => first.result.current.start());
+    first.unmount();
+
+    // The deadline passes with nothing mounted: no phase transition is left to observe.
+    vi.setSystemTime(Date.now() + 10 * 60_000);
+    const { result } = mountTimer();
+
+    expect(result.current.state.phase).toBe('finished');
+    expect(result.current.sessions).toEqual([
+      { startedAt: Date.now() - 10 * 60_000, minutes: 1, mode: 'focus' },
+    ]);
+    expect(result.current.suggestion).toEqual({ mode: 'break', minutes: 5 });
+
+    act(() => result.current.acceptSuggestion());
+    expect(result.current.state).toMatchObject({ phase: 'idle', mode: 'break', minutes: 5 });
+  });
+
+  it('logs nothing extra when a finished session is merely reloaded', () => {
+    const first = mountTimer();
+    act(() => first.result.current.setMinutes(1));
+    act(() => first.result.current.start());
+    act(() => void vi.advanceTimersByTime(60_000 + 300));
+    expect(first.result.current.sessions).toHaveLength(1);
+    first.unmount();
+
+    const { result } = mountTimer();
+    expect(result.current.state.phase).toBe('finished');
+    expect(result.current.sessions).toHaveLength(1);
+  });
+
   it('restores a running session across a remount', () => {
     const first = mountTimer();
     act(() => first.result.current.start());

@@ -60,6 +60,39 @@ export function restoreTimerState(raw: unknown, now: number): TimerState {
   };
 }
 
+export interface ElapsedSession {
+  endsAt: number;
+  minutes: number;
+  mode: Mode;
+}
+
+/**
+ * The session a stored `running` state finished with nothing watching. `restoreTimerState`
+ * collapses it straight to `finished`, so no running-to-finished transition survives the
+ * reload and the caller would otherwise never learn the session ran to term.
+ */
+export function elapsedWhileAway(raw: unknown, now: number): ElapsedSession | null {
+  if (!isRecord(raw) || raw.phase !== 'running' || !isMode(raw.mode)) return null;
+
+  const { endsAt } = raw;
+  if (typeof endsAt !== 'number' || !Number.isFinite(endsAt) || endsAt > now) return null;
+
+  const minutes = toStoredMinutes(raw.minutes);
+  if (minutes === null) return null;
+
+  return { endsAt, minutes, mode: raw.mode };
+}
+
+export function loadElapsedWhileAway(now: number): ElapsedSession | null {
+  try {
+    const raw = globalThis.localStorage.getItem(TIMER_STORAGE_KEY);
+    if (raw === null) return null;
+    return elapsedWhileAway(JSON.parse(raw), now);
+  } catch {
+    return null;
+  }
+}
+
 export function loadTimerState(now: number): TimerState {
   try {
     const raw = globalThis.localStorage.getItem(TIMER_STORAGE_KEY);

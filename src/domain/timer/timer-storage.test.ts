@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TIMER_STORAGE_KEY, type TimerState } from '../../types';
 import { initialTimerState } from './timer-machine';
-import { loadTimerState, restoreTimerState, saveTimerState } from './timer-storage';
+import {
+  elapsedWhileAway,
+  loadElapsedWhileAway,
+  loadTimerState,
+  restoreTimerState,
+  saveTimerState,
+} from './timer-storage';
 
 const T0 = 1_700_000_000_000;
 const MINUTE = 60_000;
@@ -190,5 +196,56 @@ describe('saveTimerState', () => {
       throw new Error('quota exceeded');
     });
     expect(() => saveTimerState(initialTimerState())).not.toThrow();
+  });
+});
+
+describe('elapsedWhileAway', () => {
+  const running = {
+    phase: 'running',
+    mode: 'focus',
+    minutes: 25,
+    endsAt: T0 + 25 * MINUTE,
+    remainingMs: 25 * MINUTE,
+  };
+
+  it('reports a running deadline that has already passed', () => {
+    expect(elapsedWhileAway(running, T0 + 30 * MINUTE)).toEqual({
+      endsAt: T0 + 25 * MINUTE,
+      minutes: 25,
+      mode: 'focus',
+    });
+  });
+
+  it('reports the deadline reached exactly on time', () => {
+    expect(elapsedWhileAway(running, T0 + 25 * MINUTE)?.endsAt).toBe(T0 + 25 * MINUTE);
+  });
+
+  it('reports nothing while the deadline is still ahead', () => {
+    expect(elapsedWhileAway(running, T0 + 24 * MINUTE)).toBeNull();
+  });
+
+  it('reports nothing for a phase that was not running', () => {
+    for (const phase of ['idle', 'paused', 'finished']) {
+      expect(elapsedWhileAway({ ...running, phase }, T0 + 30 * MINUTE)).toBeNull();
+    }
+  });
+
+  it('reports nothing for a malformed record', () => {
+    expect(elapsedWhileAway(null, T0)).toBeNull();
+    expect(elapsedWhileAway({ ...running, endsAt: 'soon' }, T0 + 30 * MINUTE)).toBeNull();
+    expect(elapsedWhileAway({ ...running, mode: 'nap' }, T0 + 30 * MINUTE)).toBeNull();
+    expect(elapsedWhileAway({ ...running, minutes: 'lots' }, T0 + 30 * MINUTE)).toBeNull();
+  });
+
+  it('reads the same verdict back out of storage', () => {
+    store(running);
+    expect(loadElapsedWhileAway(T0 + 30 * MINUTE)?.minutes).toBe(25);
+    expect(loadElapsedWhileAway(T0)).toBeNull();
+  });
+
+  it('survives an empty or unreadable storage', () => {
+    expect(loadElapsedWhileAway(T0)).toBeNull();
+    globalThis.localStorage.setItem(TIMER_STORAGE_KEY, 'not json');
+    expect(loadElapsedWhileAway(T0)).toBeNull();
   });
 });
