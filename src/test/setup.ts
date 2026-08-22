@@ -1,5 +1,20 @@
 import '@testing-library/jest-dom/vitest';
 
+// jsdom ships no matchMedia; components read it for layout and colour scheme.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  window.matchMedia = (query: string): MediaQueryList =>
+    ({
+      media: query,
+      matches: false,
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
+}
+
 interface JsdomHandle {
   window: { localStorage: Storage; sessionStorage: Storage };
 }
