@@ -60,6 +60,19 @@ React 18, TypeScript strict, CSS Modules and custom properties. `react` and
 `react-dom` are the only runtime dependencies — no CSS framework, no state
 library, no i18n library, no chart library.
 
+Two typefaces, two jobs. Clash Display is drawn for large sizes: it carries the
+clock, the screen titles, the wordmark and the labels on committing actions — short
+strings, never under 14px. Inter carries everything read as a sentence or scanned as
+a list: body copy, hints, list rows, values, the stats card end to end. One display
+face doing both jobs is what the app shipped with, and at 13px its tight spacing and
+closed apertures cost more than its character was worth. `--font-display` and
+`--font-sans` hold the two; a module that needs the first says so, everything else
+inherits the second.
+
+Inter is one variable woff2, subset to the characters the interface uses and to the
+400–600 weights it asks for: 25 KB. Clash lost the 400 weight nothing calls for any
+more, so the type payload is 42 KB across three files, up from 24 KB.
+
 Four layouts (portrait, landscape, tablet, desktop), three theme settings, four
 accents, French and English, all persisted and applied without a reload. `system`
 is the default theme and tracks `prefers-color-scheme` live — the app turns with

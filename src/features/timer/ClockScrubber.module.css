@@ -29,6 +29,7 @@
 }
 
 .digits {
+  font-family: var(--font-display);
   font-size: var(--digits-size);
   font-weight: 600;
   line-height: 1;
@@ -37,6 +38,7 @@
 }
 
 .ghost {
+  font-family: var(--font-display);
   min-height: 1em;
   font-size: var(--ghost-size);
   font-weight: 600;

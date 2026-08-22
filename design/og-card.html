@@ -16,9 +16,9 @@
         font-weight: 500;
       }
       @font-face {
-        font-family: 'Clash Display';
-        src: url('../public/fonts/clash-display-400.woff2') format('woff2');
-        font-weight: 400;
+        font-family: 'Inter Variable';
+        src: url('../public/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 400 600;
       }
 
       * {
@@ -97,10 +97,12 @@
         background: #d63e45;
       }
 
+      /* Same split as the app: Clash for the clock and the line, Inter for the rest. */
       .foot {
         display: flex;
         gap: 18px;
-        font-size: 23px;
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 22px;
         font-weight: 400;
         color: #6b625a;
       }

@@ -159,7 +159,8 @@ export const fr: Messages = {
   'legal.data.body':
     'Les sessions sont stockées localement sur cet appareil. Aucune collecte, aucun traceur, aucun compte.',
   'legal.licences.title': 'Licences',
-  'legal.licences.body': 'Clash Display (Fontshare), sous licence Fontshare.',
+  'legal.licences.body':
+    'Clash Display (Fontshare), sous licence Fontshare. Inter (rsms.me/inter), sous licence SIL Open Font 1.1.',
 
   'a11y.openSettings': 'réglages',
   'a11y.back': 'retour',

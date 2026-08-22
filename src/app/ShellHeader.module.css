@@ -12,6 +12,10 @@
     calc(var(--safe-left) + 56px);
 }
 
+.appName {
+  font-family: var(--font-display);
+}
+
 .topBar .appName {
   font-size: 18px;
   font-weight: 600;
