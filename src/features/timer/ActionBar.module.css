@@ -98,4 +98,5 @@
 
 :global(html[data-layout='desktop']) .hint {
   display: block;
+  margin-top: 16px;
 }

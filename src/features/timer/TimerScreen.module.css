@@ -5,6 +5,7 @@
   gap: 12px;
   min-width: 0;
   min-height: 0;
+  justify-content: space-between;
 }
 
 /* The collapse rule: during a session only the clock, the bar and the buttons remain. */

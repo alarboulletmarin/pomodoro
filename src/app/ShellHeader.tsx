@@ -19,13 +19,6 @@ export function ShellHeader({ layout, onOpenSettings }: ShellHeaderProps): JSX.E
 
   return (
     <header className={isDesktop ? styles.titleBar : styles.topBar}>
-      {isDesktop ? (
-        <span className={styles.dots} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
-      ) : null}
       <span className={styles.appName}>{t('app.name')}</span>
 
       {/* During a session the top bar carries nothing that invites a detour. */}
