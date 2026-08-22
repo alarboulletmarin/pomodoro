@@ -29,6 +29,15 @@
   min-height: 0;
 }
 
+/* Portrait stacks the two surfaces; the timer takes whatever the stats card leaves. */
+:global(html[data-layout='portrait']) .timerColumn {
+  flex: 1 0 auto;
+}
+
+:global(html[data-layout='portrait']) .rail {
+  flex: none;
+}
+
 /* Landscape: one vertical axis, wide left padding keeps the surface clear of the holding hand. */
 :global(html[data-layout='landscape']) .body {
   flex-direction: row;

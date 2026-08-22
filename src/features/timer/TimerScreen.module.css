@@ -1,17 +1,28 @@
 .timer {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
   min-height: 0;
 }
 
+/* The collapse rule: during a session only the clock, the bar and the buttons remain. */
+.timer[data-active] {
+  justify-content: center;
+}
+
 .header {
   display: flex;
-  align-items: center;
+  flex: none;
+  align-items: baseline;
   justify-content: space-between;
   gap: 12px;
   padding: 0 4px;
+}
+
+.titles {
+  min-width: 0;
 }
 
 .heading {
@@ -20,15 +31,157 @@
   letter-spacing: -0.5px;
 }
 
-.card {
+.subhead {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.meta {
+  display: flex;
+  flex: none;
   align-items: center;
+  gap: 10px;
+}
+
+.mode {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* Only portrait wraps the timer in a card; the other layouts sit on the surface itself. */
+:global(html[data-layout='landscape']) .panel,
+:global(html[data-layout='tablet']) .panel,
+:global(html[data-layout='desktop']) .panel {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+:global(html[data-layout='landscape']) .timer {
+  gap: 10px;
+  justify-content: space-between;
+  padding: 2px 10px 6px;
+}
+
+:global(html[data-layout='landscape']) .timer[data-active] {
+  justify-content: center;
   gap: 14px;
 }
 
-.digits {
-  font-size: var(--digits-size);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: var(--digits-tracking);
-  font-variant-numeric: tabular-nums;
+:global(html[data-layout='landscape']) .header {
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0;
+}
+
+:global(html[data-layout='landscape']) .titles {
+  display: contents;
+}
+
+:global(html[data-layout='landscape']) .heading {
+  font-size: 24px;
+}
+
+:global(html[data-layout='landscape']) .subhead {
+  order: 3;
+  flex-basis: 100%;
+  margin-top: 0;
+  font-size: 14px;
+}
+
+:global(html[data-layout='landscape']) .meta {
+  order: 2;
+}
+
+:global(html[data-layout='landscape']) .panel {
+  gap: 10px;
+}
+
+:global(html[data-layout='tablet']) .timer,
+:global(html[data-layout='desktop']) .timer {
+  justify-content: center;
+}
+
+:global(html[data-layout='tablet']) .header,
+:global(html[data-layout='desktop']) .header {
+  display: block;
+  padding: 0;
+}
+
+/* The mode label and the day count live in the shell top bar on the wide layouts. */
+:global(html[data-layout='tablet']) .meta,
+:global(html[data-layout='desktop']) .meta {
+  display: none;
+}
+
+:global(html[data-layout='tablet']) .timer,
+:global(html[data-layout='tablet']) .panel {
+  gap: 22px;
+}
+
+:global(html[data-layout='tablet']) .heading {
+  font-size: 40px;
+  letter-spacing: -1px;
+}
+
+:global(html[data-layout='tablet']) .subhead {
+  margin-top: 6px;
+  font-size: 17px;
+}
+
+:global(html[data-layout='desktop']) .timer,
+:global(html[data-layout='desktop']) .panel {
+  gap: 26px;
+  align-items: center;
+}
+
+:global(html[data-layout='desktop']) .header {
+  text-align: center;
+}
+
+:global(html[data-layout='desktop']) .heading {
+  font-size: 44px;
+  letter-spacing: -1.1px;
+}
+
+:global(html[data-layout='desktop']) .subhead {
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+/* Wide layouts read the clock first and treat the presets as an adjustment below it. */
+:global(html[data-layout='tablet']) .scrubber,
+:global(html[data-layout='desktop']) .scrubber {
+  order: 1;
+}
+
+:global(html[data-layout='tablet']) .presets,
+:global(html[data-layout='desktop']) .presets {
+  order: 2;
+}
+
+:global(html[data-layout='tablet']) .progress,
+:global(html[data-layout='desktop']) .progress {
+  order: 3;
+}
+
+:global(html[data-layout='tablet']) .actions,
+:global(html[data-layout='desktop']) .actions {
+  order: 4;
 }

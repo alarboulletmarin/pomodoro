@@ -1,0 +1,101 @@
+.actions {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.primary {
+  min-height: 58px;
+  font-size: 18px;
+}
+
+/* Pausing is not the loudest thing on screen: quiet fill, hairline ring, real text colour. */
+.quiet {
+  background: var(--fill-quiet);
+}
+
+.secondary {
+  min-height: var(--hit-min);
+  border-radius: var(--radius-chip);
+  font-size: 15px;
+}
+
+.hint {
+  display: none;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+:global(html[data-layout='landscape']) .row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+:global(html[data-layout='landscape']) .primary {
+  flex: 1;
+  max-width: 250px;
+  min-height: 52px;
+  padding: 0 26px;
+  font-size: 17px;
+}
+
+:global(html[data-layout='landscape']) .secondary {
+  flex: none;
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: var(--radius-button);
+}
+
+:global(html[data-layout='tablet']) .row,
+:global(html[data-layout='desktop']) .row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: auto;
+}
+
+:global(html[data-layout='tablet']) .primary,
+:global(html[data-layout='desktop']) .primary {
+  min-height: 62px;
+  padding: 0 40px;
+  font-size: 19px;
+}
+
+:global(html[data-layout='tablet']) .secondary,
+:global(html[data-layout='desktop']) .secondary {
+  min-height: 62px;
+  padding: 0 24px;
+  border-radius: var(--radius-button);
+  font-size: 16px;
+}
+
+/* Tablet puts the quiet way out first, so the accent stays the rightmost thumb target. */
+:global(html[data-layout='tablet']) .primary {
+  order: 1;
+}
+
+:global(html[data-layout='desktop']) .primary,
+:global(html[data-layout='desktop']) .secondary {
+  min-height: 64px;
+}
+
+:global(html[data-layout='desktop']) .secondary {
+  padding: 0 26px;
+}
+
+:global(html[data-layout='desktop']) .hint {
+  display: block;
+}

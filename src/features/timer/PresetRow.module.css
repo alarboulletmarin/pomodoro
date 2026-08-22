@@ -1,0 +1,67 @@
+.row {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.preset {
+  flex: 1;
+  min-height: var(--hit-min);
+  padding: 0 16px;
+  border-radius: var(--radius-chip);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: var(--hairline-ring);
+  transition: opacity var(--duration-fast) var(--ease);
+}
+
+.preset:hover {
+  opacity: 0.72;
+}
+
+.preset:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Selected reads as filled, thicker-ringed and heavier — never by hue alone. */
+.preset[aria-pressed='true'] {
+  background: var(--accent-tint);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.preset[aria-pressed='true']:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+:global(html[data-layout='landscape']) .row,
+:global(html[data-layout='tablet']) .row,
+:global(html[data-layout='desktop']) .row {
+  justify-content: center;
+}
+
+:global(html[data-layout='landscape']) .preset {
+  flex: none;
+  min-height: 42px;
+  padding: 0 20px;
+}
+
+:global(html[data-layout='tablet']) .row,
+:global(html[data-layout='desktop']) .row {
+  gap: 10px;
+}
+
+:global(html[data-layout='tablet']) .preset,
+:global(html[data-layout='desktop']) .preset {
+  flex: none;
+  min-height: 50px;
+  padding: 0 26px;
+  font-size: 16px;
+}
+
+:global(html[data-layout='desktop']) .preset {
+  min-height: 48px;
+}

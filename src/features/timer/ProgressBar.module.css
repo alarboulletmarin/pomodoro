@@ -1,0 +1,30 @@
+.track {
+  flex: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  transition: width var(--duration-slow) linear;
+}
+
+:global(html[data-layout='landscape']) .track {
+  width: 82%;
+  margin: 0 auto;
+}
+
+:global(html[data-layout='tablet']) .track,
+:global(html[data-layout='desktop']) .track {
+  height: 8px;
+}
+
+:global(html[data-layout='desktop']) .track {
+  width: 520px;
+  max-width: 100%;
+}

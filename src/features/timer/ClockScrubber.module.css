@@ -1,0 +1,84 @@
+.scrubber {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.grab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 14px;
+  border-radius: var(--radius-card);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.grab[data-idle] {
+  cursor: ns-resize;
+}
+
+.grab:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.digits {
+  font-size: var(--digits-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--digits-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+.ghost {
+  min-height: 1em;
+  font-size: var(--ghost-size);
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0.16;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  height: 15px;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+:global(html[data-layout='landscape']) .grab {
+  gap: 0;
+  padding: 2px 14px;
+}
+
+:global(html[data-layout='landscape']) .digits {
+  line-height: 1.02;
+}
+
+:global(html[data-layout='landscape']) .ghost {
+  line-height: 1.15;
+}
+
+:global(html[data-layout='landscape']) .hint {
+  height: 13px;
+}
+
+:global(html[data-layout='tablet']) .grab {
+  gap: 4px;
+}
+
+:global(html[data-layout='desktop']) .grab {
+  gap: 6px;
+}
+
+:global(html[data-layout='tablet']) .hint,
+:global(html[data-layout='desktop']) .hint {
+  height: 16px;
+}
