@@ -1,0 +1,793 @@
+<!doctype html>
+<!-- Le montage. Chaque plan est une section posée sur la même scène ; `render(t)` les
+     échantillonne à la seconde `t` plutôt que de les laisser jouer.
+
+     Les animations sont écrites en vraies `@keyframes`, mais mises en pause : le plan
+     porte `--local`, le temps écoulé depuis son entrée, et chaque élément se règle par
+     `animation-delay: calc((var(--delay) - var(--local)) * 1s)`. Un délai négatif
+     échantillonne l'animation à cet instant précis. Le film est donc reproductible à
+     l'image près, ce qu'une lecture en temps réel ne serait jamais.
+
+     Les plans se chevauchent, et le chevauchement est le fondu : la sortie de chacun
+     dure exactement le temps que le suivant met à entrer, calculé au chargement depuis
+     les bornes. Écrire une durée de sortie à la main, c'est se tromper au premier
+     déplacement d'une coupe.
+
+     Les plans de l'application ne sont pas rejoués ici : ce sont les images d'un
+     tournage, servies une par une dans <img class="footage"> par `make-film.mjs`.
+     `data-head` dit à quelle seconde du tournage le plan commence — un plan qui
+     ouvrirait sur une application immobile est un plan qui commence trop tôt.
+
+     Ouvert à la main dans un navigateur, le fichier montre la première image. -->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-500.woff2') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../public/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 400 600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --paper: #fbf6ee;
+        --surface: #ffffff;
+        --ink: #221e1a;
+        --muted: #6b625a;
+        --accent: #d63e45;
+        --on-accent: #ffffff;
+      }
+
+      body {
+        background: #8b8279;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* La scène. 1920×1080 par défaut, 1080×1920 en `data-format="tall"` ; tout ce qui
+         suit est en `em` de `font-size`, donc un format se recadre en un nombre. */
+      .stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Clash Display', sans-serif;
+        font-size: 19px;
+      }
+
+      .stage[data-format='tall'] {
+        width: 1080px;
+        height: 1920px;
+        font-size: 17px;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: none;
+      }
+
+      .scene[data-on] {
+        display: block;
+      }
+
+      /* Le carton sombre reprend les jetons du thème sombre de l'application, aux mêmes
+         valeurs : l'écran qui le précède vient d'y basculer, et la coupe se fait sur la
+         même couleur de fond. */
+      .scene[data-tone='ink'] {
+        color: #f5f0e8;
+        --muted: #a79c90;
+        --accent: #ff6f6f;
+      }
+
+      /* Le fond d'un carton arrive comme le reste, en fondu. Posé d'un coup, il coupe
+         net là où tout le reste se recouvre — et c'est visible à l'image près sur la
+         bande de papier des plans filmés, qui disparaîtrait d'un seul coup. */
+      .wash {
+        position: absolute;
+        inset: 0;
+        background: var(--wash, transparent);
+      }
+
+      /* Chaque élément animé lit le temps local du plan. `both` fige la première et la
+         dernière image hors de la durée, sans quoi un élément clignoterait à ses bords. */
+      [data-anim] {
+        animation-fill-mode: both;
+        animation-play-state: paused;
+        animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+        animation-delay: calc((var(--delay, 0) - var(--local, 0)) * 1s);
+        animation-duration: calc(var(--dur, 0.6) * 1s);
+      }
+
+      /* Le texte sort d'un masque plutôt que d'apparaître : une ligne qui se dévoile par
+         le bas se lit comme de la composition, un fondu se lit comme une diapositive. */
+      @keyframes lift {
+        from {
+          opacity: 0;
+          transform: translateY(0.3em);
+          clip-path: inset(100% -6% -20% -4%);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+          clip-path: inset(-24% -6% -20% -4%);
+        }
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(0.9em);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Les deux sorties. `depart` emporte le carton vers le haut, dans le sens où le
+         suivant arrive ; `dissolve` ne touche qu'à l'opacité, parce qu'un plan filmé ou
+         un fond de couleur qui glisse laisse voir le papier derrière lui. */
+      @keyframes depart {
+        from {
+          opacity: 1;
+          transform: none;
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-0.42em);
+        }
+      }
+
+      @keyframes dissolve {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      /* L'anneau se trace : c'est la marque qui se présente, pas un logo qu'on pose.
+         Elle le fait à la fin, une fois qu'on sait de quoi il s'agit. */
+      @keyframes draw {
+        from {
+          stroke-dashoffset: var(--len);
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes wipe {
+        from {
+          clip-path: inset(0 100% 0 0);
+        }
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+
+      /* Le cadrage, et son mouvement. Une capture posée à plat se lit comme une image ;
+         un plan qui se resserre lentement, ou qui s'ouvre, se lit comme un film. Chaque
+         plan dit son point de mire (`--ox`/`--oy`, dans les coordonnées du tournage) et
+         les deux échelles entre lesquelles il dérive pendant toute sa durée. */
+      @keyframes drift {
+        from {
+          transform: scale(var(--z0, 1));
+        }
+        to {
+          transform: scale(var(--z1, 1));
+        }
+      }
+
+      .lift {
+        animation-name: lift;
+      }
+      .rise {
+        animation-name: rise;
+      }
+      .fade {
+        animation-name: fade;
+      }
+      .wipe {
+        animation-name: wipe;
+      }
+      .draw {
+        animation-name: draw;
+      }
+      .depart {
+        animation-name: depart;
+      }
+      .dissolve {
+        animation-name: dissolve;
+      }
+      .drift {
+        animation-name: drift;
+        animation-timing-function: linear;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le centre : ce sur quoi tous les cartons s'alignent              */
+      /* ---------------------------------------------------------------- */
+
+      .plate {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 9em;
+      }
+
+      .stage[data-format='tall'] .plate {
+        padding: 0 3.8em;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le logotype                                                      */
+      /* ---------------------------------------------------------------- */
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 1.2em;
+      }
+
+      .lockup .mark {
+        flex: none;
+        width: 7em;
+        height: 7em;
+        color: var(--accent);
+      }
+
+      .lockup .name {
+        font-size: 5.8em;
+        font-weight: 500;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Typographie des cartons                                          */
+      /* ---------------------------------------------------------------- */
+
+      .say {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 6.6em;
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.024em;
+      }
+
+      .stage[data-format='tall'] .say {
+        font-size: 4.6em;
+      }
+
+      /* Un masque se pose sur un bloc, pas sur un morceau de ligne. */
+      .say .line {
+        display: block;
+      }
+
+      .rule {
+        width: 7em;
+        height: 0.42em;
+        margin-top: 1.5em;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.05em;
+        list-style: none;
+      }
+
+      .list li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.85em;
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 4.6em;
+        font-weight: 600;
+        letter-spacing: -0.018em;
+      }
+
+      .stage[data-format='tall'] .list li {
+        font-size: 3.9em;
+      }
+
+      /* Le tiret est de la couleur d'accent : c'est la seule chose qui rappelle l'app
+         sur un carton où elle n'apparaît pas. */
+      .list li::before {
+        content: '';
+        flex: none;
+        width: 0.62em;
+        height: 0.16em;
+        border-radius: 999px;
+        background: var(--accent);
+        transform: translateY(-0.28em);
+      }
+
+      .kicker {
+        margin-bottom: 1.6em;
+        font-size: 1.9em;
+        font-weight: 500;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Les plans filmés, et leur légende                                */
+      /* ---------------------------------------------------------------- */
+
+      /* Le calque qui porte l'image du tournage. Il est posé lui-même plutôt que de
+         laisser l'image se caler sur le plan : une animation de `transform`, même en
+         pause, fait de son élément un bloc contenant, et l'image s'y retrouvait haute
+         de zéro pixel. */
+      /* Les plans filmés ne vont pas jusqu'au bas du cadre : une bande de papier leur
+         est réservée en dessous, et la légende y vit. L'ancienne légende était un
+         bandeau blanc posé sur l'image, qui prenait le sixième de la hauteur et se
+         posait exactement sur le bouton qu'on regardait. */
+      .stage {
+        --band: 9em;
+      }
+
+      /* La bande du 9:16 est plus haute que celle du 16:9 et la légende s'y range en
+         haut : le bas d'une story est occupé par le nom du compte et les boutons du
+         réseau, et ce qui s'y trouve n'est pas lu. */
+      .stage[data-format='tall'] {
+        --band: 13em;
+      }
+
+      .frame {
+        position: absolute;
+        inset: 0 0 var(--band) 0;
+        overflow: hidden;
+        box-shadow: 0 0.7em 1.6em -0.9em rgba(34, 30, 26, 0.55);
+      }
+
+      .footage {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center var(--fit, center);
+        transform-origin: var(--ox, 50%) var(--oy, 50%);
+      }
+
+      /* Le geste : on serre sur le cadran, la colonne de statistiques et le titre
+         sortent du cadre, et le plan continue de se resserrer pendant qu'on glisse. */
+      .scene[data-shot='scrub'] .footage {
+        --ox: 28.5%;
+        --oy: 55%;
+        --z0: 1.9;
+        --z1: 1.99;
+      }
+
+      /* La session démarre et l'écran se vide : le cadre s'ouvre au lieu de se serrer,
+         et le curseur, sorti par le bas, reste hors champ. */
+      .scene[data-shot='run'] .footage {
+        --ox: 50%;
+        --oy: 43.5%;
+        --z0: 1.3;
+        --z1: 1.12;
+      }
+
+      /* Les réglages tiennent la largeur — l'horloge à gauche change de couleur en même
+         temps que les pastilles à droite, et rien ne peut sortir du cadre. Le mouvement
+         y est donc le plus discret des trois. */
+      .scene[data-shot='accent'] .footage {
+        --fit: top;
+        --ox: 62%;
+        --oy: 40%;
+        --z0: 1;
+        --z1: 1.06;
+      }
+
+      /* En 9:16, l'application occupe déjà toute la largeur de son écran : au-delà de
+         3 % de grossissement, le cadre lui coupe les flancs — le bouton et les cartes
+         touchent les bords. Le mouvement y est donc minime, et c'est l'application
+         elle-même qui bouge. La source ne permettrait de toute façon pas davantage :
+         elle est filmée à 540 px de large et déjà agrandie deux fois. */
+      .stage[data-format='tall'] .scene[data-shot='scrub'] .footage {
+        --fit: top;
+        --ox: 50%;
+        --oy: 12%;
+        --z0: 1;
+        --z1: 1.035;
+      }
+
+      .stage[data-format='tall'] .scene[data-shot='run'] .footage {
+        --ox: 50%;
+        --oy: 60%;
+        --z0: 1.035;
+        --z1: 1;
+      }
+
+      .stage[data-format='tall'] .scene[data-shot='accent'] .footage {
+        --fit: top;
+        --ox: 50%;
+        --oy: 22%;
+        --z0: 1;
+        --z1: 1.03;
+      }
+
+      /* La légende nomme ce qu'on voit, dans la bande, hors de l'image. Elle n'a plus
+         besoin de fond : posée sur le papier, elle ne masque rien et ne change pas
+         d'aspect selon le thème que le plan est en train de prendre. */
+      .caption {
+        position: absolute;
+        left: 4.6em;
+        right: 4.6em;
+        bottom: 0;
+        height: var(--band);
+        display: flex;
+        align-items: center;
+        gap: 1.15em;
+      }
+
+      .caption .mark {
+        flex: none;
+        width: 2.5em;
+        height: 2.5em;
+        color: var(--accent);
+      }
+
+      .caption p {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 2.2em;
+        font-weight: 600;
+        letter-spacing: -0.014em;
+      }
+
+      .stage[data-format='tall'] .caption {
+        left: 3.8em;
+        right: 3.8em;
+        align-items: flex-start;
+        padding-top: 1.6em;
+      }
+
+      .stage[data-format='tall'] .caption p {
+        font-size: 2.05em;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le carton de fin                                                 */
+      /* ---------------------------------------------------------------- */
+
+      .close {
+        align-items: flex-start;
+        gap: 2.2em;
+      }
+
+      .close .claim {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 2.9em;
+        font-weight: 400;
+        color: var(--muted);
+      }
+
+      /* Une story se lit à bout de bras : le logotype y devient une enseigne, et les
+         mentions rentrent dans la largeur au lieu de l'étirer. */
+      .stage[data-format='tall'] .lockup .mark {
+        width: 7.6em;
+        height: 7.6em;
+      }
+
+      .stage[data-format='tall'] .lockup .name {
+        font-size: 6.2em;
+      }
+
+      .stage[data-format='tall'] .close .claim {
+        font-size: 2.5em;
+      }
+
+      /* Le même bouton que celui de l'application, à la même forme et dans la même
+         police : c'est ce qu'on vient de voir presser trois fois. */
+      .cta {
+        display: inline-flex;
+        padding: 0.78em 1.5em;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 2.5em;
+        font-weight: 500;
+        letter-spacing: 0.005em;
+      }
+
+      .stage[data-format='tall'] .cta {
+        font-size: 2.3em;
+      }
+
+      .close .licence {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 1.9em;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- prettier-ignore -->
+    <template id="mark">
+      <svg class="mark" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="48.64" stroke-linecap="round" aria-hidden="true">
+        <path d="M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079" />
+        <path d="M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278" />
+      </svg>
+    </template>
+
+    <div class="stage" id="stage" data-format="wide">
+      <!-- 1 · On ouvre sur le geste, déjà commencé. Une vidéo qui s'ouvre sur un logo
+           immobile a perdu avant d'avoir dit quoi que ce soit ; des chiffres qui
+           défilent sous un doigt disent en une seconde de quoi il s'agit. -->
+      <section
+        class="scene"
+        data-kind="shot"
+        data-shot="scrub"
+        data-take="scrub"
+        data-head="2"
+        data-in="0"
+        data-out="4"
+      >
+        <div class="frame">
+          <img class="footage" alt="" />
+        </div>
+        <div class="caption rise" data-anim style="--delay: 1.15; --dur: 0.6">
+          <span class="slot"></span>
+          <p>la durée se règle en glissant sur les chiffres</p>
+        </div>
+      </section>
+
+      <!-- 2 · La promesse, une fois qu'on a vu la chose. -->
+      <section class="scene" data-kind="card" data-in="3.75" data-out="7.15">
+        <div class="plate">
+          <p class="say">
+            <span class="line lift" data-anim style="--delay: 0.1; --dur: 0.72"
+              >Un minuteur de travail</span
+            ><span class="line lift" data-anim style="--delay: 0.28; --dur: 0.72"
+              >qui te laisse partir.</span
+            >
+          </p>
+          <span class="rule wipe" data-anim style="--delay: 0.8; --dur: 0.55"></span>
+        </div>
+      </section>
+
+      <!-- 3 · Ça démarre, et l'écran se vide. Le plan entre sur le curseur déjà en
+           route vers le bouton : l'application immobile du début du tournage n'est pas
+           du film. -->
+      <section
+        class="scene"
+        data-kind="shot"
+        data-shot="run"
+        data-take="run"
+        data-head="1"
+        data-in="6.9"
+        data-out="11.25"
+      >
+        <div class="frame fade" data-anim style="--delay: 0; --dur: 0.35">
+          <img class="footage" alt="" />
+        </div>
+        <!-- La légende attend que l'écran se soit réduit : l'annoncer sur l'écran de
+             réglage, c'est légender autre chose que ce qu'on montre. -->
+        <div class="caption rise" data-anim style="--delay: 1.4; --dur: 0.6">
+          <span class="slot"></span>
+          <p>pendant une session, l’écran n’a plus rien à te proposer</p>
+        </div>
+      </section>
+
+      <!-- 4 · Deux secondes et demie, une phrase. Le film a besoin d'un temps court
+           entre deux plans longs, sinon tout dure pareil. -->
+      <section class="scene" data-kind="card" data-in="11" data-out="13.5">
+        <div class="plate">
+          <p class="say">
+            <span class="line lift" data-anim style="--delay: 0.08; --dur: 0.7"
+              >Rien ne sort</span
+            ><span class="line lift" data-anim style="--delay: 0.24; --dur: 0.7"
+              >de ton appareil.</span
+            >
+          </p>
+        </div>
+      </section>
+
+      <!-- 5 · À tes couleurs. Le plan finit en thème sombre, et le carton suivant part
+           de là. -->
+      <section
+        class="scene"
+        data-kind="shot"
+        data-shot="accent"
+        data-take="accent"
+        data-head="0.55"
+        data-in="13.25"
+        data-out="19.45"
+      >
+        <div class="frame fade" data-anim style="--delay: 0; --dur: 0.35">
+          <img class="footage" alt="" />
+        </div>
+        <div class="caption rise" data-anim style="--delay: 0.5; --dur: 0.6">
+          <span class="slot"></span>
+          <p>clair, sombre, et la couleur que tu veux</p>
+        </div>
+      </section>
+
+      <!-- 6 · Ce qu'il ne fait pas — l'argument, en toutes lettres, sur le fond que
+           l'écran vient de prendre. -->
+      <section class="scene" data-kind="card" data-tone="ink" data-in="19.2" data-out="24.2">
+        <div class="wash fade" data-anim style="--wash: #151311; --delay: 0; --dur: 0.25"></div>
+        <div class="plate">
+          <p class="kicker fade" data-anim style="--delay: 0.25; --dur: 0.45">ce qu’il ne fait pas</p>
+          <ul class="list">
+            <li class="lift" data-anim style="--delay: 0.5; --dur: 0.6">pas de notification</li>
+            <li class="lift" data-anim style="--delay: 0.72; --dur: 0.6">pas de compte</li>
+            <li class="lift" data-anim style="--delay: 0.94; --dur: 0.6">pas de série à tenir</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 7 · Carton de fin. La marque se trace ici, pas au début : à l'ouverture elle
+           ne dit rien à personne, à la fin elle signe. -->
+      <section class="scene" data-kind="card" data-in="23.95" data-out="29.55">
+        <!-- Le papier revient par-dessus l'encre plutôt que l'encre par en dessous : un
+             fondu croisé entre les deux passerait par un gris qui n'est ni l'un ni
+             l'autre. -->
+        <div class="wash fade" data-anim style="--wash: var(--paper); --delay: 0; --dur: 0.28"></div>
+        <div class="plate close">
+          <div class="lockup">
+            <span class="slot" data-draw-mark></span>
+            <span class="name lift" data-anim style="--delay: 0.55; --dur: 0.7">pomodoro</span>
+          </div>
+          <p class="claim lift" data-anim style="--delay: 1.05; --dur: 0.6">
+            ça s’installe, et ça marche hors ligne
+          </p>
+          <span class="cta rise" data-anim style="--delay: 1.65; --dur: 0.6"
+            >installe-le depuis ton navigateur</span
+          >
+          <p class="licence fade" data-anim style="--delay: 2.4; --dur: 0.6">
+            libre et ouvert — AGPL-3.0
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const stage = document.getElementById('stage');
+      const markTemplate = document.getElementById('mark').content.firstElementChild;
+
+      for (const slot of document.querySelectorAll('.slot')) {
+        const mark = markTemplate.cloneNode(true);
+        // L'anneau du carton de fin se trace plutôt que d'apparaître. La longueur de
+        // chaque course est mesurée sur le tracé même : un chiffre écrit à la main
+        // serait faux au premier changement de géométrie.
+        if (slot.hasAttribute('data-draw-mark')) {
+          for (const path of mark.querySelectorAll('path')) {
+            const length = path.getTotalLength();
+            path.style.setProperty('--len', length);
+            path.style.strokeDasharray = length;
+            path.setAttribute('data-anim', '');
+            path.classList.add('draw');
+            path.style.setProperty('--delay', '0.15');
+            path.style.setProperty('--dur', '0.9');
+          }
+        }
+        slot.replaceWith(mark);
+      }
+
+      const scenes = [...document.querySelectorAll('.scene')].map((element) => ({
+        element,
+        id: element.dataset.shot ?? null,
+        in: Number(element.dataset.in),
+        out: Number(element.dataset.out),
+        take: element.dataset.take ?? null,
+        head: Number(element.dataset.head ?? 0),
+        image: element.querySelector('.footage'),
+      }));
+
+      // La sortie de chaque plan dure exactement le chevauchement avec le suivant : le
+      // fondu se ferme sur la borne `data-out` et pas ailleurs. Le dernier n'en a pas —
+      // un film qui se termine sur un écran vide se termine deux fois.
+      scenes.forEach((scene, index) => {
+        const next = scenes[index + 1];
+        if (!next) return;
+        const overlap = Math.max(0.12, scene.out - next.in);
+        const glides =
+          scene.element.dataset.kind === 'card' && scene.element.dataset.tone !== 'ink';
+        scene.element.setAttribute('data-anim', '');
+        scene.element.classList.add(glides ? 'depart' : 'dissolve');
+        scene.element.style.setProperty('--delay', scene.out - scene.in - overlap);
+        scene.element.style.setProperty('--dur', overlap);
+      });
+
+      // Le mouvement de cadrage court sur toute la durée du plan : posé une fois ici,
+      // il n'a pas à être répété sur chaque section.
+      for (const scene of scenes) {
+        if (!scene.image) continue;
+        scene.image.setAttribute('data-anim', '');
+        scene.image.classList.add('drift');
+        scene.image.style.setProperty('--delay', '0');
+        scene.image.style.setProperty('--dur', scene.out - scene.in);
+      }
+
+      const DURATION = Math.max(...scenes.map((scene) => scene.out));
+
+      /**
+       * Pose le film à `seconds`. `frames` associe à chaque plan filmé l'image à
+       * montrer — calculée dans Node, parce que c'est lui qui sait combien d'images
+       * chaque tournage a produites.
+       */
+      async function render(seconds, frames = {}) {
+        const waits = [];
+
+        for (const scene of scenes) {
+          const on = seconds >= scene.in && seconds < scene.out;
+          if (!on) {
+            delete scene.element.dataset.on;
+            continue;
+          }
+
+          scene.element.dataset.on = '';
+          scene.element.style.setProperty('--local', seconds - scene.in);
+
+          const source = scene.id ? frames[scene.id] : null;
+          if (source && scene.image && scene.image.getAttribute('src') !== source) {
+            scene.image.setAttribute('src', source);
+            waits.push(scene.image.decode().catch(() => {}));
+          }
+        }
+
+        await Promise.all(waits);
+        // Deux images successives : la première applique les styles, la seconde garantit
+        // qu'elles sont peintes avant que la capture ne parte.
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      window.film = {
+        duration: DURATION,
+        shots: scenes
+          .filter((scene) => scene.take)
+          .map((scene) => ({
+            id: scene.id,
+            take: scene.take,
+            head: scene.head,
+            in: scene.in,
+            out: scene.out,
+          })),
+        format: (value) => {
+          stage.dataset.format = value;
+        },
+        render,
+      };
+
+      render(0);
+    </script>
+  </body>
+</html>

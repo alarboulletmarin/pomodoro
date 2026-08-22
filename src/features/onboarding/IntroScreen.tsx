@@ -2,6 +2,7 @@ import type { MessageKey } from '../../types';
 import { useI18n } from '../../shared/i18n/i18n';
 import { Button } from '../../shared/ui/Button';
 import { Card } from '../../shared/ui/Card';
+import { Mark } from '../../shared/ui/Mark';
 import styles from './IntroScreen.module.css';
 
 export interface IntroScreenProps {
@@ -23,7 +24,10 @@ export function IntroScreen({ onStart, onMethod }: IntroScreenProps): JSX.Elemen
   return (
     <section className={styles.intro}>
       <Card className={styles.card}>
-        <p className={styles.name}>{t('app.name')}</p>
+        <p className={styles.name}>
+          <Mark size={18} />
+          {t('app.name')}
+        </p>
         <h1 className={styles.lead}>{t('intro.lead')}</h1>
 
         <ul className={styles.points}>
