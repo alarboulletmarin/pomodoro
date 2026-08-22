@@ -12,7 +12,7 @@ export const SESSION_DOTS = 6;
 
 const WEEK_DAYS = 7;
 const MONTH_CELLS = 35;
-const ROLLING_WINDOW_DAYS = 30;
+export const ROLLING_WINDOW_DAYS = 30;
 
 // Calendar arithmetic only: adding 86_400_000 ms would lose or duplicate a day
 // on a daylight-saving transition.

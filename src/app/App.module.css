@@ -29,9 +29,15 @@
   min-height: 0;
 }
 
-/* Portrait stacks the two surfaces; the timer takes whatever the stats card leaves. */
+/* Portrait stacks both surfaces at their natural height and centres the stack.
+   `safe` degrades to top-aligned when the content outgrows the viewport, so a tall
+   stats card scrolls from its beginning instead of being clipped at both ends. */
 :global(html[data-layout='portrait']) .timerColumn {
-  flex: 1 0 auto;
+  flex: none;
+}
+
+:global(html[data-layout='portrait']) .body {
+  justify-content: safe center;
 }
 
 :global(html[data-layout='portrait']) .rail {

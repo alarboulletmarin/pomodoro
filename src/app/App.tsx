@@ -38,7 +38,7 @@ export function App(): JSX.Element {
         />
       ) : null}
 
-      <main className={styles.body}>
+      <main className={styles.body} data-active={active || undefined}>
         <div className={styles.timerColumn}>
           <TimerScreen onOpenSettings={openSettings} />
         </div>

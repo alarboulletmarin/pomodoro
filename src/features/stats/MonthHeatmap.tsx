@@ -1,8 +1,7 @@
+import { ROLLING_WINDOW_DAYS } from '../../domain/sessions/session-stats';
 import { useI18n } from '../../shared/i18n/i18n';
 import type { MonthStats } from '../../types';
 import styles from './MonthHeatmap.module.css';
-
-const WINDOW_DAYS = 30;
 
 export interface MonthHeatmapProps {
   stats: MonthStats;
@@ -31,7 +30,7 @@ export function MonthHeatmap({ stats }: MonthHeatmapProps): JSX.Element {
       <p className={styles.footer}>
         {t('stats.month.footer', {
           active: stats.activeDays,
-          days: WINDOW_DAYS,
+          days: ROLLING_WINDOW_DAYS,
           count: stats.total,
         })}
       </p>
