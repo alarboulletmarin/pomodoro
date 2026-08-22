@@ -165,6 +165,8 @@ describe('the primary action', () => {
     act(() => void vi.advanceTimersByTime(60_300));
 
     expect(screen.getByRole('heading', { name: 'session done' })).toBeInTheDocument();
+    // The duration is no longer settable once the session is over: no dead presets.
+    expect(screen.queryByRole('button', { name: '15 min' })).toBeNull();
 
     fireEvent.click(action('5 min break'));
     expect(screen.getByRole('heading', { name: 'break time' })).toBeInTheDocument();

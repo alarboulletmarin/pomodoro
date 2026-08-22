@@ -24,6 +24,9 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
   const { phase, mode, minutes } = timer.state;
 
   const active = phase === 'running' || phase === 'paused';
+  // No shortcut applies once the session is over, so the hint says nothing rather than lying.
+  const shortcutHint =
+    phase === 'finished' ? null : t(active ? 'timer.shortcuts.active' : 'timer.shortcuts.idle');
   const copy = timerCopy(phase, mode);
   const announcement = usePhaseAnnouncement(phase, mode);
   // Tablet and desktop expose the gear in the shell top bar instead.
@@ -73,14 +76,14 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
       )}
 
       <div className={styles.panel}>
-        {active ? null : (
+        {phase === 'idle' ? (
           <PresetRow
             className={styles.presets}
             mode={mode}
             minutes={minutes}
             onSelect={timer.setMinutes}
           />
-        )}
+        ) : null}
         <ClockScrubber
           className={styles.scrubber}
           minutes={minutes}
@@ -94,7 +97,7 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
           primaryLabel={t(copy.primary, { minutes: timer.suggestion?.minutes ?? minutes })}
           secondaryLabel={copy.secondary === null ? null : t(copy.secondary)}
           quietPrimary={phase === 'running'}
-          hint={t(active ? 'timer.shortcuts.active' : 'timer.shortcuts.idle')}
+          hint={shortcutHint}
           onPrimary={onPrimary}
           onSecondary={onSecondary}
         />

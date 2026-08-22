@@ -5,7 +5,7 @@ export interface ActionBarProps {
   primaryLabel: string;
   secondaryLabel: string | null;
   quietPrimary: boolean;
-  hint: string;
+  hint: string | null;
   onPrimary(): void;
   onSecondary(): void;
   className?: string | undefined;
@@ -36,7 +36,7 @@ export function ActionBar({
           </Button>
         )}
       </div>
-      <p className={styles.hint}>{hint}</p>
+      {hint === null ? null : <p className={styles.hint}>{hint}</p>}
     </div>
   );
 }
