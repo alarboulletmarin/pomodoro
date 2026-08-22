@@ -15,7 +15,9 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['iPhone 13'] } },
+    // iPhone 13 defaults to WebKit, whose Linux build needs system packages CI does not
+    // carry; the viewport, touch and DPR emulation is what this project is here for.
+    { name: 'mobile', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
   ],
   webServer: {
     command: `npm run preview -- --port ${PORT} --strictPort`,

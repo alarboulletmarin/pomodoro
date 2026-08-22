@@ -13,6 +13,7 @@ export default tseslint.config(
       'coverage',
       'playwright-report',
       'test-results',
+      '.screenshots',
       '.husky',
       'design',
       'public',
