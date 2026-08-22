@@ -13,6 +13,7 @@ import type { SessionEntry, Suggestion, TimerContextValue } from '../../types';
 import { appendSession, loadSessions, saveSessions } from '../../domain/sessions/session-log';
 import { todayCount as countToday } from '../../domain/sessions/session-stats';
 import { DEFAULT_FOCUS_MINUTES, MS_PER_MINUTE, nextSuggestion } from '../../domain/timer/durations';
+import { displayedSeconds } from '../../domain/timer/format-clock';
 import { timerReducer } from '../../domain/timer/timer-machine';
 import {
   loadElapsedWhileAway,
@@ -27,10 +28,6 @@ import { playChime } from './chime';
 const TICK_MS = 250;
 
 const TimerContext = createContext<TimerContextValue | null>(null);
-
-function displayedSecond(remainingMs: number): number {
-  return Math.ceil(remainingMs / 1000);
-}
 
 export function TimerProvider({ children }: { children: ReactNode }): JSX.Element {
   const { settings } = useSettings();
@@ -87,7 +84,7 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
     if (current.phase !== 'running' || current.endsAt === null) return;
     const now = Date.now();
     const left = current.endsAt - now;
-    if (left > 0 && displayedSecond(left) === displayedSecond(current.remainingMs)) return;
+    if (left > 0 && displayedSeconds(left) === displayedSeconds(current.remainingMs)) return;
     dispatch({ type: 'sync', now });
   }, []);
 

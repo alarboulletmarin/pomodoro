@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatClock, formatMinutesClock } from './format-clock';
+import { displayedSeconds, formatClock, formatMinutesClock } from './format-clock';
 
 describe('formatClock', () => {
   it('never goes below zero', () => {
@@ -40,5 +40,15 @@ describe('formatMinutesClock', () => {
     expect(formatMinutesClock(0)).toBe('00:00');
     expect(formatMinutesClock(-3)).toBe('00:00');
     expect(formatMinutesClock(Number.NaN)).toBe('00:00');
+  });
+});
+
+describe('displayedSeconds', () => {
+  it('is the rounding the clock face and the tick gate share', () => {
+    expect(displayedSeconds(25 * 60_000)).toBe(1500);
+    expect(displayedSeconds(1)).toBe(1);
+    expect(displayedSeconds(0)).toBe(0);
+    expect(displayedSeconds(-5)).toBe(0);
+    expect(displayedSeconds(Number.NaN)).toBe(0);
   });
 });
