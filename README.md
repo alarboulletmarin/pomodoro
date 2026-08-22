@@ -40,6 +40,7 @@ npm run dev
 | `icons`                       | redraw the icon set and favicon   |
 | `social`                      | re-render the share images        |
 | `demo`                        | re-record the demo GIF and videos |
+| `film`                        | re-cut the promo film             |
 | `format`                      | Prettier                          |
 
 `SITE_URL=https://your.host npm run build` writes absolute URLs into the link
@@ -179,6 +180,32 @@ first — fill is elapsed, digits are remaining, as in the app. The first versio
 `25:00` above a bar already a third of the way across: a picture of something that never
 happens.
 
+## The film
+
+`npm run film` cuts a 30-second promotional film, in 16:9 and 9:16. It is an edit, not
+a capture: the mark draws itself, the promise lands on its own card, three shots of the
+app arrive captioned, a typographic card says what the app refuses to do, and an end
+card closes on the licence.
+
+It is built in three passes. **Shooting**: Playwright plays each shot in the real app,
+one browser context per shot so every clip starts and ends where the edit wants it.
+**Cutting**: `design/film/film.html` holds the edit; the take frames are served into it
+one at a time and `render(t)` samples the animations at the second it wants rather than
+letting them play. **Encoding**: frames go down a pipe into ffmpeg without touching
+disk — thirty seconds of 1920×1080 is nine hundred files nobody needs.
+
+Sampling rather than playing is what makes it reproducible to the frame. Real CSS
+keyframes are still what the edit is written in; each shot carries `--local`, the time
+since it came in, and every animated element resolves
+`animation-delay: calc((var(--delay) - var(--local)) * 1s)` against it, paused. A
+negative delay samples an animation at exactly that instant.
+
+The one measurement that has to be right is the trim. The recorder starts with the page,
+so the first second of every clip is a page loading; the shooter timestamps the moment
+the app is ready and cuts that much, rather than guessing a constant. Each shot then
+opens on `HOLD_SEC` of a motionless app, which is what the cut-in covers and what
+absorbs the recorder's own imprecision.
+
 ## The demo
 
 No still frame can show the one gesture the app is built around, so `npm run demo`
@@ -186,8 +213,10 @@ films it: Playwright drives the **real build** — not a re-enactment — throug
 move. Grab the digits, climb to 45 minutes, come back down, let go, start, and watch the
 screen collapse to what a running session needs.
 
-It needs a server on `http://localhost:4173` (`npm run build && npm run preview`, or set
-`POMODORO_BASE_URL`) and **ffmpeg on `PATH`**. Out come
+Both it and the film need a server on `http://localhost:4173`
+(`npm run build && npm run preview`, or set `POMODORO_BASE_URL`) and **ffmpeg on
+`PATH`**; `scripts/stage.mjs` holds what they share — the browser opened on a known
+state, the drawn cursor, the eased gestures. Out of `npm run demo` come
 `design/social/pomodoro-demo.gif` for a README or a chat, and
 `pomodoro-demo-16x9.mp4` / `pomodoro-demo-9x16.mp4` for the networks, which almost all
 refuse WebM.

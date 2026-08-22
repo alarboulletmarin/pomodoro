@@ -1,0 +1,584 @@
+<!doctype html>
+<!-- Le montage. Chaque plan est une section posée sur la même scène ; `render(t)` les
+     échantillonne à la seconde `t` plutôt que de les laisser jouer.
+
+     Les animations sont écrites en vraies `@keyframes`, mais mises en pause : le plan
+     porte `--local`, le temps écoulé depuis son entrée, et chaque élément se règle par
+     `animation-delay: calc((var(--delay) - var(--local)) * 1s)`. Un délai négatif
+     échantillonne l'animation à cet instant précis. Le film est donc reproductible à
+     l'image près, ce qu'une lecture en temps réel ne serait jamais.
+
+     Les plans de l'application ne sont pas rejoués ici : ce sont les images d'un
+     tournage, servies une par une dans <img id="footage"> par `make-film.mjs`.
+
+     Ouvert à la main dans un navigateur, le fichier montre la première image. -->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-500.woff2') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../public/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 400 600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --paper: #fbf6ee;
+        --surface: #ffffff;
+        --ink: #221e1a;
+        --muted: #6b625a;
+        --accent: #d63e45;
+        --on-accent: #ffffff;
+      }
+
+      body {
+        background: #8b8279;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* La scène. 1920×1080 par défaut, 1080×1920 en `data-format="tall"` ; tout ce qui
+         suit est en `em` de `font-size`, donc un format se recadre en un nombre. */
+      .stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Clash Display', sans-serif;
+        font-size: 19px;
+      }
+
+      .stage[data-format='tall'] {
+        width: 1080px;
+        height: 1920px;
+        font-size: 17px;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: none;
+      }
+
+      .scene[data-on] {
+        display: block;
+      }
+
+      /* Chaque élément animé lit le temps local du plan. `both` fige la première et la
+         dernière image hors de la durée, sans quoi un élément clignoterait à ses bords. */
+      [data-anim] {
+        animation-fill-mode: both;
+        animation-play-state: paused;
+        animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+        animation-delay: calc((var(--delay, 0) - var(--local, 0)) * 1s);
+        animation-duration: calc(var(--dur, 0.6) * 1s);
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(0.9em);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes leave {
+        from {
+          opacity: 1;
+          transform: none;
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-0.5em);
+        }
+      }
+
+      /* L'anneau se trace : c'est la marque qui se présente, pas un logo qu'on pose. */
+      @keyframes draw {
+        from {
+          stroke-dashoffset: var(--len);
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes wipe {
+        from {
+          clip-path: inset(0 100% 0 0);
+        }
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+
+      /* Les plans de l'application entrent en s'approchant d'un cheveu : une coupe
+         franche sur une capture fixe se lit comme une image, pas comme un film. */
+      @keyframes push {
+        from {
+          opacity: 0;
+          transform: scale(1.035);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .rise {
+        animation-name: rise;
+      }
+      .fade {
+        animation-name: fade;
+      }
+      .leave {
+        animation-name: leave;
+      }
+      .wipe {
+        animation-name: wipe;
+      }
+      .push {
+        animation-name: push;
+      }
+      .draw {
+        animation-name: draw;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le centre : ce sur quoi tous les cartons s'alignent              */
+      /* ---------------------------------------------------------------- */
+
+      .plate {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 9em;
+      }
+
+      .stage[data-format='tall'] .plate {
+        padding: 0 4.6em;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le logotype                                                      */
+      /* ---------------------------------------------------------------- */
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 1.1em;
+      }
+
+      /* À l'ouverture le logotype est seul en scène : il la prend. Au carton de fin il
+         partage l'affiche avec deux lignes, et redescend à sa taille de signature. */
+      .open .lockup {
+        gap: 1.4em;
+      }
+
+      .open .lockup .mark {
+        width: 10em;
+        height: 10em;
+      }
+
+      .open .lockup .name {
+        font-size: 8.2em;
+      }
+
+      .lockup .mark {
+        flex: none;
+        width: 6.6em;
+        height: 6.6em;
+        color: var(--accent);
+      }
+
+      .lockup .name {
+        font-size: 5.4em;
+        font-weight: 500;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Typographie des cartons                                          */
+      /* ---------------------------------------------------------------- */
+
+      .say {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 6.4em;
+        font-weight: 600;
+        line-height: 1.12;
+        letter-spacing: -0.022em;
+      }
+
+      .stage[data-format='tall'] .say {
+        font-size: 5.4em;
+      }
+
+      .rule {
+        width: 7em;
+        height: 0.42em;
+        margin-top: 1.6em;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.15em;
+        list-style: none;
+      }
+
+      .list li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.85em;
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 4.4em;
+        font-weight: 600;
+        letter-spacing: -0.016em;
+      }
+
+      .stage[data-format='tall'] .list li {
+        font-size: 4em;
+      }
+
+      /* Le tiret est de la couleur d'accent : c'est la seule chose qui rappelle l'app
+         sur un carton où elle n'apparaît pas. */
+      .list li::before {
+        content: '';
+        flex: none;
+        width: 0.62em;
+        height: 0.16em;
+        border-radius: 999px;
+        background: var(--accent);
+        transform: translateY(-0.28em);
+      }
+
+      .kicker {
+        margin-bottom: 1.5em;
+        font-size: 1.9em;
+        font-weight: 500;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Les plans filmés, et leur légende                                */
+      /* ---------------------------------------------------------------- */
+
+      /* Le calque qui porte l'image du tournage. Il est posé lui-même plutôt que de
+         laisser l'image se caler sur le plan : une animation de `transform`, même en
+         pause, fait de son élément un bloc contenant, et l'image s'y retrouvait haute
+         de zéro pixel. */
+      .frame {
+        position: absolute;
+        inset: 0;
+      }
+
+      .footage {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+      }
+
+      /* Un bandeau bas, comme un tiers inférieur de télévision : il nomme ce qu'on est
+         en train de voir sans couvrir l'endroit où ça se passe. */
+      .caption {
+        position: absolute;
+        left: 4em;
+        right: 4em;
+        bottom: 3.4em;
+        display: flex;
+        align-items: center;
+        gap: 1.3em;
+        padding: 1.5em 2em;
+        border-radius: 1.4em;
+        background: var(--surface);
+        box-shadow:
+          0 1px 0 rgba(34, 30, 26, 0.06),
+          0 2em 4em -2.4em rgba(34, 30, 26, 0.85);
+      }
+
+      .caption .mark {
+        flex: none;
+        width: 2.5em;
+        height: 2.5em;
+        color: var(--accent);
+      }
+
+      .caption p {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 2.5em;
+        font-weight: 600;
+        letter-spacing: -0.012em;
+      }
+
+      .stage[data-format='tall'] .caption {
+        left: 2.4em;
+        right: 2.4em;
+        bottom: 4.5em;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /*  Le carton de fin                                                 */
+      /* ---------------------------------------------------------------- */
+
+      .close {
+        align-items: flex-start;
+        gap: 2.6em;
+      }
+
+      /* Les mentions s'empilent. En ligne, la troisième repassait sous les deux autres
+         en laissant un point de séparation pendu au bout de la précédente — et à
+         1080 px de large elles ne tenaient de toute façon pas. */
+      .close .claims {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55em;
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 2.7em;
+        font-weight: 400;
+        color: var(--muted);
+      }
+
+      .close .claims span {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7em;
+      }
+
+      .close .claims span::before {
+        content: '';
+        flex: none;
+        width: 0.52em;
+        height: 0.09em;
+        border-radius: 999px;
+        background: var(--accent);
+        transform: translateY(-0.3em);
+      }
+
+      .close .licence {
+        font-family: 'Inter Variable', sans-serif;
+        font-size: 1.9em;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- prettier-ignore -->
+    <template id="mark">
+      <svg class="mark" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="48.64" stroke-linecap="round" aria-hidden="true">
+        <path d="M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079" />
+        <path d="M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278" />
+      </svg>
+    </template>
+
+    <div class="stage" id="stage" data-format="wide">
+      <!-- 1 · Ouverture — l'anneau se trace, le nom suit. -->
+      <section class="scene" data-in="0" data-out="3.4">
+        <div class="plate open">
+          <div class="lockup">
+            <span class="slot" data-draw-mark></span>
+            <span class="name rise" data-anim style="--delay: 1.05; --dur: 0.7">pomodoro</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 · La promesse. -->
+      <section class="scene" data-in="3.2" data-out="7.2">
+        <div class="plate">
+          <p class="say">
+            <span class="block rise" data-anim style="--delay: 0.15; --dur: 0.75"
+              >Un minuteur de travail</span
+            ><br /><span class="block rise" data-anim style="--delay: 0.4; --dur: 0.75"
+              >qui te laisse partir.</span
+            >
+          </p>
+          <span class="rule wipe" data-anim style="--delay: 0.95; --dur: 0.6"></span>
+        </div>
+      </section>
+
+      <!-- 3 · Le geste : la durée se règle en glissant. -->
+      <section class="scene take" data-in="7.0" data-out="13.4" data-take="scrub">
+        <div class="frame push" data-anim style="--delay: 0; --dur: 0.7">
+          <img class="footage" alt="" />
+        </div>
+        <div class="caption rise" data-anim style="--delay: 0.55; --dur: 0.7">
+          <span class="slot"></span>
+          <p>la durée se règle en glissant sur les chiffres</p>
+        </div>
+      </section>
+
+      <!-- 4 · Ça tourne, et l'écran se tait. -->
+      <section class="scene take" data-in="13.2" data-out="16.8" data-take="run">
+        <div class="frame push" data-anim style="--delay: 0; --dur: 0.6">
+          <img class="footage" alt="" />
+        </div>
+        <div class="caption rise" data-anim style="--delay: 0.35; --dur: 0.7">
+          <span class="slot"></span>
+          <p>pendant une session, l’écran n’a plus rien à te proposer</p>
+        </div>
+      </section>
+
+      <!-- 5 · Ce qu'il ne fait pas — l'argument, en toutes lettres. -->
+      <section class="scene" data-in="16.6" data-out="21.2">
+        <div class="plate">
+          <p class="kicker fade" data-anim style="--delay: 0.1; --dur: 0.5">ce qu’il ne fait pas</p>
+          <ul class="list">
+            <li class="rise" data-anim style="--delay: 0.35; --dur: 0.6">pas de notification</li>
+            <li class="rise" data-anim style="--delay: 0.6; --dur: 0.6">pas de compte</li>
+            <li class="rise" data-anim style="--delay: 0.85; --dur: 0.6">pas de série à tenir</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 6 · À tes couleurs. -->
+      <section class="scene take" data-in="21.0" data-out="26.4" data-take="accent">
+        <div class="frame push" data-anim style="--delay: 0; --dur: 0.6">
+          <img class="footage" alt="" />
+        </div>
+        <div class="caption rise" data-anim style="--delay: 0.35; --dur: 0.7">
+          <span class="slot"></span>
+          <p>clair, sombre, et la couleur que tu veux</p>
+        </div>
+      </section>
+
+      <!-- 7 · Carton de fin. -->
+      <section class="scene" data-in="26.2" data-out="30.2">
+        <div class="plate close">
+          <div class="lockup rise" data-anim style="--delay: 0.1; --dur: 0.7">
+            <span class="slot"></span>
+            <span class="name">pomodoro</span>
+          </div>
+          <div class="claims rise" data-anim style="--delay: 0.45; --dur: 0.7">
+            <span>ça s’installe, et ça marche hors ligne</span>
+            <span>rien ne sort de ton appareil</span>
+            <span>pas de compte, pas de série à tenir</span>
+          </div>
+          <p class="licence fade" data-anim style="--delay: 0.8; --dur: 0.6">
+            libre et gratuit — AGPL-3.0
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const stage = document.getElementById('stage');
+      const markTemplate = document.getElementById('mark').content.firstElementChild;
+
+      for (const slot of document.querySelectorAll('.slot')) {
+        const mark = markTemplate.cloneNode(true);
+        // L'anneau d'ouverture se trace plutôt que d'apparaître. La longueur de chaque
+        // course est mesurée sur le tracé même : un chiffre écrit à la main serait faux
+        // au premier changement de géométrie.
+        if (slot.hasAttribute('data-draw-mark')) {
+          for (const path of mark.querySelectorAll('path')) {
+            const length = path.getTotalLength();
+            path.style.setProperty('--len', length);
+            path.style.strokeDasharray = length;
+            path.setAttribute('data-anim', '');
+            path.classList.add('draw');
+            path.style.setProperty('--delay', '0.15');
+            path.style.setProperty('--dur', '0.95');
+          }
+        }
+        slot.replaceWith(mark);
+      }
+
+      const scenes = [...document.querySelectorAll('.scene')].map((element) => ({
+        element,
+        in: Number(element.dataset.in),
+        out: Number(element.dataset.out),
+        take: element.dataset.take ?? null,
+        image: element.querySelector('.footage'),
+      }));
+
+      const DURATION = Math.max(...scenes.map((scene) => scene.out));
+
+      /**
+       * Pose le film à `seconds`. `frames` associe à chaque plan filmé l'image à
+       * montrer — calculée dans Node, parce que c'est lui qui sait combien d'images
+       * chaque tournage a produites.
+       */
+      async function render(seconds, frames = {}) {
+        const waits = [];
+
+        for (const scene of scenes) {
+          const on = seconds >= scene.in && seconds < scene.out;
+          if (!on) {
+            delete scene.element.dataset.on;
+            continue;
+          }
+
+          scene.element.dataset.on = '';
+          scene.element.style.setProperty('--local', seconds - scene.in);
+
+          const source = scene.take ? frames[scene.take] : null;
+          if (source && scene.image && scene.image.getAttribute('src') !== source) {
+            scene.image.setAttribute('src', source);
+            waits.push(scene.image.decode().catch(() => {}));
+          }
+        }
+
+        await Promise.all(waits);
+        // Deux images successives : la première applique les styles, la seconde garantit
+        // qu'elles sont peintes avant que la capture ne parte.
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      window.film = {
+        duration: DURATION,
+        takes: scenes.filter((scene) => scene.take).map((scene) => scene.take),
+        spans: Object.fromEntries(
+          scenes
+            .filter((scene) => scene.take)
+            .map((scene) => [scene.take, [scene.in, scene.out]]),
+        ),
+        format: (value) => {
+          stage.dataset.format = value;
+        },
+        render,
+      };
+
+      render(0);
+    </script>
+  </body>
+</html>

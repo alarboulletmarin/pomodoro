@@ -25,6 +25,13 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 - **L'horloge et la barre décrivent enfin le même instant.** La première version affichait `25:00` au-dessus d'une barre déjà au tiers — une capture de quelque chose qui n'arrive jamais. La barre se déduit maintenant des chiffres, dans le même sens que l'app : le remplissage est le temps écoulé, les chiffres le temps restant.
 - **La carte de lien passe par le même gabarit.** Toutes les planches vivent dans un seul fichier, capturé par `npm run social` : trois gabarits séparés finissent par ne plus se ressembler, et une identité se juge côte à côte.
 
+### Ajouté — un film pour présenter le projet
+
+- **Trente secondes montées**, en 16:9 et en 9:16 : la marque se trace, la promesse tient son carton, trois plans de l'application arrivent légendés, un carton dit ce que l'app refuse de faire, et la fin ferme sur la licence. Ce n'est pas une capture d'écran plus longue, c'est un montage.
+- **Le découpage vit dans une page**, `design/film/film.html`. Les animations y sont écrites en vraies `@keyframes` mais mises en pause : chaque plan porte le temps écoulé depuis son entrée, et un délai négatif échantillonne l'animation à l'instant voulu. Le film est donc reproductible à l'image près, ce qu'une lecture en temps réel ne serait jamais.
+- **Un plan montre les couleurs.** Thème sombre, puis vert, puis bleu — les accents se voient mieux posés sur un fond sombre, et c'est l'ordre qu'annonce la légende.
+- **Ce que les deux scripts de tournage ont en commun vit à un seul endroit** (`scripts/stage.mjs`) : le navigateur ouvert sur un état connu, le curseur dessiné, les gestes adoucis. Deux copies auraient fini par ne plus tourner la même application.
+
 ### Ajouté — un film du geste
 
 - **La durée se règle en glissant sur les chiffres**, et c'est ce qu'aucune image fixe ne montre. `npm run demo` filme la vraie application — pas une reconstitution — pendant tout le geste : on saisit les chiffres, on monte à 45 minutes, on redescend, on lâche, on démarre, et l'écran se réduit à ce qu'une session en cours demande.
