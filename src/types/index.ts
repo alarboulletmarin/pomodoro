@@ -83,12 +83,18 @@ export interface SettingsContextValue {
   setChime(enabled: boolean): void;
 }
 
+export interface Suggestion {
+  mode: Mode;
+  minutes: number;
+}
+
 export interface TimerContextValue {
   state: TimerState;
   remainingMs: number;
   progressRatio: number;
   todayCount: number;
   sessions: SessionEntry[];
+  suggestion: Suggestion | null;
   setMinutes(minutes: number): void;
   start(): void;
   pause(): void;

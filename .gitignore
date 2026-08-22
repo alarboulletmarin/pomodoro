@@ -8,3 +8,4 @@ test-results/
 .husky/_/
 *.local
 .DS_Store
+.claude/
