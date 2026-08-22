@@ -1,0 +1,104 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.today {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.goal {
+  flex: none;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.dots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  height: 10px;
+  min-width: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--hairline-ring);
+}
+
+.dot[data-done] {
+  background: var(--accent);
+}
+
+:global(html[data-layout='landscape']) .block {
+  gap: 14px;
+}
+
+:global(html[data-layout='landscape']) .dots {
+  gap: 7px;
+}
+
+:global(html[data-layout='landscape']) .dot {
+  height: 9px;
+}
+
+:global(html[data-layout='tablet']) .block {
+  gap: 20px;
+}
+
+:global(html[data-layout='tablet']) .today {
+  font-size: 19px;
+}
+
+:global(html[data-layout='tablet']) .goal {
+  font-size: 14px;
+}
+
+:global(html[data-layout='tablet']) .dots,
+:global(html[data-layout='desktop']) .dots {
+  gap: 9px;
+}
+
+:global(html[data-layout='tablet']) .dot,
+:global(html[data-layout='desktop']) .dot {
+  height: 11px;
+}
+
+:global(html[data-layout='desktop']) .block {
+  gap: 26px;
+}
+
+/* The desktop rail has room to stack the two lines instead of squeezing them onto one. */
+:global(html[data-layout='desktop']) .header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+:global(html[data-layout='desktop']) .today {
+  font-size: 22px;
+}
+
+:global(html[data-layout='desktop']) .goal {
+  font-size: 14px;
+}

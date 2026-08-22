@@ -1,9 +1,82 @@
-.stats {
+.panel {
+  flex: none;
   gap: 12px;
 }
 
-.total {
-  font-size: 16px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+/* Portrait and landscape read the two records side by side; wider rails stack them. */
+.sections {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  height: 132px;
+  min-width: 0;
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.notice {
+  display: none;
+}
+
+:global(html[data-layout='landscape']) .panel {
+  flex: 1;
+  min-height: 0;
+  gap: 14px;
+  padding: 18px;
+}
+
+:global(html[data-layout='landscape']) .sections {
+  flex: 1;
+  height: auto;
+  min-height: 124px;
+  gap: 14px;
+}
+
+:global(html[data-layout='tablet']) .panel {
+  gap: 20px;
+  padding: 26px;
+}
+
+:global(html[data-layout='tablet']) .sections,
+:global(html[data-layout='desktop']) .sections {
+  flex-direction: column;
+  height: auto;
+}
+
+:global(html[data-layout='tablet']) .sections {
+  gap: 20px;
+}
+
+:global(html[data-layout='tablet']) .divider,
+:global(html[data-layout='desktop']) .divider {
+  width: auto;
+  height: 1px;
+}
+
+/* The desktop rail is already the surface: the card only supplies the rhythm. */
+:global(html[data-layout='desktop']) .panel {
+  flex: 1;
+  min-height: 0;
+  gap: 26px;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:global(html[data-layout='desktop']) .sections {
+  gap: 26px;
+}
+
+:global(html[data-layout='desktop']) .notice {
+  display: block;
+  margin-top: auto;
+  padding-top: 26px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
 }
