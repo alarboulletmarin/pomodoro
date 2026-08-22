@@ -1,0 +1,17 @@
+.page {
+  gap: 12px;
+  padding: 18px;
+}
+
+.lead {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.body {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}

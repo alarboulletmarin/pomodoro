@@ -1,0 +1,42 @@
+.section {
+  gap: 0;
+  padding: 2px 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  transition: opacity var(--duration-fast) var(--ease);
+}
+
+.row:hover {
+  opacity: 0.65;
+}
+
+.row:focus-visible {
+  outline: none;
+  border-radius: var(--radius-chip);
+  box-shadow: var(--focus-ring);
+}
+
+.row + .row {
+  box-shadow: inset 0 1px 0 var(--hairline);
+}
+
+.row + .row:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.label {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.chevron {
+  font-size: 17px;
+  line-height: 1;
+  color: var(--muted);
+}
