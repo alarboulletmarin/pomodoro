@@ -1,0 +1,47 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--hit-min);
+  padding: 0 20px;
+  border-radius: var(--radius-button);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  transition: opacity var(--duration-fast) var(--ease);
+}
+
+.button:hover {
+  opacity: 0.86;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.quiet {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.outline {
+  color: var(--text);
+  box-shadow: var(--hairline-ring);
+}
+
+.outline:focus-visible {
+  box-shadow: var(--focus-ring);
+}

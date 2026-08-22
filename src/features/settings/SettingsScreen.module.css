@@ -1,0 +1,22 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}

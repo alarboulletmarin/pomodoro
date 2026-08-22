@@ -1,0 +1,30 @@
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: var(--hit-min);
+  min-height: var(--hit-min);
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  transition: opacity var(--duration-fast) var(--ease);
+}
+
+.iconButton:hover {
+  opacity: 0.6;
+}
+
+.iconButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--hairline-ring);
+}
