@@ -1,4 +1,4 @@
-import type { TimerEvent, TimerState } from '../../types';
+import type { Phase, TimerEvent, TimerState } from '../../types';
 import { clampMinutes, DEFAULT_FOCUS_MINUTES, MS_PER_MINUTE } from './durations';
 
 function armed(mode: TimerState['mode'], minutes: number): TimerState {
@@ -9,6 +9,11 @@ function armed(mode: TimerState['mode'], minutes: number): TimerState {
     endsAt: null,
     remainingMs: minutes * MS_PER_MINUTE,
   };
+}
+
+/** Running or paused: the phases the app collapses to nothing but the timer for. */
+export function isSessionUnderway(phase: Phase): boolean {
+  return phase === 'running' || phase === 'paused';
 }
 
 export function initialTimerState(): TimerState {

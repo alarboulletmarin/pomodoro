@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TimerEvent, TimerState } from '../../types';
-import { initialTimerState, timerReducer } from './timer-machine';
+import { initialTimerState, isSessionUnderway, timerReducer } from './timer-machine';
 
 const T0 = 1_700_000_000_000;
 const MINUTE = 60_000;
@@ -238,5 +238,14 @@ describe('end', () => {
       endsAt: null,
       remainingMs: 5 * MINUTE,
     });
+  });
+});
+
+describe('isSessionUnderway', () => {
+  it('covers running and paused only', () => {
+    expect(isSessionUnderway('running')).toBe(true);
+    expect(isSessionUnderway('paused')).toBe(true);
+    expect(isSessionUnderway('idle')).toBe(false);
+    expect(isSessionUnderway('finished')).toBe(false);
   });
 });

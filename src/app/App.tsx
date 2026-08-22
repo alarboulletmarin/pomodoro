@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { isSessionUnderway } from '../domain/timer/timer-machine';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { StatsPanel } from '../features/stats/StatsPanel';
 import { TimerScreen } from '../features/timer/TimerScreen';
@@ -17,7 +18,7 @@ export function App(): JSX.Element {
 
   const isWide = layout === 'tablet' || layout === 'desktop';
   // A running session leaves nothing on screen but the timer, in every layout.
-  const active = state.phase === 'running' || state.phase === 'paused';
+  const active = isSessionUnderway(state.phase);
 
   if (settingsOpen && !isWide) {
     return (

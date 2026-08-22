@@ -1,4 +1,5 @@
 import type { Layout } from '../types';
+import { isSessionUnderway } from '../domain/timer/timer-machine';
 import { useTimer } from '../features/timer/timer-provider';
 import { useI18n } from '../shared/i18n/i18n';
 import { GearIcon } from '../shared/ui/GearIcon';
@@ -15,7 +16,7 @@ export function ShellHeader({ layout, onOpenSettings }: ShellHeaderProps): JSX.E
   const { state, todayCount } = useTimer();
 
   const isDesktop = layout === 'desktop';
-  const active = state.phase === 'running' || state.phase === 'paused';
+  const active = isSessionUnderway(state.phase);
 
   return (
     <header className={isDesktop ? styles.titleBar : styles.topBar}>

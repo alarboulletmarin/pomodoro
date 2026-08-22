@@ -1,3 +1,4 @@
+import { isSessionUnderway } from '../../domain/timer/timer-machine';
 import { useMediaLayout } from '../../shared/hooks/use-media-layout';
 import { useI18n } from '../../shared/i18n/i18n';
 import { GearIcon } from '../../shared/ui/GearIcon';
@@ -23,7 +24,7 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
   const timer = useTimer();
   const { phase, mode, minutes } = timer.state;
 
-  const active = phase === 'running' || phase === 'paused';
+  const active = isSessionUnderway(phase);
   // No shortcut applies once the session is over, so the hint says nothing rather than lying.
   const shortcutHint =
     phase === 'finished' ? null : t(active ? 'timer.shortcuts.active' : 'timer.shortcuts.idle');
