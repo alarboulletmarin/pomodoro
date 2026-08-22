@@ -1,0 +1,140 @@
+/* Scrolls rather than centres when the viewport is shorter than the card — landscape
+   phones would otherwise clip it at both ends. */
+.intro {
+  flex: 1;
+  display: flex;
+  align-items: safe center;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.card {
+  flex: none;
+  width: 100%;
+  max-width: 520px;
+  gap: 20px;
+  padding: 24px;
+}
+
+.name {
+  font-size: var(--label-size);
+  font-weight: 500;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lead {
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.6px;
+  color: var(--text);
+}
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.point {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pointTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pointBody {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Sticky, so the one thing to tap stays on screen on a short viewport while the
+   three paragraphs scroll behind it. Inert on any screen the card already fits. */
+.actions {
+  position: sticky;
+  bottom: -1px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  background: var(--surface);
+}
+
+/* Fades whatever is scrolling behind it, so the cut looks like more text rather
+   than a sentence that ends badly. Invisible when the card fits. */
+.actions::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 18px;
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none;
+}
+
+.start {
+  width: 100%;
+}
+
+/* Quiet, and second: the intro is worth one tap, not two decisions. */
+.method {
+  width: 100%;
+  min-height: var(--hit-min);
+  font-size: 14px;
+}
+
+:global(html[data-layout='tablet']) .lead,
+:global(html[data-layout='desktop']) .lead {
+  font-size: 32px;
+}
+
+:global(html[data-layout='tablet']) .card,
+:global(html[data-layout='desktop']) .card {
+  padding: 30px;
+  gap: 24px;
+}
+
+:global(html[data-layout='landscape']) .card {
+  gap: 16px;
+  padding: 20px;
+}
+
+:global(html[data-layout='landscape']) .lead {
+  font-size: 23px;
+}
+
+/* A short screen — a small phone, or any phone on its side — pays for every line. */
+@media (max-height: 700px) {
+  .card {
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .lead {
+    font-size: 23px;
+  }
+
+  .points {
+    gap: 10px;
+  }
+
+  .pointBody {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+}

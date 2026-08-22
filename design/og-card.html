@@ -1,0 +1,131 @@
+<!doctype html>
+<!-- Source of public/og.png, the card a pasted link unfurls into.
+     Render: 1200×630, deviceScaleFactor 1. See README, "The link". -->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../public/fonts/clash-display-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../public/fonts/clash-display-500.woff2') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../public/fonts/clash-display-400.woff2') format('woff2');
+        font-weight: 400;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        display: flex;
+        padding: 56px;
+        background: #fbf6ee;
+        color: #221e1a;
+        font-family: 'Clash Display', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 48px 56px;
+        border-radius: 30px;
+        background: #ffffff;
+        box-shadow:
+          0 1px 0 rgba(34, 30, 26, 0.06),
+          0 30px 60px -40px rgba(34, 30, 26, 0.8);
+      }
+
+      .name {
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: #6b625a;
+      }
+
+      .middle {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 48px;
+      }
+
+      .clock {
+        font-size: 168px;
+        font-weight: 600;
+        letter-spacing: -9px;
+        line-height: 0.9;
+      }
+
+      .lead {
+        max-width: 420px;
+        padding-bottom: 14px;
+        font-size: 34px;
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.8px;
+        text-align: right;
+      }
+
+      .bar {
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(34, 30, 26, 0.09);
+        overflow: hidden;
+      }
+
+      .fill {
+        width: 38%;
+        height: 100%;
+        border-radius: 999px;
+        background: #d63e45;
+      }
+
+      .foot {
+        display: flex;
+        gap: 18px;
+        font-size: 23px;
+        font-weight: 400;
+        color: #6b625a;
+      }
+
+      .dot {
+        color: rgba(34, 30, 26, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p class="name">pomodoro</p>
+
+      <div class="middle">
+        <p class="clock">25:00</p>
+        <p class="lead">Un minuteur de travail qui te laisse partir.</p>
+      </div>
+
+      <div class="bar"><div class="fill"></div></div>
+
+      <div class="foot">
+        <span>pas de notification</span><span class="dot">·</span>
+        <span>pas de compte</span><span class="dot">·</span>
+        <span>tout reste sur ton appareil</span>
+      </div>
+    </div>
+  </body>
+</html>

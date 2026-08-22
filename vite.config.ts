@@ -4,6 +4,13 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const BACKGROUND = '#FBF6EE';
+const DESCRIPTION =
+  'Un minuteur de travail qui te laisse partir : une durée, une session, une pause. ' +
+  'Pas de notification, pas de compte, pas de série à tenir.';
+
+// Link previews want absolute URLs. Set SITE_URL at build time to get them; without it
+// the tags stay relative, which most unfurlers still resolve.
+const SITE_URL = (process.env.SITE_URL ?? '').replace(/\/$/, '');
 
 // Read rather than imported so the manifest never lands in the client bundle.
 const { version } = JSON.parse(
@@ -15,6 +22,16 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(version),
   },
   plugins: [
+    {
+      name: 'site-url',
+      // Without a site URL there is no canonical address to declare, so the tag goes
+      // rather than pointing at "/"; the rest degrade to paths the scraper resolves.
+      transformIndexHtml: (html: string) =>
+        (SITE_URL ? html : html.replace(/\s*<meta property="og:url"[^>]*>/, '')).replaceAll(
+          '%SITE_URL%',
+          SITE_URL,
+        ),
+    },
     react(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -23,7 +40,7 @@ export default defineConfig({
       manifest: {
         name: 'Pomodoro',
         short_name: 'Pomodoro',
-        description: 'Un minuteur de travail qui te laisse partir.',
+        description: DESCRIPTION,
         start_url: '/',
         scope: '/',
         display: 'standalone',

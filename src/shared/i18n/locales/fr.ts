@@ -2,7 +2,8 @@ import type { Messages } from '../../../types';
 
 export const fr: Messages = {
   'app.name': 'pomodoro',
-  'app.description': 'Un minuteur de travail qui te laisse partir.',
+  'app.description':
+    'Un minuteur de travail qui te laisse partir : une durée, une session, une pause. Pas de notification, pas de compte, pas de série à tenir.',
 
   'timer.mode.focus': 'focus',
   'timer.mode.break': 'pause',
@@ -112,6 +113,19 @@ export const fr: Messages = {
   'settings.about': 'à propos',
   'settings.legal': 'mentions légales',
   'settings.version': 'version {version}',
+
+  'intro.lead': 'Un minuteur de travail qui te laisse partir.',
+  'intro.what.title': 'Tu choisis une durée.',
+  'intro.what.body':
+    'Tu travailles, ça sonne une fois, puis tu prends une pause. C’est tout ce que fait l’app.',
+  'intro.quiet.title': 'Rien ne te relance.',
+  'intro.quiet.body':
+    'Pas de notification, pas de série à tenir, pas de compte. Quand ta session est finie, il n’y a plus rien à faire ici.',
+  'intro.local.title': 'Rien ne sort d’ici.',
+  'intro.local.body':
+    'Tes sessions restent sur cet appareil. L’app s’installe et fonctionne hors ligne.',
+  'intro.start': 'commencer',
+  'intro.method': 'la méthode, et ce qu’en dit la recherche',
 
   'about.title': 'à propos',
   'about.lead': 'Un minuteur, rien d’autre.',

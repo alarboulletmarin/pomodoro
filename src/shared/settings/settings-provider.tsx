@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import {
   ACCENT_PALETTE,
   DEFAULT_SETTINGS,
@@ -12,6 +12,7 @@ import {
 } from '../../types';
 import { clampGoal } from '../../domain/sessions/session-stats';
 import { clampDuration } from '../../domain/timer/durations';
+import { preferredLocale } from '../i18n/preferred-locale';
 import { usePersistentState } from '../hooks/use-persistent-state';
 import { normaliseHex } from '../theme/contrast';
 import { useSystemTheme } from '../theme/use-system-theme';
@@ -58,12 +59,11 @@ export function normaliseSettings(raw: unknown, defaults: Settings): Settings | 
 }
 
 export function SettingsProvider({ children }: { children: ReactNode }): JSX.Element {
-  const normalise = useCallback((raw: unknown) => normaliseSettings(raw, DEFAULT_SETTINGS), []);
-  const [settings, setSettings] = usePersistentState(
-    SETTINGS_STORAGE_KEY,
-    DEFAULT_SETTINGS,
-    normalise,
-  );
+  // Read once: the language the browser asks for is a starting point, not a preference
+  // that keeps overruling the one that was chosen.
+  const [defaults] = useState<Settings>(() => ({ ...DEFAULT_SETTINGS, lang: preferredLocale() }));
+  const normalise = useCallback((raw: unknown) => normaliseSettings(raw, defaults), [defaults]);
+  const [settings, setSettings] = usePersistentState(SETTINGS_STORAGE_KEY, defaults, normalise);
   const systemTheme = useSystemTheme();
 
   const setTheme = useCallback(

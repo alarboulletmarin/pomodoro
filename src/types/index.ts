@@ -236,6 +236,16 @@ interface SingularMessages {
   'settings.legal': string;
   'settings.version': string;
 
+  'intro.lead': string;
+  'intro.what.title': string;
+  'intro.what.body': string;
+  'intro.quiet.title': string;
+  'intro.quiet.body': string;
+  'intro.local.title': string;
+  'intro.local.body': string;
+  'intro.start': string;
+  'intro.method': string;
+
   'about.title': string;
   'about.lead': string;
   'about.body1': string;
@@ -280,6 +290,7 @@ export interface I18nContextValue {
 export const SETTINGS_STORAGE_KEY = 'pomodoro.settings.v1';
 export const SESSIONS_STORAGE_KEY = 'pomodoro.sessions.v1';
 export const TIMER_STORAGE_KEY = 'pomodoro.timer.v1';
+export const INTRO_STORAGE_KEY = 'pomodoro.intro.v1';
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',

@@ -9,6 +9,11 @@ come back.
 
 Everything stays on your device. It installs, and it works with the network off.
 
+The first visit opens on a screen that says what the app is, in the language the
+browser asks for, and never shows it again — a link sent to someone lands on an
+explanation rather than on a bare clock. `?intro` brings it back on a device that
+has already seen it.
+
 ## Running it
 
 ```
@@ -24,6 +29,9 @@ npm run dev
 | `lint` · `typecheck` · `test` | the checks CI runs                |
 | `e2e`                         | Playwright, the two user journeys |
 | `format`                      | Prettier                          |
+
+`SITE_URL=https://your.host npm run build` writes absolute URLs into the link
+preview tags. Without it they stay relative, which most unfurlers still resolve.
 
 ## How it is put together
 
@@ -66,9 +74,16 @@ The stats read out a day at a time. Every week bar carries its count, and every
 bar and heatmap cell is a button: picking one states that day's date, sessions and
 total focus time under the charts; picking it again goes back to today.
 
+## The link
+
+A pasted link has to explain itself before anyone taps it, so `index.html` carries
+Open Graph and Twitter card tags and `public/og.png` is the 1200×630 card they point
+at. That PNG is rendered from `design/og-card.html` — open it at 1200×630 and
+screenshot it to regenerate.
+
 ## Verified
 
-237 unit tests, 4 end-to-end, on Chromium.
+257 unit tests, 8 end-to-end, on Chromium.
 
 The figures below were measured on the build that preceded the settings and stats
 work, and have **not** been re-run since. Lighthouse on the production build:
@@ -108,6 +123,12 @@ would mean scrolling the week or dropping days from the grid, and the readout th
 feed is the point of the change. The bars clear 44px in one dimension; the cells
 clear it in neither. Every day of the current week is reachable from the taller
 bars, and every cell states its date and its count to a screen reader.
+
+**The intro is a screen, not a tour.** No tooltips, no dots, no swiping through
+steps: one card, three sentences, one button. A tour would be four decisions in a
+row before the app does anything, on a first visit that lasts seconds. What the
+card leaves out — the presets, the stats, the settings — is discoverable in place,
+and the method page carries the rest.
 
 **Only tested on Chromium.** WebKit's Linux build needs system packages that were
 not installed, so the matrix, the offline proof, the drift test and Lighthouse all

@@ -2,7 +2,8 @@ import type { Messages } from '../../../types';
 
 export const en: Messages = {
   'app.name': 'pomodoro',
-  'app.description': 'A work timer that lets you leave.',
+  'app.description':
+    'A work timer that lets you leave: one length, one session, one break. No notifications, no account, no streak to keep.',
 
   'timer.mode.focus': 'focus',
   'timer.mode.break': 'break',
@@ -112,6 +113,18 @@ export const en: Messages = {
   'settings.about': 'about',
   'settings.legal': 'legal notice',
   'settings.version': 'version {version}',
+
+  'intro.lead': 'A work timer that lets you leave.',
+  'intro.what.title': 'You pick a length.',
+  'intro.what.body':
+    'You work, it chimes once, then you take a break. That is everything the app does.',
+  'intro.quiet.title': 'Nothing chases you.',
+  'intro.quiet.body':
+    'No notifications, no streak to keep, no account. Once your session is over, there is nothing left to do here.',
+  'intro.local.title': 'Nothing leaves this device.',
+  'intro.local.body': 'Your sessions stay here. The app installs, and works offline.',
+  'intro.start': 'start',
+  'intro.method': 'the method, and what the research says',
 
   'about.title': 'about',
   'about.lead': 'A timer, nothing else.',

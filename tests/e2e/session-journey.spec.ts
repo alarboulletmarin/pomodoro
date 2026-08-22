@@ -22,6 +22,8 @@ test.beforeEach(async ({ page }) => {
     // Runs on every navigation, so the marker keeps a reload from wiping the app state.
     if (window.sessionStorage.getItem('e2e-reset') === null) {
       window.localStorage.clear();
+      // These journeys start after the first visit; first-visit.spec.ts owns that one.
+      window.localStorage.setItem('pomodoro.intro.v1', '1');
       window.sessionStorage.setItem('e2e-reset', '1');
     }
   });

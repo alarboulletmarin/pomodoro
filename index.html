@@ -5,7 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
     <title>Pomodoro</title>
-    <meta name="description" content="Un minuteur de travail qui te laisse partir." />
+    <meta
+      name="description"
+      content="Un minuteur de travail qui te laisse partir : une durée, une session, une pause. Pas de notification, pas de compte, pas de série à tenir."
+    />
+
+    <!-- What a pasted link unfurls into: the app has to say what it is before it is opened.
+         SITE_URL is substituted at build time; empty leaves the paths relative. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pomodoro" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="Pomodoro — un minuteur de travail qui te laisse partir" />
+    <meta
+      property="og:description"
+      content="Un minuteur de travail qui te laisse partir : une durée, une session, une pause. Pas de notification, pas de compte, pas de série à tenir."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Un minuteur affichant 25:00, sous le titre « un minuteur de travail qui te laisse partir »."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <meta name="theme-color" content="#FBF6EE" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#151311" media="(prefers-color-scheme: dark)" />
