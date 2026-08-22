@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "icons": "node scripts/generate-icons.mjs",
     "social": "node scripts/generate-social.mjs",
+    "demo": "node scripts/record-demo.mjs",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
     "test": "vitest run",

@@ -25,6 +25,13 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 - **L'horloge et la barre décrivent enfin le même instant.** La première version affichait `25:00` au-dessus d'une barre déjà au tiers — une capture de quelque chose qui n'arrive jamais. La barre se déduit maintenant des chiffres, dans le même sens que l'app : le remplissage est le temps écoulé, les chiffres le temps restant.
 - **La carte de lien passe par le même gabarit.** Toutes les planches vivent dans un seul fichier, capturé par `npm run social` : trois gabarits séparés finissent par ne plus se ressembler, et une identité se juge côte à côte.
 
+### Ajouté — un film du geste
+
+- **La durée se règle en glissant sur les chiffres**, et c'est ce qu'aucune image fixe ne montre. `npm run demo` filme la vraie application — pas une reconstitution — pendant tout le geste : on saisit les chiffres, on monte à 45 minutes, on redescend, on lâche, on démarre, et l'écran se réduit à ce qu'une session en cours demande.
+- **Un GIF pour le README et les conversations**, un MP4 en 16:9 et un en 9:16 pour les réseaux — qui refusent presque tous le WebM que produit l'enregistreur.
+- **Le film dessine son propre curseur**, parce qu'une capture n'enregistre pas le pointeur du système : des chiffres qui défilent sans que rien ne les touche ne se lisent pas comme un geste.
+- **Il sème un mois de sessions** avant de tourner. Un relevé à zéro laisserait la moitié de l'écran vide, alors que c'est justement ce que l'application a à montrer. Le semis est calculé, pas tiré au sort : deux tournages donnent la même semaine.
+
 ### Ajouté — la licence
 
 - **Le projet est sous AGPL-3.0-only.** Reprendre, modifier, héberger, y compris pour gagner sa vie : librement. Une seule condition, ferme : ce qui part d'ici reste ouvert. L'article 13 étend l'obligation à la simple mise en ligne — servir cette application, c'est en distribuer le code au navigateur.

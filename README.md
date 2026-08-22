@@ -11,6 +11,13 @@ come back.
 
 Everything stays on your device. It installs, and it works with the network off.
 
+![Setting the length by dragging the digits, then a session starting](design/social/pomodoro-demo.gif)
+
+The length is set by **dragging the digits** — nine pixels a minute, with the next value
+above and the previous one below so it reads as a dial rather than a field. Arrow keys,
+`Page↑`/`Page↓`, `Home`/`End` and the wheel do the same thing, and the three presets are
+there for the lengths people actually pick.
+
 The first visit opens on a screen that says what the app is, in the language the
 browser asks for, and never shows it again — a link sent to someone lands on an
 explanation rather than on a bare clock. `?intro` brings it back on a device that
@@ -31,7 +38,8 @@ npm run dev
 | `lint` · `typecheck` · `test` | the checks CI runs                |
 | `e2e`                         | Playwright, the two user journeys |
 | `icons`                       | redraw the icon set and favicon   |
-| `social`                      | re-render the three share images  |
+| `social`                      | re-render the share images        |
+| `demo`                        | re-record the demo GIF and videos |
 | `format`                      | Prettier                          |
 
 `SITE_URL=https://your.host npm run build` writes absolute URLs into the link
@@ -170,6 +178,32 @@ The clock and the bar describe one instant, and the board derives the second fro
 first — fill is elapsed, digits are remaining, as in the app. The first version showed
 `25:00` above a bar already a third of the way across: a picture of something that never
 happens.
+
+## The demo
+
+No still frame can show the one gesture the app is built around, so `npm run demo`
+films it: Playwright drives the **real build** — not a re-enactment — through the whole
+move. Grab the digits, climb to 45 minutes, come back down, let go, start, and watch the
+screen collapse to what a running session needs.
+
+It needs a server on `http://localhost:4173` (`npm run build && npm run preview`, or set
+`POMODORO_BASE_URL`) and **ffmpeg on `PATH`**. Out come
+`design/social/pomodoro-demo.gif` for a README or a chat, and
+`pomodoro-demo-16x9.mp4` / `pomodoro-demo-9x16.mp4` for the networks, which almost all
+refuse WebM.
+
+Three things the recording has to do that are not obvious:
+
+- **Draw its own cursor.** A capture does not record the system pointer, and digits that
+  change with nothing touching them do not read as a gesture. A dot is injected into the
+  page and tightens on press.
+- **Seed a month of sessions.** An empty record would leave half the desktop screen
+  blank, and the record is exactly what the app has to show. The seed is computed, not
+  drawn at random, so two takes give the same week.
+- **Pick the window for the layout, not the resolution.** Past 768px the app switches to
+  its tablet layout, so the 9:16 has to be filmed at 540 wide and enlarged afterwards —
+  Playwright composes video in CSS pixels and only ever scales _down_, so asking a 540px
+  window for a 1080px video returns grey borders, not a bigger picture.
 
 The card is laid out for the size it is actually seen at. A chat client draws it around
 350px wide, so everything on it is sized against that: the sentence is the largest
