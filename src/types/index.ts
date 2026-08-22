@@ -238,7 +238,6 @@ export const ON_ACCENT: Record<Theme, string> = {
 };
 
 export const LAYOUT_BREAKPOINTS = {
-  portraitMaxWidth: 430,
   landscapeMaxHeight: 430,
   tabletMinWidth: 768,
   desktopMinWidth: 1200,
