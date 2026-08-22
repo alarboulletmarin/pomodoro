@@ -4,6 +4,7 @@ import { useTimer } from '../features/timer/timer-provider';
 import { useI18n } from '../shared/i18n/i18n';
 import { GearIcon } from '../shared/ui/GearIcon';
 import { IconButton } from '../shared/ui/IconButton';
+import { Mark } from '../shared/ui/Mark';
 import styles from './ShellHeader.module.css';
 
 export interface ShellHeaderProps {
@@ -20,7 +21,10 @@ export function ShellHeader({ layout, onOpenSettings }: ShellHeaderProps): JSX.E
 
   return (
     <header className={isDesktop ? styles.titleBar : styles.topBar}>
-      <span className={styles.appName}>{t('app.name')}</span>
+      <span className={styles.logotype}>
+        <Mark size={isDesktop ? 15 : 19} />
+        <span className={styles.appName}>{t('app.name')}</span>
+      </span>
 
       {/* During a session the top bar carries nothing that invites a detour. */}
       {active ? null : (

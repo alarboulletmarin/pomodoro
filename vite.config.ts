@@ -39,17 +39,27 @@ export default defineConfig({
       // en cours de réglage disparaîtrait sans un mot.
       registerType: 'prompt',
       injectRegister: null,
-      includeManifestIcons: false,
       manifest: {
+        id: '/',
         name: 'Pomodoro',
         short_name: 'Pomodoro',
         description: DESCRIPTION,
+        // The interface opens in the language the browser asks for, but the manifest
+        // is read once, by the installer, before any of that: it declares the one the
+        // app is written in.
+        lang: 'fr',
+        dir: 'ltr',
+        categories: ['productivity', 'utilities'],
         start_url: '/',
         scope: '/',
         display: 'standalone',
         orientation: 'any',
         background_color: BACKGROUND,
         theme_color: BACKGROUND,
+        // Three purposes, three drawings — see scripts/generate-icons.mjs. `any` keeps
+        // its corners, `maskable` bleeds to the edge with the dial inside the safe
+        // circle, `monochrome` is alpha only. Shipping one file under two purposes is
+        // what left the installed app looking cropped.
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
@@ -58,6 +68,12 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
+          },
+          {
+            src: '/icons/icon-512-monochrome.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'monochrome',
           },
         ],
       },

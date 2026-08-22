@@ -12,6 +12,19 @@
     calc(var(--safe-left) + 56px);
 }
 
+.logotype {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The mark is the only accent in the bar. It reads as a logo, not as a status light:
+   nothing about it changes while a session runs. */
+.logotype svg {
+  flex: none;
+  color: var(--accent);
+}
+
 .appName {
   font-family: var(--font-display);
 }

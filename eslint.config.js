@@ -63,5 +63,12 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
   },
 
+  // The asset generators run in Node, but `generate-social.mjs` also carries a
+  // callback that Playwright evaluates inside the page — hence both sets.
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+
   prettier,
 );
