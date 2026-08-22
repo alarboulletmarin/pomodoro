@@ -50,6 +50,8 @@ export const fr: Messages = {
   'stats.month.total_one': '{count} session ce mois-ci',
   'stats.month.total_other': '{count} sessions ce mois-ci',
   'stats.month.footer': '{active} jours actifs sur {days} · {count} sessions',
+  'stats.notice':
+    'Pas de notification pendant une session. Rien ne t’attend ici quand elle est finie.',
   'stats.session.done': 'session terminée',
   'stats.session.todo': 'session à venir',
   'stats.day.none': 'jour sans session',

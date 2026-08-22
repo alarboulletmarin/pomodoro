@@ -50,6 +50,7 @@ export const en: Messages = {
   'stats.month.total_one': '{count} session this month',
   'stats.month.total_other': '{count} sessions this month',
   'stats.month.footer': '{active} active days out of {days} · {count} sessions',
+  'stats.notice': 'No notifications during a session. Nothing waits for you here when it ends.',
   'stats.session.done': 'completed session',
   'stats.session.todo': 'upcoming session',
   'stats.day.none': 'day with no session',

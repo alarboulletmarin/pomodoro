@@ -155,6 +155,7 @@ interface SingularMessages {
   'stats.goal': string;
   'stats.week.caption': string;
   'stats.month.footer': string;
+  'stats.notice': string;
   'stats.session.done': string;
   'stats.session.todo': string;
   'stats.day.none': string;
