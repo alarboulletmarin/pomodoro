@@ -107,7 +107,11 @@ export interface TimerContextValue {
 export type TranslateParams = Record<string, string | number>;
 
 export type PluralMessageKey =
-  'stats.today' | 'stats.week.footer' | 'stats.month.total' | 'stats.day.count';
+  | 'stats.today'
+  | 'stats.week.footer'
+  | 'stats.month.total'
+  | 'stats.month.footer'
+  | 'stats.day.count';
 
 type PluralForms<K extends string> = { [P in `${K}_one` | `${K}_other`]: string };
 
@@ -154,7 +158,6 @@ interface SingularMessages {
 
   'stats.goal': string;
   'stats.week.caption': string;
-  'stats.month.footer': string;
   'stats.notice': string;
   'stats.session.done': string;
   'stats.session.todo': string;

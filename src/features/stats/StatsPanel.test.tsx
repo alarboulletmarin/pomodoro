@@ -165,12 +165,18 @@ describe('both languages', () => {
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 
+  it('keeps both halves of the footer singular on a single day and a single session', () => {
+    renderPanel(sessionsOn(0, 1));
+
+    expect(screen.getByText('1 active day out of 30 · 1 session')).toBeInTheDocument();
+  });
+
   it('keeps the French month and week wording intact', () => {
     renderPanel(sessionsOn(0, 1), 'fr');
 
     expect(screen.getByRole('list', { name: 'août' })).toBeInTheDocument();
     expect(screen.getByText('objectif 4')).toBeInTheDocument();
     expect(screen.getByText('mercredi · 1 session cette semaine')).toBeInTheDocument();
-    expect(screen.getByText('1 jours actifs sur 30 · 1 sessions')).toBeInTheDocument();
+    expect(screen.getByText('1 jour actif sur 30 · 1 session')).toBeInTheDocument();
   });
 });

@@ -28,10 +28,9 @@ export function MonthHeatmap({ stats }: MonthHeatmapProps): JSX.Element {
         ))}
       </ul>
       <p className={styles.footer}>
-        {t('stats.month.footer', {
-          active: stats.activeDays,
+        {tn('stats.month.footer', stats.activeDays, {
           days: ROLLING_WINDOW_DAYS,
-          count: stats.total,
+          sessions: tn('stats.day.count', stats.total),
         })}
       </p>
     </section>
