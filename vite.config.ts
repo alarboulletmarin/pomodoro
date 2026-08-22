@@ -23,7 +23,7 @@ export default defineConfig({
       manifest: {
         name: 'Pomodoro',
         short_name: 'Pomodoro',
-        description: 'A work timer that lets you leave.',
+        description: 'Un minuteur de travail qui te laisse partir.',
         start_url: '/',
         scope: '/',
         display: 'standalone',

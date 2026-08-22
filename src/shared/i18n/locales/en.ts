@@ -2,6 +2,7 @@ import type { Messages } from '../../../types';
 
 export const en: Messages = {
   'app.name': 'pomodoro',
+  'app.description': 'A work timer that lets you leave.',
 
   'timer.mode.focus': 'focus',
   'timer.mode.break': 'break',
@@ -25,6 +26,7 @@ export const en: Messages = {
   'timer.scrubHint': 'swipe to set',
   'timer.scrubber.label': 'session length in minutes',
   'timer.shortcuts.idle': '↑ ↓ or drag to set · space to start',
+  'timer.shortcuts.paused': 'space to resume · esc to end',
   'timer.shortcuts.active': 'space to pause · esc to end',
 
   'timer.action.start': 'start',
@@ -76,7 +78,8 @@ export const en: Messages = {
   'settings.accent.blue': 'blue',
   'settings.accent.custom': 'customise',
   'settings.accent.customHint': 'your own colour, picked from the system palette',
-  'settings.accent.contrastWarning': 'low contrast — text on this colour will be hard to read',
+  'settings.accent.contrastWarning':
+    'low contrast — this colour will be hard to tell apart from the background',
   'settings.language.title': 'language',
   'settings.language.fr': 'french',
   'settings.language.en': 'english',

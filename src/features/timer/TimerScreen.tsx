@@ -1,4 +1,5 @@
 import { isSessionUnderway } from '../../domain/timer/timer-machine';
+import type { MessageKey, Phase } from '../../types';
 import { useMediaLayout } from '../../shared/hooks/use-media-layout';
 import { useI18n } from '../../shared/i18n/i18n';
 import { GearIcon } from '../../shared/ui/GearIcon';
@@ -18,6 +19,13 @@ export interface TimerScreenProps {
   onOpenSettings(): void;
 }
 
+const SHORTCUT_HINTS = {
+  idle: 'timer.shortcuts.idle',
+  running: 'timer.shortcuts.active',
+  paused: 'timer.shortcuts.paused',
+  finished: 'timer.shortcuts.idle',
+} as const satisfies Record<Phase, MessageKey>;
+
 export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
   const layout = useMediaLayout();
   const { t } = useI18n();
@@ -26,8 +34,7 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
 
   const active = isSessionUnderway(phase);
   // No shortcut applies once the session is over, so the hint says nothing rather than lying.
-  const shortcutHint =
-    phase === 'finished' ? null : t(active ? 'timer.shortcuts.active' : 'timer.shortcuts.idle');
+  const shortcutHint = phase === 'finished' ? null : t(SHORTCUT_HINTS[phase]);
   const copy = timerCopy(phase, mode);
   const announcement = usePhaseAnnouncement(phase, mode);
   // Tablet and desktop expose the gear in the shell top bar instead.

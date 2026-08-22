@@ -117,6 +117,7 @@ type PluralForms<K extends string> = { [P in `${K}_one` | `${K}_other`]: string 
 
 interface SingularMessages {
   'app.name': string;
+  'app.description': string;
 
   'timer.mode.focus': string;
   'timer.mode.break': string;
@@ -141,6 +142,7 @@ interface SingularMessages {
   'timer.scrubber.label': string;
   'timer.shortcuts.idle': string;
   'timer.shortcuts.active': string;
+  'timer.shortcuts.paused': string;
 
   'timer.action.start': string;
   'timer.action.startBreak': string;

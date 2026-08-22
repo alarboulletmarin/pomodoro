@@ -32,6 +32,8 @@ export function I18nProvider({ children }: { children: ReactNode }): JSX.Element
 
   useLayoutEffect(() => {
     document.documentElement.lang = lang;
+    const meta = document.querySelector('meta[name="description"]');
+    meta?.setAttribute('content', DICTIONARIES[lang]['app.description']);
   }, [lang]);
 
   const value = useMemo<I18nContextValue>(() => {
