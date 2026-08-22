@@ -1,6 +1,8 @@
 # Pomodoro
 
-A work timer that lets you leave.
+[![Licence : AGPL-3.0-only](https://img.shields.io/badge/licence-AGPL--3.0--only-blue.svg)](LICENSE)
+
+> A work timer that lets you leave.
 
 No notifications. No streak to protect. No badge, no nagging sound, nothing to do
 here once your session is over. While a session runs, the screen collapses to the
@@ -28,6 +30,8 @@ npm run dev
 | `preview`                     | serve the production build        |
 | `lint` · `typecheck` · `test` | the checks CI runs                |
 | `e2e`                         | Playwright, the two user journeys |
+| `icons`                       | redraw the icon set and favicon   |
+| `social`                      | re-render the three share images  |
 | `format`                      | Prettier                          |
 
 `SITE_URL=https://your.host npm run build` writes absolute URLs into the link
@@ -111,18 +115,52 @@ old bundle, and the reload button appears to do nothing. The reload is therefore
 done here, on `controllerchange`, with a timeout for the worker that never announces
 itself.
 
-## The link
+## The mark
 
-A pasted link has to explain itself before anyone taps it, so `index.html` carries
-Open Graph and Twitter card tags and `public/og.png` is the 1200×630 card they point
-at. That PNG is rendered from `design/og-card.html` — open it at 1200×630 and
-screenshot it to regenerate.
+One dial, two runs: the long one is the 25-minute session, the short one the 5-minute
+break, on a turn of 30. The ratio is the rhythm the app arms on launch — the drawing
+says what the product does, without a caption and without a tomato. It stands next to
+the name, which stays set in Clash Display.
 
-The card is laid out for the size it is actually seen at. A chat client draws it
-around 350px wide, so everything on it is sized against that: the sentence is the
-largest element and set in the text face, and nothing is smaller than 27px on the
-1200px canvas — under about 30px it arrives illegible. Check any change to it by
-looking at the PNG at 350px, not at full size.
+`scripts/mark.mjs` holds the geometry and is the only place it exists. `npm run icons`
+redraws every PNG and the favicon from it; `src/shared/ui/Mark.tsx` carries the two
+path strings that script prints, and the app draws them in `currentColor` beside the
+wordmark in the shell header and on the intro card. Change the ratio in one file and
+every surface follows.
+
+The icons are rasterised by hand and encoded with `zlib` — no image dependency for a
+rounded square and two arcs. Three drawings, because three purposes want different
+things, and shipping one file under two of them is what left the installed app looking
+wrong:
+
+- **`any`** (192, 512, plus a 32 for the tab) keeps its rounded corners transparent.
+- **`maskable`** (512) bleeds the tile to all four edges and pulls the dial inside the
+  80% safe circle, so a launcher's round or squircle mask crops background, not mark.
+- **`monochrome`** (512) is alpha only, for the Android launchers that tint it.
+- **`apple-touch-icon`** (180) is square and fully opaque: iOS does not composite what
+  you hand it, so a transparent corner arrives black.
+
+## The link, and what gets posted
+
+A pasted link has to explain itself before anyone taps it, so `index.html` carries Open
+Graph and Twitter card tags and `public/og.png` is the 1200×630 card they point at.
+Two more images sit beside it for the networks: `design/social/pomodoro-16x9.png`
+(1920×1080) and `design/social/pomodoro-9x16.png` (1080×1920). Those two stay out of
+`public/` on purpose — they are images to post, not files the app should carry into
+every offline install.
+
+All three are boards in `design/social/cards.html`, captured by `npm run social`. One
+file, so they are judged side by side; separate templates drift. Each board sets a
+font size and everything on it is expressed in `em` of that, so a format is recomposed
+by changing one number and nothing can slip under the legibility floor by accident.
+
+The card is laid out for the size it is actually seen at. A chat client draws it around
+350px wide, so everything on it is sized against that: the sentence is the largest
+element and set in the text face, and nothing is smaller than 27px on the 1200px canvas
+— under about 30px it arrives illegible. Check any change to it by looking at the PNG at
+350px, not at full size. The 9:16 is read at arm's length for a couple of seconds, so it
+takes the opposite treatment: the lockup becomes a sign, the claims stack instead of
+running as one punctuated line, and the white that remains is white on purpose.
 
 ## Verified
 
@@ -183,4 +221,30 @@ service-worker eviction — are untested.
 
 `design/` holds the high-fidelity mockups the build was made from. They are the
 visual and behavioural reference; their code is a mockup runtime and was not
-ported.
+ported. `design/social/` is the exception: it is not a mockup but the source of the
+three images the project ships, and it is regenerated, not read.
+
+The version log is in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Licence
+
+**AGPL-3.0-only**, see [LICENSE](LICENSE). Copyright (c) 2026 Andréa Larboullet Marin.
+
+Strong copyleft. In plain terms:
+
+- **Using it, installing it, hosting it, modifying it for yourself: freely**, including
+  commercially. The licence discriminates against no use.
+- **Redistributing it, or hosting a modified version for other people: you publish your
+  modified sources under AGPL-3.0.** Article 13 asks for that even when the software is
+  only reachable over a network — and it is exactly the case here, since serving this
+  app is handing its code to a browser.
+- **Folding it into a closed product: no**, absent a separate agreement with the author.
+
+The point is not to stop anyone earning a living with it. It is to stop anyone closing
+it. What leaves here stays open.
+
+That covers this repository. The two typefaces keep their own terms: Inter's licence
+ships beside its woff2 in [`public/fonts/inter-LICENSE.txt`](public/fonts/inter-LICENSE.txt),
+and Clash Display's does not yet — it is bundled without its notice, which is a gap to
+close before anything is published. `react` and `react-dom`, the only two runtime
+dependencies, are MIT.
