@@ -4,8 +4,9 @@
  * Monte le film de promotion.
  *
  * Ce n'est pas la démonstration de `record-demo.mjs`, qui filme un geste et s'arrête
- * là. C'est un film : une ouverture où la marque se trace, une promesse, trois plans
- * de l'application légendés, un carton sur ce que l'app refuse de faire, et une fin.
+ * là. C'est un film : il ouvre sur le geste déjà commencé, pose la promesse, montre la
+ * session démarrer et l'écran se vider, dit ce qui ne sort pas de l'appareil, laisse
+ * changer les couleurs, énumère ce que l'app refuse de faire, et signe.
  *
  * Trois étapes :
  *
@@ -42,9 +43,10 @@ const OUT_DIR = join(ROOT, 'design', 'film');
 const FPS = 30;
 
 /**
- * Le plan s'ouvre sur une application immobile, le temps que la coupe d'entrée se
- * pose — et le temps d'absorber le décalage entre le début de l'enregistrement et
- * l'horloge de Node, qui ne sont jamais tout à fait le même instant.
+ * Le tournage s'ouvre sur une application immobile, le temps d'absorber le décalage
+ * entre le début de l'enregistrement et l'horloge de Node, qui ne sont jamais tout à
+ * fait le même instant. Le montage, lui, n'en montre rien : chaque plan dit par son
+ * `data-head` à quelle seconde de la prise il commence.
  */
 const HOLD_SEC = 0.35;
 
@@ -74,9 +76,10 @@ const FORMATS = [
 const digitsOf = (page) => page.getByRole('spinbutton', { name: 'durée de la session en minutes' });
 
 /**
- * Chaque plan commence sur une application immobile — le temps que la coupe d'entrée
- * se pose — puis joue son geste, puis tient une seconde. Sa durée est celle du plan au
- * montage : le film n'accélère ni ne ralentit ce qu'il montre.
+ * Chaque prise commence sur une application immobile, joue son geste, puis tient une
+ * seconde de plus qu'il n'en faut : le montage entre en cours de geste et sort après,
+ * et une prise trop courte se figerait sur sa dernière image. Le film n'accélère ni ne
+ * ralentit ce qu'il montre.
  */
 const TAKES = {
   /** On saisit les chiffres et on cherche sa durée. 25 → 45 → 15. */
@@ -101,7 +104,7 @@ const TAKES = {
     await page.waitForTimeout(700);
 
     await pointer.up();
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(900);
   },
 
   /** On démarre, et l'écran se tait. */
@@ -126,7 +129,7 @@ const TAKES = {
     // posé au milieu de l'écran dirait le contraire.
     const { height } = page.viewportSize();
     await pointer.moveTo(pointer.at.x, height + 60, 550);
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2200);
   },
 
   /** Les réglages : la couleur, puis le thème. */
@@ -151,7 +154,7 @@ const TAKES = {
       await page.waitForTimeout(620);
     }
 
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(900);
   },
 };
 
@@ -273,9 +276,9 @@ async function cut(browser, format, takes) {
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate((value) => window.film.format(value), format.key);
 
-  const { duration, spans } = await page.evaluate(() => ({
+  const { duration, shots } = await page.evaluate(() => ({
     duration: window.film.duration,
-    spans: window.film.spans,
+    shots: window.film.shots,
   }));
 
   const stage = page.locator('#stage');
@@ -287,14 +290,16 @@ async function cut(browser, format, takes) {
     const seconds = index / FPS;
 
     // Pour chaque plan filmé encore à l'écran, l'image du tournage qui lui correspond.
-    // Un plan plus court que sa place au montage tient sur sa dernière image plutôt
-    // que de disparaître.
+    // `head` est la seconde du tournage sur laquelle le plan ouvre : chaque prise
+    // commence par une application immobile et un curseur qui arrive, et rien de tout
+    // cela n'est du film. Un plan plus court que sa place au montage tient sur sa
+    // dernière image plutôt que de disparaître.
     const frames = {};
-    for (const [name, [from, to]] of Object.entries(spans)) {
-      if (seconds < from || seconds >= to) continue;
-      const take = takes[name];
-      const wanted = Math.min(Math.round((seconds - from) * FPS), take.count - 1);
-      frames[name] = pathToFileURL(
+    for (const shot of shots) {
+      if (seconds < shot.in || seconds >= shot.out) continue;
+      const take = takes[shot.take];
+      const wanted = Math.min(Math.round((seconds - shot.in + shot.head) * FPS), take.count - 1);
+      frames[shot.id] = pathToFileURL(
         join(take.dir, String(wanted + 1).padStart(4, '0') + '.jpg'),
       ).href;
     }
@@ -304,9 +309,12 @@ async function cut(browser, format, takes) {
     const shot = await stage.screenshot({ type: 'jpeg', quality: 95 });
     await encoder.write(shot);
 
-    // L'affiche : la promesse, une fois posée. C'est l'image qu'un lecteur vidéo
-    // montre avant qu'on appuie sur lecture, donc elle doit dire quelque chose.
-    if (format.poster && Math.abs(seconds - 5.4) < 0.5 / FPS) {
+    // L'affiche : le cadran une fois la durée posée, légendé. C'est l'image qu'un
+    // lecteur vidéo montre avant qu'on appuie sur lecture — elle doit montrer le
+    // produit et dire ce qu'il fait, ce qu'une phrase seule sur du papier ne fait qu'à
+    // moitié. Prise à l'arrêt du geste : en plein glissement, l'encodeur laisse une
+    // traînée sur les chiffres, qui se lit dans un film et pas dans une image fixe.
+    if (format.poster && Math.abs(seconds - 3.6) < 0.5 / FPS) {
       poster = await stage.screenshot({ type: 'png' });
     }
   }

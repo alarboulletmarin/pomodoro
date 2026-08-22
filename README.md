@@ -182,10 +182,17 @@ happens.
 
 ## The film
 
-`npm run film` cuts a 30-second promotional film, in 16:9 and 9:16. It is an edit, not
-a capture: the mark draws itself, the promise lands on its own card, three shots of the
-app arrive captioned, a typographic card says what the app refuses to do, and an end
-card closes on the licence.
+`npm run film` cuts a thirty-second promotional film, in 16:9 and 9:16. It is an edit,
+not a capture, and it opens mid-gesture: a hand already dragging the digits, because
+what stops a thumb is a number moving, not a logo being drawn. Then the promise lands on
+its own card, the session starts and the screen empties, a card says `Rien ne sort de
+ton appareil.`, the theme and the accent change on screen, a dark card lists what the
+app refuses to do, and the mark finally draws itself on the end card over a button
+reading `installe-le depuis ton navigateur`. The lockup is the signature, not the
+greeting — at the head it means nothing to anyone.
+
+The beats are 2.5 to 5.8 seconds, on purpose. A film where every shot lasts the same
+four seconds has no rhythm, and the eye leaves before the argument does.
 
 It is built in three passes. **Shooting**: Playwright plays each shot in the real app,
 one browser context per shot so every clip starts and ends where the edit wants it.
@@ -200,11 +207,38 @@ since it came in, and every animated element resolves
 `animation-delay: calc((var(--delay) - var(--local)) * 1s)` against it, paused. A
 negative delay samples an animation at exactly that instant.
 
+**Shots overlap, and the overlap is the dissolve.** Each scene's exit lasts exactly as
+long as the next one takes to arrive, computed at load from the two bounds rather than
+written down: a hand-written exit duration is wrong the first time a cut moves. Cards
+leave upward, in the direction the next one arrives from; a filmed shot and a coloured
+ground only fade, since either of them sliding would show the paper behind it. A card's
+ground fades in too — dropped in at full strength it cuts hard exactly where everything
+else overlaps.
+
+**Each shot is framed rather than dropped in flat.** `--ox`/`--oy` name the point it
+holds on, in the coordinates of the take, and it drifts between two scales for its whole
+length: the gesture tightens on the dial and pushes the stats rail out of frame, the
+session opens up as the screen empties. In 9:16 that movement is nearly nothing. The app
+already fills the width of its screen there, so past about 3% the frame cuts its flanks,
+and the take is filmed 540px wide and already doubled — the format is given its own
+composition instead, a taller caption band with the caption ranged to its top, away from
+the account name and the buttons a story is read under.
+
+**The caption lives in a band of paper below the picture, not on it.** The first version
+was a white slab across the bottom sixth of the frame that landed exactly on the button
+being watched.
+
 The one measurement that has to be right is the trim. The recorder starts with the page,
 so the first second of every clip is a page loading; the shooter timestamps the moment
-the app is ready and cuts that much, rather than guessing a constant. Each shot then
-opens on `HOLD_SEC` of a motionless app, which is what the cut-in covers and what
-absorbs the recorder's own imprecision.
+the app is ready and cuts that much, rather than guessing a constant, and `HOLD_SEC` of
+a motionless app absorbs what is left. None of that is film, so none of it is shown:
+each scene says with `data-head` which second of its take it opens on, and every take
+runs a second longer than it needs at both ends so the edit can enter mid-gesture and
+leave after it.
+
+The poster frame — what a player shows before anyone presses play — is the dial in
+mid-drag with its caption, not the promise alone on paper. A sentence on an empty ground
+says half of what a still has to say.
 
 ## The demo
 
