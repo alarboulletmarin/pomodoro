@@ -41,6 +41,18 @@ export default tseslint.config(
   },
 
   {
+    files: ['src/domain/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['react', 'react-dom', 'react/*', 'react-dom/*'],
+        },
+      ],
+    },
+  },
+
+  {
     files: ['src/**/*.test.{ts,tsx}', 'src/test/**/*.ts'],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
