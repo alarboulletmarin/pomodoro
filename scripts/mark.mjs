@@ -83,11 +83,52 @@ export function arcPath(cx, cy, radius, from, to) {
   return `M ${round(x1)} ${round(y1)} A ${round(radius)} ${round(radius)} 0 ${large} 1 ${round(x2)} ${round(y2)}`;
 }
 
-/** La palette de la marque, reprise des jetons de l'interface. */
+/**
+ * Les trois accents de l'application, dans leurs deux thèmes.
+ *
+ * Ces valeurs existent déjà dans `ACCENT_PALETTE` (src/types/index.ts) : les scripts
+ * ne peuvent pas lire du TypeScript, alors elles sont recopiées ici — et un test
+ * (src/shared/ui/Mark.test.tsx) relit ce fichier pour interdire qu'elles divergent.
+ */
+export const ACCENTS = {
+  red: { light: '#D63E45', dark: '#FF6F6F' },
+  green: { light: '#2C855E', dark: '#5FCB92' },
+  blue: { light: '#2F6FE0', dark: '#7FA9FF' },
+};
+
+/** Les surfaces des deux thèmes, mêmes valeurs que src/styles/tokens.css. */
+export const THEMES = {
+  light: {
+    paper: '#FBF6EE',
+    surface: '#FFFFFF',
+    ink: '#221E1A',
+    muted: '#6B625A',
+    track: 'rgba(34, 30, 26, 0.09)',
+    dot: 'rgba(34, 30, 26, 0.3)',
+    shadow: '0 1px 0 rgba(34, 30, 26, 0.06), 0 2.5em 5em -3.4em rgba(34, 30, 26, 0.8)',
+  },
+  dark: {
+    paper: '#151311',
+    surface: '#201D1A',
+    ink: '#F5F0E8',
+    muted: '#A79C90',
+    track: 'rgba(245, 240, 232, 0.1)',
+    dot: 'rgba(245, 240, 232, 0.3)',
+    // Le thème sombre de l'app ne porte pas d'ombre portée : sur un fond sombre elle
+    // ne se voit pas, et une carte s'y détache par sa clarté. Juste le filet du haut.
+    shadow: '0 1px 0 rgba(245, 240, 232, 0.05)',
+  },
+};
+
+/**
+ * La palette de la tuile d'icône : toujours le rouge clair sur le papier clair.
+ * Une icône d'écran d'accueil ne suit pas le thème du système, et elle est posée
+ * une fois pour toutes à l'installation.
+ */
 export const PALETTE = {
-  accent: '#D63E45',
-  paper: '#FBF6EE',
-  ink: '#221E1A',
+  accent: ACCENTS.red.light,
+  paper: THEMES.light.paper,
+  ink: THEMES.light.ink,
 };
 
 /**

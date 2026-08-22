@@ -7,8 +7,8 @@ export interface MarkProps {
 // `scripts/generate-icons.mjs` writes into `public/icons/icon.svg`; the geometry lives
 // in `scripts/mark.mjs` and `npm run icons` reprints both. Nothing here is decorative:
 // change the ratio there and every surface follows.
-const WORK = 'M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079';
-const BREAK = 'M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278';
+export const WORK = 'M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079';
+export const BREAK = 'M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278';
 
 /**
  * Drawn in `currentColor` and hidden from screen readers: it stands next to the name

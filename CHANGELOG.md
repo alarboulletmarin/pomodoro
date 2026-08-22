@@ -15,11 +15,15 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 - **L'icône d'iOS ne peut plus tomber sur du noir.** iOS ne compose pas l'image qu'on lui donne, il la pose et l'arrondit lui-même : un coin transparent y devient un coin noir. L'`apple-touch-icon` est donc carrée et opaque.
 - **Le manifeste dit sa langue, son identité et ses catégories.** Il annonçait `en` alors que l'application est écrite en français, et n'avait pas d'`id` — deux détails que seul l'installateur lit, et qui décident de ce qu'il affiche.
 - **Les icônes sont calculées, plus déposées.** `npm run icons` les redessine toutes depuis une seule géométrie ; changer le rapport travail/pause d'un nombre suffit à reprendre le jeu entier. Sans dépendance : le PNG est encodé à la main, comme dans les autres projets.
+- **Un test interdit à la marque de se dédoubler.** Le script de génération ne peut pas lire du TypeScript, il recopie donc les accents et les surfaces de l'application ; le test relit le fichier, le favicon et les planches sociales, et échoue dès que l'un cesse d'être d'accord avec les autres.
 
-### Ajouté — trois images à poster
+### Ajouté — des images à poster, dans les couleurs de chacun
 
 - **Un 16:9 et un 9:16**, dans `design/social/`, pour un post et pour une story. Ils portent le même logotype, la même phrase et la même horloge que la carte de lien, recomposés pour leur format : le 9:16 grossit son enseigne et empile ses mentions plutôt que d'étirer les écarts d'une carte large.
-- **La carte de lien passe par le même gabarit.** Les trois planches vivent dans un seul fichier, capturé par `npm run social` : trois gabarits séparés finissent par ne plus se ressembler, et une identité se juge côte à côte.
+- **Clair et sombre, et les trois accents livrés** — douze fichiers, aux jetons exacts de l'application. Une image qu'on poste dit ce que le produit a l'air d'être ; le montrer dans un seul thème serait en cacher la moitié.
+- **N'importe quelle couleur**, avec `npm run social -- --accent '#7A5AF8'` : l'app laisse choisir la sienne dans les réglages, les visuels aussi.
+- **L'horloge et la barre décrivent enfin le même instant.** La première version affichait `25:00` au-dessus d'une barre déjà au tiers — une capture de quelque chose qui n'arrive jamais. La barre se déduit maintenant des chiffres, dans le même sens que l'app : le remplissage est le temps écoulé, les chiffres le temps restant.
+- **La carte de lien passe par le même gabarit.** Toutes les planches vivent dans un seul fichier, capturé par `npm run social` : trois gabarits séparés finissent par ne plus se ressembler, et une identité se juge côte à côte.
 
 ### Ajouté — la licence
 

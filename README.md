@@ -128,6 +128,11 @@ path strings that script prints, and the app draws them in `currentColor` beside
 wordmark in the shell header and on the intro card. Change the ratio in one file and
 every surface follows.
 
+That file also restates the accent and surface palettes, because a `.mjs` script cannot
+import TypeScript. Restated values drift, so `Mark.test.tsx` reads the generator, the
+favicon and the share boards off disk and fails the build when any of them stops
+agreeing with `ACCENT_PALETTE`, the theme colours or the two paths.
+
 The icons are rasterised by hand and encoded with `zlib` — no image dependency for a
 rounded square and two arcs. Three drawings, because three purposes want different
 things, and shipping one file under two of them is what left the installed app looking
@@ -144,15 +149,27 @@ wrong:
 
 A pasted link has to explain itself before anyone taps it, so `index.html` carries Open
 Graph and Twitter card tags and `public/og.png` is the 1200×630 card they point at.
-Two more images sit beside it for the networks: `design/social/pomodoro-16x9.png`
-(1920×1080) and `design/social/pomodoro-9x16.png` (1080×1920). Those two stay out of
-`public/` on purpose — they are images to post, not files the app should carry into
-every offline install.
+Beside it, `design/social/` holds the posting formats — 1920×1080 and 1080×1920 — in
+every theme and every shipped accent, twelve files named
+`pomodoro-<format>-<theme>-<accent>.png`. They stay out of `public/` on purpose: they
+are images to post, not files the app should carry into every offline install.
 
-All three are boards in `design/social/cards.html`, captured by `npm run social`. One
-file, so they are judged side by side; separate templates drift. Each board sets a
-font size and everything on it is expressed in `em` of that, so a format is recomposed
-by changing one number and nothing can slip under the legibility floor by accident.
+There is only one `og.png` because `index.html` names it, and it is the light theme in
+red — what someone who has changed nothing is looking at. `npm run social` redraws the
+lot; `npm run social -- --accent '#7A5AF8'` swaps the three shipped accents for a colour
+of your own, in both themes, the way the settings let anyone pick one.
+
+Every format is a board in `design/social/cards.html`, captured by `npm run social`. One
+file, so they are judged side by side; separate templates drift. Each board sets a font
+size and everything on it is expressed in `em` of that, so a format is recomposed by
+changing one number and nothing can slip under the legibility floor by accident. The
+theme and the accent arrive from outside, through the same custom properties the app
+uses, at the same values.
+
+The clock and the bar describe one instant, and the board derives the second from the
+first — fill is elapsed, digits are remaining, as in the app. The first version showed
+`25:00` above a bar already a third of the way across: a picture of something that never
+happens.
 
 The card is laid out for the size it is actually seen at. A chat client draws it around
 350px wide, so everything on it is sized against that: the sentence is the largest

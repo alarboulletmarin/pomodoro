@@ -1,13 +1,16 @@
 <!doctype html>
-<!-- Les trois visuels que l'application distribue d'elle-même, sur une seule planche.
+<!-- Les visuels que l'application distribue d'elle-même, sur une seule planche.
 
      - #og    1200×630  — la carte qu'un lien collé déplie (public/og.png)
      - #wide  1920×1080 — 16:9, pour un post, une vignette, une bannière
      - #tall  1080×1920 — 9:16, pour une story
 
-     Rendu par `npm run social`, qui capture chaque planche à sa taille exacte.
-     Les trois vivent dans le même fichier pour qu'on les voie ensemble : trois
-     gabarits séparés dérivent, et une identité se juge côte à côte. -->
+     Le thème et l'accent sont posés de l'extérieur par `npm run social`, qui capture
+     chaque planche une fois par combinaison. Les trois vivent dans le même fichier
+     pour qu'on les voie ensemble : trois gabarits séparés dérivent, et une identité
+     se juge côte à côte.
+
+     Ouvert à la main dans un navigateur, le fichier s'affiche en clair et en rouge. -->
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -34,13 +37,40 @@
         box-sizing: border-box;
       }
 
+      /* Les mêmes jetons que src/styles/tokens.css, aux mêmes valeurs. Le thème et
+         l'accent sont écrits par le script ; ceux-ci ne sont que les défauts du
+         fichier ouvert seul. */
+      :root {
+        --paper: #fbf6ee;
+        --surface: #ffffff;
+        --ink: #221e1a;
+        --muted: #6b625a;
+        --track: rgba(34, 30, 26, 0.09);
+        --dot: rgba(34, 30, 26, 0.3);
+        --shadow: 0 1px 0 rgba(34, 30, 26, 0.06), 0 2.5em 5em -3.4em rgba(34, 30, 26, 0.8);
+        --accent: #d63e45;
+      }
+
+      :root[data-theme='dark'] {
+        --paper: #151311;
+        --surface: #201d1a;
+        --ink: #f5f0e8;
+        --muted: #a79c90;
+        --track: rgba(245, 240, 232, 0.1);
+        --dot: rgba(245, 240, 232, 0.3);
+        /* Le thème sombre de l'app ne porte pas d'ombre portée : sur un fond sombre
+           elle ne se voit pas, et une carte s'y détache par sa clarté. */
+        --shadow: 0 1px 0 rgba(245, 240, 232, 0.05);
+        --accent: #ff6f6f;
+      }
+
       body {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 40px;
         padding: 40px;
-        background: #e7e0d5;
+        background: #8b8279;
         -webkit-font-smoothing: antialiased;
       }
 
@@ -51,8 +81,8 @@
         flex: none;
         display: flex;
         font-family: 'Clash Display', sans-serif;
-        background: #fbf6ee;
-        color: #221e1a;
+        background: var(--paper);
+        color: var(--ink);
         overflow: hidden;
       }
 
@@ -84,10 +114,8 @@
         justify-content: space-between;
         padding: 4.4em 5em;
         border-radius: 2.5em;
-        background: #ffffff;
-        box-shadow:
-          0 1px 0 rgba(34, 30, 26, 0.06),
-          0 2.5em 5em -3.4em rgba(34, 30, 26, 0.8);
+        background: var(--surface);
+        box-shadow: var(--shadow);
       }
 
       #tall .card {
@@ -100,14 +128,14 @@
         display: flex;
         align-items: center;
         gap: 0.72em;
-        color: #6b625a;
+        color: var(--muted);
       }
 
       .mark {
         flex: none;
         width: 2.75em;
         height: 2.75em;
-        color: #d63e45;
+        color: var(--accent);
       }
 
       .name {
@@ -187,15 +215,14 @@
         flex: 1;
         height: 1.2em;
         border-radius: 999px;
-        background: rgba(34, 30, 26, 0.09);
+        background: var(--track);
         overflow: hidden;
       }
 
       .fill {
-        width: 38%;
         height: 100%;
         border-radius: 999px;
-        background: #d63e45;
+        background: var(--accent);
       }
 
       .foot {
@@ -205,11 +232,11 @@
         font-family: 'Inter Variable', sans-serif;
         font-size: 2.25em;
         font-weight: 400;
-        color: #6b625a;
+        color: var(--muted);
       }
 
       .dot {
-        color: rgba(34, 30, 26, 0.3);
+        color: var(--dot);
       }
 
       /* Le 9:16 est lu à bout de bras, plein écran, quelques secondes : il a de la
@@ -235,15 +262,23 @@
       </svg>
     </template>
 
+    <!-- Une session de 25 minutes dont il reste 15 : l'horloge et la barre décrivent
+         le même instant, et le script en déduit le remplissage plutôt que de le
+         reprendre à la main. La première version montrait 25:00 au-dessus d'une barre
+         déjà au tiers — une capture de quelque chose qui n'arrive jamais. -->
+    <template id="device">
+      <div class="device" data-session="25" data-left="15:00">
+        <p class="clock">15:00</p>
+        <div class="bar"><div class="fill"></div></div>
+      </div>
+    </template>
+
     <section class="board" id="og">
       <div class="card">
         <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
         <div class="body">
           <p class="lead">Un minuteur de travail<br />qui te laisse partir.</p>
-          <div class="device">
-            <p class="clock">25:00</p>
-            <div class="bar"><div class="fill"></div></div>
-          </div>
+          <span class="device-slot"></span>
         </div>
         <div class="foot">
           <span>pas de notification</span><span class="dot">·</span>
@@ -258,10 +293,7 @@
         <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
         <div class="body">
           <p class="lead">Un minuteur de travail<br />qui te laisse partir.</p>
-          <div class="device">
-            <p class="clock">25:00</p>
-            <div class="bar"><div class="fill"></div></div>
-          </div>
+          <span class="device-slot"></span>
         </div>
         <div class="foot">
           <span>pas de notification</span><span class="dot">·</span>
@@ -276,10 +308,7 @@
         <p class="logotype"><span class="slot"></span><span class="name">pomodoro</span></p>
         <div class="body">
           <p class="lead">Un minuteur de travail qui te laisse partir.</p>
-          <div class="device">
-            <p class="clock">25:00</p>
-            <div class="bar"><div class="fill"></div></div>
-          </div>
+          <span class="device-slot"></span>
         </div>
         <div class="foot">
           <span>pas de notification</span>
@@ -291,11 +320,25 @@
     </section>
 
     <script>
-      // La marque est écrite une fois et clonée : trois copies d'un même chemin SVG
-      // finissent par ne plus être le même chemin.
-      const mark = document.getElementById('mark').content.firstElementChild;
-      for (const slot of document.querySelectorAll('.slot')) {
-        slot.replaceWith(mark.cloneNode(true));
+      // La marque et le minuteur sont écrits une fois et clonés : trois copies d'un
+      // même chemin SVG finissent par ne plus être le même chemin.
+      for (const [id, selector] of [
+        ['mark', '.slot'],
+        ['device', '.device-slot'],
+      ]) {
+        const source = document.getElementById(id).content.firstElementChild;
+        for (const slot of document.querySelectorAll(selector)) {
+          slot.replaceWith(source.cloneNode(true));
+        }
+      }
+
+      // La barre se déduit de l'horloge, dans le même sens que l'application : le
+      // remplissage est le temps écoulé, les chiffres le temps restant.
+      for (const device of document.querySelectorAll('.device')) {
+        const total = Number(device.dataset.session) * 60;
+        const [minutes, seconds] = device.dataset.left.split(':').map(Number);
+        const elapsed = total - (minutes * 60 + seconds);
+        device.querySelector('.fill').style.width = `${(elapsed / total) * 100}%`;
       }
     </script>
   </body>
