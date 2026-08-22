@@ -1,0 +1,80 @@
+.page {
+  gap: 16px;
+  padding: 18px;
+}
+
+.lead {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.clause {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.clauseTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.body {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.references {
+  gap: 14px;
+  padding: 18px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.citation {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.doi {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.doi:focus-visible {
+  outline: none;
+  border-radius: var(--radius-chip);
+  box-shadow: var(--focus-ring);
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--muted);
+}

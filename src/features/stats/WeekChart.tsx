@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useI18n } from '../../shared/i18n/i18n';
 import type { MessageKey, WeekStats } from '../../types';
+import { localDate } from './day-label';
 import styles from './WeekChart.module.css';
 
 const DAY_KEYS: readonly MessageKey[] = [
@@ -21,15 +22,13 @@ function barHeight(count: number, max: number): string {
   return `${Math.max(BAR_FLOOR_PERCENT, Math.round(ratio))}%`;
 }
 
-function localDate(key: string): Date {
-  return new Date(`${key}T00:00:00`);
-}
-
 export interface WeekChartProps {
   stats: WeekStats;
+  selected: string | null;
+  onSelect(date: string): void;
 }
 
-export function WeekChart({ stats }: WeekChartProps): JSX.Element {
+export function WeekChart({ stats, selected, onSelect }: WeekChartProps): JSX.Element {
   const { t, tn, formatDate } = useI18n();
 
   const bars = useMemo(
@@ -64,23 +63,31 @@ export function WeekChart({ stats }: WeekChartProps): JSX.Element {
           <li
             key={bar.date}
             className={styles.column}
-            aria-label={bar.label}
-            aria-current={bar.isToday ? 'date' : undefined}
             data-today={bar.isToday ? '' : undefined}
+            data-selected={bar.date === selected ? '' : undefined}
           >
-            <span className={styles.barArea}>
-              <span className={styles.count} aria-hidden="true">
-                {bar.count === 0 ? EMPTY_COUNT : bar.count}
+            <button
+              type="button"
+              className={styles.day}
+              aria-label={bar.label}
+              aria-pressed={bar.date === selected}
+              aria-current={bar.isToday ? 'date' : undefined}
+              onClick={() => onSelect(bar.date)}
+            >
+              <span className={styles.barArea}>
+                <span className={styles.count} aria-hidden="true">
+                  {bar.count === 0 ? EMPTY_COUNT : bar.count}
+                </span>
+                <span className={styles.bar} style={{ height: bar.height }} />
               </span>
-              <span className={styles.bar} style={{ height: bar.height }} />
-            </span>
-            <span className={styles.initial} aria-hidden="true">
-              {bar.initial}
-            </span>
-            <span className={styles.full} aria-hidden="true">
-              {bar.short}
-            </span>
-            <span className={styles.marker} aria-hidden="true" />
+              <span className={styles.initial} aria-hidden="true">
+                {bar.initial}
+              </span>
+              <span className={styles.full} aria-hidden="true">
+                {bar.short}
+              </span>
+              <span className={styles.marker} aria-hidden="true" />
+            </button>
           </li>
         ))}
       </ul>

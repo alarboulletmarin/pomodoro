@@ -149,6 +149,21 @@ describe('loadTimerState', () => {
     expect(loadTimerState(T0)).toEqual(initialTimerState());
   });
 
+  it('arms the length it is handed when there is nothing stored', () => {
+    expect(loadTimerState(T0, 40)).toEqual(initialTimerState(40));
+
+    globalThis.localStorage.setItem(TIMER_STORAGE_KEY, 'not json');
+    expect(loadTimerState(T0, 40)).toEqual(initialTimerState(40));
+
+    store({ phase: 'idle' });
+    expect(restoreTimerState({ phase: 'idle' }, T0, 40)).toEqual(initialTimerState(40));
+  });
+
+  it('prefers what was stored over the length it is handed', () => {
+    store({ phase: 'idle', mode: 'break', minutes: 5, endsAt: null, remainingMs: 5 * 60_000 });
+    expect(loadTimerState(T0, 40)).toMatchObject({ mode: 'break', minutes: 5 });
+  });
+
   it('returns the default for stored garbage', () => {
     globalThis.localStorage.setItem(TIMER_STORAGE_KEY, 'not json');
     expect(loadTimerState(T0)).toEqual(initialTimerState());

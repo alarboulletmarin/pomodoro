@@ -11,6 +11,8 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: BASE_URL,
+    // The app opens in the language the browser asks for; these journeys read French.
+    locale: 'fr-FR',
     trace: 'on-first-retry',
   },
   projects: [

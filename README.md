@@ -9,6 +9,11 @@ come back.
 
 Everything stays on your device. It installs, and it works with the network off.
 
+The first visit opens on a screen that says what the app is, in the language the
+browser asks for, and never shows it again — a link sent to someone lands on an
+explanation rather than on a bare clock. `?intro` brings it back on a device that
+has already seen it.
+
 ## Running it
 
 ```
@@ -24,6 +29,9 @@ npm run dev
 | `lint` · `typecheck` · `test` | the checks CI runs                |
 | `e2e`                         | Playwright, the two user journeys |
 | `format`                      | Prettier                          |
+
+`SITE_URL=https://your.host npm run build` writes absolute URLs into the link
+preview tags. Without it they stay relative, which most unfurlers still resolve.
 
 ## How it is put together
 
@@ -52,20 +60,83 @@ React 18, TypeScript strict, CSS Modules and custom properties. `react` and
 `react-dom` are the only runtime dependencies — no CSS framework, no state
 library, no i18n library, no chart library.
 
-Four layouts (portrait, landscape, tablet, desktop), two themes, four accents,
-French and English, all persisted and applied without a reload.
+Two typefaces, two jobs. Clash Display is drawn for large sizes: it carries the
+clock, the screen titles, the wordmark and the labels on committing actions — short
+strings, never under 14px. Inter carries everything read as a sentence or scanned as
+a list: body copy, hints, list rows, values, the stats card end to end. One display
+face doing both jobs is what the app shipped with, and at 13px its tight spacing and
+closed apertures cost more than its character was worth. `--font-display` and
+`--font-sans` hold the two; a module that needs the first says so, everything else
+inherits the second.
+
+Inter is one variable woff2, subset to the characters the interface uses and to the
+400–600 weights it asks for: 25 KB. Clash lost the 400 weight nothing calls for any
+more, so the type payload is 42 KB across three files, up from 24 KB.
+
+Four layouts (portrait, landscape, tablet, desktop), three theme settings, four
+accents, French and English, all persisted and applied without a reload. `system`
+is the default theme and tracks `prefers-color-scheme` live — the app turns with
+the device, mid-session, without a reload.
+
+The lengths and the daily goal are settings, not constants: the focus session
+(5–90 min), the break (1–30 min) and the goal (1–12 sessions) decide what the app
+arms on launch, what it offers when a session ends, and how many dots the stats
+draw. The timer screen still overrides the current session without touching them.
+
+The stats read out a day at a time. Every week bar carries its count, and every
+bar and heatmap cell is a button: picking one states that day's date, sessions and
+total focus time under the charts; picking it again goes back to today.
+
+## Getting the new version
+
+An installed app runs from its own copy of the files, which is what makes it work
+with the network off — and what makes a deploy invisible until something replaces
+that copy. On a phone there is no reload button and no obvious way to clear it.
+
+So the service worker is registered in `prompt` mode: a new version installs and
+then waits. Nothing is swapped under a session in progress. When one is ready, a
+quiet notice offers the reload — never over a running session, never on top of the
+settings, which carry the same button. The settings also hold the check itself:
+`version 0.1.0` with a button that asks the server, and answers `à jour` when there
+is nothing. That row is the reload button that a phone does not otherwise have.
+
+The app also asks by itself: every hour it is left open, and whenever it comes back
+on screen after fifteen minutes away — an installed app can sit for days otherwise,
+and would never learn that anything shipped.
+
+One trap, found by shipping two builds against a running instance and watching:
+`updateServiceWorker(true)` promises to reload the page and does not, when that page
+was already controlled by a worker. The new worker takes over, the screen keeps the
+old bundle, and the reload button appears to do nothing. The reload is therefore
+done here, on `controllerchange`, with a timeout for the worker that never announces
+itself.
+
+## The link
+
+A pasted link has to explain itself before anyone taps it, so `index.html` carries
+Open Graph and Twitter card tags and `public/og.png` is the 1200×630 card they point
+at. That PNG is rendered from `design/og-card.html` — open it at 1200×630 and
+screenshot it to regenerate.
+
+The card is laid out for the size it is actually seen at. A chat client draws it
+around 350px wide, so everything on it is sized against that: the sentence is the
+largest element and set in the text face, and nothing is smaller than 27px on the
+1200px canvas — under about 30px it arrives illegible. Check any change to it by
+looking at the PNG at 350px, not at full size.
 
 ## Verified
 
-183 unit tests, 4 end-to-end. Lighthouse on the production build: Performance
-100 desktop / 99 mobile, Best practices 100. Installable — `getInstallabilityErrors`
-returns empty, service worker active, manifest clean.
+257 unit tests, 8 end-to-end, on Chromium.
 
+The figures below were measured on the build that preceded the settings and stats
+work, and have **not** been re-run since. Lighthouse on the production build:
+Performance 100 desktop / 99 mobile, Best practices 100. Installable —
+`getInstallabilityErrors` returns empty, service worker active, manifest clean.
 Offline was checked by killing the server and reloading, deep link included.
 Across 224 rendered states (4 layouts × 2 themes × 4 accents × 2 languages ×
 {timer, settings} × {idle, running}): no overflow, 2040 interactive elements
 enumerated with none under 44×44px, and no visible text below its contrast
-threshold.
+threshold. That last count no longer holds — see the deviation below.
 
 ## Known deviations
 
@@ -87,6 +158,20 @@ opacity ramp is specified; raising it would rewrite the chart's visual weight.
 Every cell and bar carries an accessible label, and the footers restate the
 totals, so nothing is available only to a sighted user — but the levels are
 distinguished visually by colour, and the low steps are faint by design.
+
+**The stats targets are under 44px wide.** Making a day selectable makes each week
+bar and each heatmap cell a button, and seven of them share the width of the card:
+in portrait a bar is roughly 38×90px and a cell roughly 38×22px. Widening them
+would mean scrolling the week or dropping days from the grid, and the readout they
+feed is the point of the change. The bars clear 44px in one dimension; the cells
+clear it in neither. Every day of the current week is reachable from the taller
+bars, and every cell states its date and its count to a screen reader.
+
+**The intro is a screen, not a tour.** No tooltips, no dots, no swiping through
+steps: one card, three sentences, one button. A tour would be four decisions in a
+row before the app does anything, on a first visit that lasts seconds. What the
+card leaves out — the presets, the stats, the settings — is discoverable in place,
+and the method page carries the rest.
 
 **Only tested on Chromium.** WebKit's Linux build needs system packages that were
 not installed, so the matrix, the offline proof, the drift test and Lighthouse all

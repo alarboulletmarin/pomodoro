@@ -1,6 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { SessionEntry } from '../../types';
-import { DAILY_GOAL, monthStats, SESSION_DOTS, todayCount, weekStats } from './session-stats';
+import {
+  clampGoal,
+  dayDetail,
+  DEFAULT_DAILY_GOAL,
+  dotCount,
+  GOAL_BOUNDS,
+  MAX_DOTS,
+  monthStats,
+  todayCount,
+  todayKey,
+  weekStats,
+} from './session-stats';
 
 function key(year: number, month: number, day: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -37,10 +48,70 @@ const FIXTURE: SessionEntry[] = [
   { startedAt: ts(2026, 2, 8, 9), minutes: 5, mode: 'break' },
 ];
 
-describe('constants', () => {
-  it('exposes the day counter shape', () => {
-    expect(DAILY_GOAL).toBe(4);
-    expect(SESSION_DOTS).toBe(6);
+describe('the goal', () => {
+  it('exposes the documented default and bounds', () => {
+    expect(DEFAULT_DAILY_GOAL).toBe(4);
+    expect([GOAL_BOUNDS.min, GOAL_BOUNDS.max]).toEqual([1, 12]);
+    expect(MAX_DOTS).toBe(GOAL_BOUNDS.max);
+  });
+
+  it('clamps whatever it is handed', () => {
+    expect(clampGoal(4)).toBe(4);
+    expect(clampGoal(0)).toBe(1);
+    expect(clampGoal(-3)).toBe(1);
+    expect(clampGoal(99)).toBe(12);
+    expect(clampGoal(3.4)).toBe(3);
+    expect(clampGoal(Number.NaN)).toBe(DEFAULT_DAILY_GOAL);
+  });
+
+  it('draws one dot per goal, and one more per session past it', () => {
+    expect(dotCount(4, 0)).toBe(4);
+    expect(dotCount(4, 4)).toBe(4);
+    expect(dotCount(4, 6)).toBe(6);
+    expect(dotCount(1, 0)).toBe(1);
+    // Never past a single row, however long the day was.
+    expect(dotCount(4, 40)).toBe(MAX_DOTS);
+    expect(dotCount(0, 0)).toBe(1);
+  });
+});
+
+describe('todayKey', () => {
+  it('names the local day, not the UTC one', () => {
+    expect(todayKey(ts(2026, 2, 8, 23))).toBe(key(2026, 2, 8));
+    expect(todayKey(ts(2026, 2, 8, 0))).toBe(key(2026, 2, 8));
+  });
+});
+
+describe('dayDetail', () => {
+  it('adds up the focus sessions of one day', () => {
+    const entries = [
+      ...focusOn(2026, 2, 6, 3),
+      ...focusOn(2026, 2, 7, 1),
+      { startedAt: ts(2026, 2, 6, 20), minutes: 5, mode: 'break' as const },
+    ];
+
+    expect(dayDetail(entries, key(2026, 2, 6))).toEqual({
+      date: key(2026, 2, 6),
+      count: 3,
+      minutes: 75,
+    });
+  });
+
+  it('reports an empty day rather than nothing', () => {
+    expect(dayDetail(FIXTURE, key(2026, 2, 7))).toEqual({
+      date: key(2026, 2, 7),
+      count: 0,
+      minutes: 0,
+    });
+  });
+
+  it('sums the real lengths, not a nominal one', () => {
+    const entries = [
+      { startedAt: ts(2026, 2, 6, 8), minutes: 45, mode: 'focus' as const },
+      { startedAt: ts(2026, 2, 6, 10), minutes: 12, mode: 'focus' as const },
+    ];
+
+    expect(dayDetail(entries, key(2026, 2, 6)).minutes).toBe(57);
   });
 });
 
@@ -132,6 +203,18 @@ describe('monthStats', () => {
     // Days after today still get a real date and no count.
     expect(cells.at(-1)?.date).toBe(key(2026, 2, 8));
     expect(cells.at(-1)?.count).toBe(0);
+  });
+
+  it('marks the tail of the current week as still ahead', () => {
+    const midWeek = ts(2026, 2, 4, 10);
+    const { cells } = monthStats(FIXTURE, midWeek);
+    const ahead = cells.filter((cell) => cell.isFuture).map((cell) => cell.date);
+
+    expect(ahead).toEqual([key(2026, 2, 5), key(2026, 2, 6), key(2026, 2, 7), key(2026, 2, 8)]);
+  });
+
+  it('leaves nothing ahead when today closes the grid', () => {
+    expect(monthStats(FIXTURE, SUNDAY).cells.some((cell) => cell.isFuture)).toBe(false);
   });
 
   it('maps counts to heat levels', () => {

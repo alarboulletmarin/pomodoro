@@ -2,7 +2,8 @@ import type { Messages } from '../../../types';
 
 export const fr: Messages = {
   'app.name': 'pomodoro',
-  'app.description': 'Un minuteur de travail qui te laisse partir.',
+  'app.description':
+    'Un minuteur de travail qui te laisse partir : une durée, une session, une pause. Pas de notification, pas de compte, pas de série à tenir.',
 
   'timer.mode.focus': 'focus',
   'timer.mode.break': 'pause',
@@ -46,6 +47,7 @@ export const fr: Messages = {
   'stats.today_one': '{count} session aujourd’hui',
   'stats.today_other': '{count} sessions aujourd’hui',
   'stats.goal': 'objectif {count}',
+  'stats.goal.reached': 'objectif atteint',
   'stats.week.caption': 'semaine',
   'stats.week.footer_one': '{day} · {count} session cette semaine',
   'stats.week.footer_other': '{day} · {count} sessions cette semaine',
@@ -58,8 +60,12 @@ export const fr: Messages = {
   'stats.session.done': 'session terminée',
   'stats.session.todo': 'session à venir',
   'stats.day.none': 'jour sans session',
+  'stats.day.today': 'aujourd’hui',
   'stats.day.count_one': '{count} session',
   'stats.day.count_other': '{count} sessions',
+  'stats.duration.minutes': '{minutes} min',
+  'stats.duration.hours': '{hours} h',
+  'stats.duration.hoursMinutes': '{hours} h {minutes}',
 
   'stats.day.mon': 'lun',
   'stats.day.tue': 'mar',
@@ -71,8 +77,10 @@ export const fr: Messages = {
 
   'settings.title': 'réglages',
   'settings.appearance': 'apparence',
+  'settings.theme.system': 'système',
   'settings.theme.light': 'clair',
   'settings.theme.dark': 'sombre',
+  'settings.theme.systemHint': 'suit le thème de ton appareil, et change avec lui',
   'settings.accent.title': 'couleur d’accent',
   'settings.accent.red': 'rouge',
   'settings.accent.green': 'vert',
@@ -80,6 +88,18 @@ export const fr: Messages = {
   'settings.accent.custom': 'personnaliser',
   'settings.accent.customHint': 'ta couleur, choisie dans la palette du système',
   'settings.accent.contrastWarning': 'contraste faible — cette couleur se distinguera mal du fond',
+  'settings.durations.title': 'durées',
+  'settings.durations.focus': 'session de focus',
+  'settings.durations.break': 'pause',
+  'settings.durations.hint':
+    'Les durées proposées : au démarrage de l’app, et à la fin de chaque session. Sur l’écran du minuteur, tu peux toujours régler celle du moment sans toucher à celles-ci.',
+  'settings.durations.minutes': '{minutes} min',
+  'settings.goal.title': 'objectif du jour',
+  'settings.goal.label': 'sessions par jour',
+  'settings.goal.hint':
+    'Le repère au-dessus de tes statistiques : autant de points à remplir. Rien ne se déclenche quand tu l’atteins, rien ne te le rappelle quand tu ne l’atteins pas — c’est un compte, pas une série à tenir.',
+  'settings.stepper.less': 'diminuer : {name}',
+  'settings.stepper.more': 'augmenter : {name}',
   'settings.language.title': 'langue',
   'settings.language.fr': 'français',
   'settings.language.en': 'anglais',
@@ -89,15 +109,51 @@ export const fr: Messages = {
   'settings.install.title': 'installer l’application',
   'settings.install.hint': 'pour l’ouvrir depuis l’écran d’accueil, hors ligne',
   'settings.install.action': 'installer',
+  'settings.update.title': 'version',
+  'settings.update.hint':
+    'Une app installée garde sa propre copie des fichiers, et vérifie d’elle-même de temps en temps s’il y a mieux. Tu peux le demander ici sans passer par les réglages du téléphone.',
+  'settings.method': 'la méthode',
   'settings.about': 'à propos',
   'settings.legal': 'mentions légales',
   'settings.version': 'version {version}',
 
+  'intro.lead': 'Un minuteur de travail qui te laisse partir.',
+  'intro.what.title': 'Tu choisis une durée.',
+  'intro.what.body':
+    'Tu travailles, ça sonne une fois, puis tu prends une pause. C’est tout ce que fait l’app.',
+  'intro.quiet.title': 'Rien ne te relance.',
+  'intro.quiet.body':
+    'Pas de notification, pas de série à tenir, pas de compte. Quand ta session est finie, il n’y a plus rien à faire ici.',
+  'intro.local.title': 'Rien ne sort d’ici.',
+  'intro.local.body':
+    'Tes sessions restent sur cet appareil. L’app s’installe et fonctionne hors ligne.',
+  'intro.start': 'commencer',
+  'intro.method': 'la méthode, et ce qu’en dit la recherche',
+
   'about.title': 'à propos',
   'about.lead': 'Un minuteur, rien d’autre.',
   'about.body1':
-    '25 minutes de travail, 5 minutes de pause, six sessions par jour au maximum. Pas de notification, pas de série à ne pas briser, rien à faire ici quand ta session est finie.',
+    'Une session de travail, une pause, autant de fois que tu veux. Pas de notification, pas de série à ne pas briser, rien à faire ici quand ta session est finie.',
   'about.body2': 'Tes sessions restent sur cet appareil.',
+
+  'method.title': 'la méthode',
+  'method.lead':
+    'Vingt-cinq minutes de travail, cinq de pause. Ce que la recherche soutient — et ce qu’elle ne soutient pas.',
+  'method.origin.title': 'D’où viennent les 25 minutes',
+  'method.origin.body':
+    'Francesco Cirillo, étudiant à Rome à la fin des années 1980, n’arrivait pas à tenir sur ses révisions. Il a attrapé le minuteur de cuisine qui traînait — un pomodoro, une tomate — et s’est engagé sur un seul intervalle, puis un autre. La méthode a été formalisée en 1992 et publiée en 2006. Les vingt-cinq minutes sortent de là : d’un minuteur de cuisine, pas d’un laboratoire.',
+  'method.attention.title': 'Pourquoi s’interrompre',
+  'method.attention.body':
+    'Sur une tâche longue et monotone, l’attention se dégrade : c’est le déclin de vigilance. Ariga et Lleras ont testé l’explication par l’habituation à l’objectif — le groupe dont la tâche était brièvement interrompue deux fois en cinquante minutes n’a pas décliné, les autres si. Ce qui compte n’est donc pas de se reposer, mais de désactiver l’objectif puis de le réactiver.',
+  'method.breaks.title': 'Ce que valent les pauses',
+  'method.breaks.body':
+    'À grande échelle, l’effet se mesure : sur les tests de tous les écoliers danois entre 2009 et 2013, chaque heure plus tard dans la journée coûte 0,9 % d’écart-type au score, et une pause de vingt à trente minutes en rend 1,7 %. Une méta-analyse de 2022 portant sur 22 échantillons est plus prudente : les micro-pauses rendent de l’énergie et réduisent la fatigue (d ≈ 0,35), mais leur effet sur la performance n’atteint pas le seuil de significativité — et il grandit avec la durée de la pause.',
+  'method.numbers.title': 'Les chiffres ne sont pas sacrés',
+  'method.numbers.body':
+    'Aucune étude ne montre que 25 et 5 soient les bonnes valeurs. En 2023, une expérience a comparé des pauses imposées — 24 min de travail pour 6 de pause, la version testée du Pomodoro, et 12 pour 3 — à des pauses libres : même effort investi, même quantité de travail abattue. La différence était ailleurs. Ceux qui décidaient eux-mêmes travaillaient plus longtemps d’une traite, et se déclaraient plus fatigués, plus distraits, moins concentrés, moins motivés. Ce que le minuteur apporte, c’est la régularité — pas une durée exacte. Règle les tiennes dans « durées ».',
+  'method.references.title': 'Sources',
+  'method.references.hint':
+    'Chaque lien ouvre l’article chez son éditeur. C’est le seul endroit de l’app qui sorte sur le réseau.',
 
   'legal.title': 'mentions légales',
   'legal.publisher.title': 'Éditeur',
@@ -106,7 +162,15 @@ export const fr: Messages = {
   'legal.data.body':
     'Les sessions sont stockées localement sur cet appareil. Aucune collecte, aucun traceur, aucun compte.',
   'legal.licences.title': 'Licences',
-  'legal.licences.body': 'Clash Display (Fontshare), sous licence Fontshare.',
+  'legal.licences.body':
+    'Clash Display (Fontshare), sous licence Fontshare. Inter (rsms.me/inter), sous licence SIL Open Font 1.1.',
+
+  'update.ready': 'Une nouvelle version est prête.',
+  'update.reload': 'recharger',
+  'update.later': 'plus tard',
+  'update.check': 'vérifier',
+  'update.checking': 'vérification…',
+  'update.upToDate': 'à jour',
 
   'a11y.openSettings': 'réglages',
   'a11y.back': 'retour',

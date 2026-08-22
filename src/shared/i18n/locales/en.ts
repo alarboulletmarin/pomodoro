@@ -2,7 +2,8 @@ import type { Messages } from '../../../types';
 
 export const en: Messages = {
   'app.name': 'pomodoro',
-  'app.description': 'A work timer that lets you leave.',
+  'app.description':
+    'A work timer that lets you leave: one length, one session, one break. No notifications, no account, no streak to keep.',
 
   'timer.mode.focus': 'focus',
   'timer.mode.break': 'break',
@@ -46,6 +47,7 @@ export const en: Messages = {
   'stats.today_one': '{count} session today',
   'stats.today_other': '{count} sessions today',
   'stats.goal': 'goal {count}',
+  'stats.goal.reached': 'goal reached',
   'stats.week.caption': 'week',
   'stats.week.footer_one': '{day} · {count} session this week',
   'stats.week.footer_other': '{day} · {count} sessions this week',
@@ -57,8 +59,12 @@ export const en: Messages = {
   'stats.session.done': 'completed session',
   'stats.session.todo': 'upcoming session',
   'stats.day.none': 'day with no session',
+  'stats.day.today': 'today',
   'stats.day.count_one': '{count} session',
   'stats.day.count_other': '{count} sessions',
+  'stats.duration.minutes': '{minutes} min',
+  'stats.duration.hours': '{hours} h',
+  'stats.duration.hoursMinutes': '{hours} h {minutes}',
 
   'stats.day.mon': 'mon',
   'stats.day.tue': 'tue',
@@ -70,8 +76,10 @@ export const en: Messages = {
 
   'settings.title': 'settings',
   'settings.appearance': 'appearance',
+  'settings.theme.system': 'system',
   'settings.theme.light': 'light',
   'settings.theme.dark': 'dark',
+  'settings.theme.systemHint': 'follows your device’s theme, and changes with it',
   'settings.accent.title': 'accent colour',
   'settings.accent.red': 'red',
   'settings.accent.green': 'green',
@@ -80,6 +88,18 @@ export const en: Messages = {
   'settings.accent.customHint': 'your own colour, picked from the system palette',
   'settings.accent.contrastWarning':
     'low contrast — this colour will be hard to tell apart from the background',
+  'settings.durations.title': 'lengths',
+  'settings.durations.focus': 'focus session',
+  'settings.durations.break': 'break',
+  'settings.durations.hint':
+    'The lengths offered: when the app opens, and at the end of every session. On the timer screen you can always set the current one without touching these.',
+  'settings.durations.minutes': '{minutes} min',
+  'settings.goal.title': 'daily goal',
+  'settings.goal.label': 'sessions a day',
+  'settings.goal.hint':
+    'The marker above your stats: that many dots to fill. Nothing fires when you reach it, nothing reminds you when you don’t — it is a count, not a streak to keep.',
+  'settings.stepper.less': 'decrease: {name}',
+  'settings.stepper.more': 'increase: {name}',
   'settings.language.title': 'language',
   'settings.language.fr': 'french',
   'settings.language.en': 'english',
@@ -89,15 +109,50 @@ export const en: Messages = {
   'settings.install.title': 'install the app',
   'settings.install.hint': 'to open it from your home screen, offline',
   'settings.install.action': 'install',
+  'settings.update.title': 'version',
+  'settings.update.hint':
+    'An installed app keeps its own copy of the files, and checks by itself now and then whether there is a better one. You can ask here, without going through your phone’s settings.',
+  'settings.method': 'the method',
   'settings.about': 'about',
   'settings.legal': 'legal notice',
   'settings.version': 'version {version}',
 
+  'intro.lead': 'A work timer that lets you leave.',
+  'intro.what.title': 'You pick a length.',
+  'intro.what.body':
+    'You work, it chimes once, then you take a break. That is everything the app does.',
+  'intro.quiet.title': 'Nothing chases you.',
+  'intro.quiet.body':
+    'No notifications, no streak to keep, no account. Once your session is over, there is nothing left to do here.',
+  'intro.local.title': 'Nothing leaves this device.',
+  'intro.local.body': 'Your sessions stay here. The app installs, and works offline.',
+  'intro.start': 'start',
+  'intro.method': 'the method, and what the research says',
+
   'about.title': 'about',
   'about.lead': 'A timer, nothing else.',
   'about.body1':
-    '25 minutes of work, 5 minutes of break, six sessions a day at most. No notifications, no streak to protect, nothing to do here once your session is over.',
+    'One work session, one break, as many times as you want. No notifications, no streak to protect, nothing to do here once your session is over.',
   'about.body2': 'Your sessions stay on this device.',
+
+  'method.title': 'the method',
+  'method.lead':
+    'Twenty-five minutes of work, five of break. What the research backs — and what it does not.',
+  'method.origin.title': 'Where the 25 minutes come from',
+  'method.origin.body':
+    'Francesco Cirillo, a student in Rome in the late 1980s, could not hold his attention on his revision. He grabbed the kitchen timer lying about — a pomodoro, a tomato — and committed to a single interval, then another. The method was formalised in 1992 and published in 2006. That is where the twenty-five minutes come from: a kitchen timer, not a laboratory.',
+  'method.attention.title': 'Why interrupt yourself',
+  'method.attention.body':
+    'On a long, monotonous task, attention decays: the vigilance decrement. Ariga and Lleras tested the goal-habituation account — the group whose task was briefly interrupted twice in fifty minutes did not decline, the others did. What matters is not the rest, then, but deactivating the goal and reactivating it.',
+  'method.breaks.title': 'What breaks are worth',
+  'method.breaks.body':
+    'At scale the effect is measurable: across the tests of every Danish schoolchild between 2009 and 2013, each hour later in the day costs 0.9% of a standard deviation, and a twenty-to-thirty-minute break gives 1.7% back. A 2022 meta-analysis over 22 samples is more careful: micro-breaks restore vigour and reduce fatigue (d ≈ 0.35), but their effect on performance falls short of significance — and it grows with the length of the break.',
+  'method.numbers.title': 'The numbers are not sacred',
+  'method.numbers.body':
+    'No study shows 25 and 5 to be the right values. A 2023 experiment compared imposed breaks — 24 minutes of work for 6 of break, the Pomodoro arm, and 12 for 3 — with self-regulated ones: the same mental effort invested, the same amount of work done. The difference was elsewhere. Those who decided for themselves worked longer at a stretch, and reported more fatigue, more distraction, less concentration and less motivation. What the timer buys you is the regularity, not an exact length. Set your own under “lengths”.',
+  'method.references.title': 'Sources',
+  'method.references.hint':
+    'Each link opens the paper at its publisher. It is the only place in the app that reaches the network.',
 
   'legal.title': 'legal notice',
   'legal.publisher.title': 'Publisher',
@@ -106,7 +161,15 @@ export const en: Messages = {
   'legal.data.body':
     'Sessions are stored locally on this device. No collection, no tracker, no account.',
   'legal.licences.title': 'Licences',
-  'legal.licences.body': 'Clash Display (Fontshare), under the Fontshare licence.',
+  'legal.licences.body':
+    'Clash Display (Fontshare), under the Fontshare licence. Inter (rsms.me/inter), under the SIL Open Font License 1.1.',
+
+  'update.ready': 'A new version is ready.',
+  'update.reload': 'reload',
+  'update.later': 'later',
+  'update.check': 'check',
+  'update.checking': 'checking…',
+  'update.upToDate': 'up to date',
 
   'a11y.openSettings': 'settings',
   'a11y.back': 'back',

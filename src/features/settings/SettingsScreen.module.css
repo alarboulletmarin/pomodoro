@@ -21,6 +21,7 @@
 }
 
 .heading {
+  font-family: var(--font-display);
   font-size: 26px;
   font-weight: 600;
   letter-spacing: -0.5px;
@@ -42,11 +43,4 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-bottom: var(--safe-bottom);
-}
-
-.version {
-  padding-bottom: 4px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--muted);
 }

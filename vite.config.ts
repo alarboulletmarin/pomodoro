@@ -4,6 +4,13 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const BACKGROUND = '#FBF6EE';
+const DESCRIPTION =
+  'Un minuteur de travail qui te laisse partir : une durée, une session, une pause. ' +
+  'Pas de notification, pas de compte, pas de série à tenir.';
+
+// Link previews want absolute URLs. Set SITE_URL at build time to get them; without it
+// the tags stay relative, which most unfurlers still resolve.
+const SITE_URL = (process.env.SITE_URL ?? '').replace(/\/$/, '');
 
 // Read rather than imported so the manifest never lands in the client bundle.
 const { version } = JSON.parse(
@@ -15,15 +22,28 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(version),
   },
   plugins: [
+    {
+      name: 'site-url',
+      // Without a site URL there is no canonical address to declare, so the tag goes
+      // rather than pointing at "/"; the rest degrade to paths the scraper resolves.
+      transformIndexHtml: (html: string) =>
+        (SITE_URL ? html : html.replace(/\s*<meta property="og:url"[^>]*>/, '')).replaceAll(
+          '%SITE_URL%',
+          SITE_URL,
+        ),
+    },
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      // « prompt » plutôt qu'« autoUpdate » : une nouvelle version ne remplace
+      // jamais l'app sous les doigts de quelqu'un. Une session armée à 45 min ou
+      // en cours de réglage disparaîtrait sans un mot.
+      registerType: 'prompt',
+      injectRegister: null,
       includeManifestIcons: false,
       manifest: {
         name: 'Pomodoro',
         short_name: 'Pomodoro',
-        description: 'Un minuteur de travail qui te laisse partir.',
+        description: DESCRIPTION,
         start_url: '/',
         scope: '/',
         display: 'standalone',
@@ -45,8 +65,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
+        // clientsClaim sans skipWaiting : le premier chargement prend la main
+        // tout de suite (donc hors ligne dès la première visite), mais une
+        // version suivante attend qu'on la demande.
         clientsClaim: true,
-        skipWaiting: true,
       },
     }),
   ],

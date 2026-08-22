@@ -9,10 +9,10 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { SessionEntry, Suggestion, TimerContextValue } from '../../types';
+import type { SessionDurations, SessionEntry, Suggestion, TimerContextValue } from '../../types';
 import { appendSession, loadSessions, saveSessions } from '../../domain/sessions/session-log';
 import { todayCount as countToday } from '../../domain/sessions/session-stats';
-import { DEFAULT_FOCUS_MINUTES, MS_PER_MINUTE, nextSuggestion } from '../../domain/timer/durations';
+import { MS_PER_MINUTE, nextSuggestion } from '../../domain/timer/durations';
 import { displayedSeconds } from '../../domain/timer/format-clock';
 import { timerReducer } from '../../domain/timer/timer-machine';
 import {
@@ -31,7 +31,10 @@ const TimerContext = createContext<TimerContextValue | null>(null);
 
 export function TimerProvider({ children }: { children: ReactNode }): JSX.Element {
   const { settings } = useSettings();
-  const [state, dispatch] = useReducer(timerReducer, undefined, () => loadTimerState(Date.now()));
+  const { focusMinutes, breakMinutes } = settings;
+  const [state, dispatch] = useReducer(timerReducer, undefined, () =>
+    loadTimerState(Date.now(), settings.focusMinutes),
+  );
   const [sessions, setSessions] = useState<SessionEntry[]>(() => loadSessions(Date.now()));
   const [awaySession] = useState<SessionEntry | null>(() => {
     const away = loadElapsedWhileAway(Date.now());
@@ -107,12 +110,13 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
   useWakeLock(state.phase === 'running');
 
   const value = useMemo<TimerContextValue>(() => {
+    const durations: SessionDurations = { focus: focusMinutes, break: breakMinutes };
     const totalMs = state.minutes * MS_PER_MINUTE;
     const ratio = totalMs === 0 ? 0 : (totalMs - state.remainingMs) / totalMs;
     // Every way of dropping the suggestion also leaves `finished`, so the phase alone
     // carries it — including on the reload that lands straight on a finished session.
     const suggestion: Suggestion | null =
-      state.phase === 'finished' ? nextSuggestion(state.mode) : null;
+      state.phase === 'finished' ? nextSuggestion(state.mode, durations) : null;
 
     return {
       state,
@@ -131,9 +135,9 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
         dispatch({ type: 'setMode', mode: suggestion.mode, minutes: suggestion.minutes });
       },
       dismissSuggestion: () =>
-        dispatch({ type: 'setMode', mode: 'focus', minutes: DEFAULT_FOCUS_MINUTES }),
+        dispatch({ type: 'setMode', mode: 'focus', minutes: durations.focus }),
     };
-  }, [state, sessions]);
+  }, [state, sessions, focusMinutes, breakMinutes]);
 
   return <TimerContext.Provider value={value}>{children}</TimerContext.Provider>;
 }

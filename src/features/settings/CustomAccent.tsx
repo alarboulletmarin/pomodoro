@@ -18,9 +18,11 @@ export function CustomAccent(): JSX.Element {
   const panelId = useId();
 
   const { customColor, accentKey } = settings;
-  const legible = BACKDROPS.every(
-    (backdrop) => contrastRatio(customColor, backdrop) >= GRAPHIC_CONTRAST_MIN,
-  );
+  // Only about the colour actually in force: a warning on a swatch nobody picked
+  // teaches people to ignore warnings.
+  const warn =
+    accentKey === 'custom' &&
+    !BACKDROPS.every((backdrop) => contrastRatio(customColor, backdrop) >= GRAPHIC_CONTRAST_MIN);
 
   const pick = (hex: string): void => {
     setCustomColor(hex);
@@ -57,7 +59,7 @@ export function CustomAccent(): JSX.Element {
             <span className={styles.hint}>{t('settings.accent.customHint')}</span>
           </span>
         </div>
-        {legible ? null : <p className={styles.warning}>{t('settings.accent.contrastWarning')}</p>}
+        {warn ? <p className={styles.warning}>{t('settings.accent.contrastWarning')}</p> : null}
       </div>
     </>
   );

@@ -30,9 +30,11 @@
   white-space: nowrap;
 }
 
+/* Column flow rather than a fixed count: the goal decides how many there are. */
 .dots {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -48,6 +50,17 @@
 
 .dot[data-done] {
   background: var(--accent);
+}
+
+/* Past the goal: still counted, but not part of what was asked for. */
+.dot[data-over] {
+  box-shadow: none;
+  background: var(--accent-tint);
+}
+
+.dot[data-over][data-done] {
+  background: var(--accent);
+  opacity: 0.55;
 }
 
 :global(html[data-layout='landscape']) .block {

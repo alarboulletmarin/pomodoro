@@ -16,8 +16,9 @@ export function isSessionUnderway(phase: Phase): boolean {
   return phase === 'running' || phase === 'paused';
 }
 
-export function initialTimerState(): TimerState {
-  return armed('focus', DEFAULT_FOCUS_MINUTES);
+/** A fresh focus session, at whatever length the settings hold. */
+export function initialTimerState(focusMinutes: number = DEFAULT_FOCUS_MINUTES): TimerState {
+  return armed('focus', clampMinutes(focusMinutes));
 }
 
 export function timerReducer(state: TimerState, event: TimerEvent): TimerState {

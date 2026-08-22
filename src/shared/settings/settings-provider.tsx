@@ -8,11 +8,16 @@ import {
   type Settings,
   type SettingsContextValue,
   type Theme,
+  type ThemeChoice,
 } from '../../types';
+import { clampGoal } from '../../domain/sessions/session-stats';
+import { clampDuration } from '../../domain/timer/durations';
+import { preferredLocale } from '../i18n/preferred-locale';
 import { usePersistentState } from '../hooks/use-persistent-state';
 import { normaliseHex } from '../theme/contrast';
+import { useSystemTheme } from '../theme/use-system-theme';
 
-const THEMES: readonly Theme[] = ['light', 'dark'];
+const THEMES: readonly ThemeChoice[] = ['system', 'light', 'dark'];
 const ACCENT_KEYS: readonly AccentKey[] = ['red', 'green', 'blue', 'custom'];
 const LOCALES: readonly Locale[] = ['fr', 'en'];
 
@@ -24,7 +29,11 @@ function oneOf<T extends string>(allowed: readonly T[], value: unknown, fallback
     : fallback;
 }
 
-function normaliseSettings(raw: unknown, defaults: Settings): Settings | null {
+function number(value: unknown, clamp: (input: number) => number, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? clamp(value) : fallback;
+}
+
+export function normaliseSettings(raw: unknown, defaults: Settings): Settings | null {
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return null;
   const source = raw as Partial<Record<keyof Settings, unknown>>;
   const customColor =
@@ -35,22 +44,30 @@ function normaliseSettings(raw: unknown, defaults: Settings): Settings | null {
     customColor: customColor ?? defaults.customColor,
     lang: oneOf(LOCALES, source.lang, defaults.lang),
     chime: typeof source.chime === 'boolean' ? source.chime : defaults.chime,
+    focusMinutes: number(
+      source.focusMinutes,
+      (input) => clampDuration('focus', input),
+      defaults.focusMinutes,
+    ),
+    breakMinutes: number(
+      source.breakMinutes,
+      (input) => clampDuration('break', input),
+      defaults.breakMinutes,
+    ),
+    dailyGoal: number(source.dailyGoal, clampGoal, defaults.dailyGoal),
   };
 }
 
-function initialSettings(): Settings {
-  const prefersDark =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return { ...DEFAULT_SETTINGS, theme: prefersDark ? 'dark' : 'light' };
-}
-
 export function SettingsProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [defaults] = useState(initialSettings);
+  // Read once: the language the browser asks for is a starting point, not a preference
+  // that keeps overruling the one that was chosen.
+  const [defaults] = useState<Settings>(() => ({ ...DEFAULT_SETTINGS, lang: preferredLocale() }));
   const normalise = useCallback((raw: unknown) => normaliseSettings(raw, defaults), [defaults]);
   const [settings, setSettings] = usePersistentState(SETTINGS_STORAGE_KEY, defaults, normalise);
+  const systemTheme = useSystemTheme();
 
   const setTheme = useCallback(
-    (theme: Theme) => setSettings((prev) => ({ ...prev, theme })),
+    (theme: ThemeChoice) => setSettings((prev) => ({ ...prev, theme })),
     [setSettings],
   );
   const setAccentKey = useCallback(
@@ -73,23 +90,54 @@ export function SettingsProvider({ children }: { children: ReactNode }): JSX.Ele
     (chime: boolean) => setSettings((prev) => ({ ...prev, chime })),
     [setSettings],
   );
+  const setFocusMinutes = useCallback(
+    (minutes: number) =>
+      setSettings((prev) => ({ ...prev, focusMinutes: clampDuration('focus', minutes) })),
+    [setSettings],
+  );
+  const setBreakMinutes = useCallback(
+    (minutes: number) =>
+      setSettings((prev) => ({ ...prev, breakMinutes: clampDuration('break', minutes) })),
+    [setSettings],
+  );
+  const setDailyGoal = useCallback(
+    (sessions: number) => setSettings((prev) => ({ ...prev, dailyGoal: clampGoal(sessions) })),
+    [setSettings],
+  );
 
+  const theme: Theme = settings.theme === 'system' ? systemTheme : settings.theme;
   const accentHex =
     settings.accentKey === 'custom'
       ? settings.customColor
-      : ACCENT_PALETTE[settings.accentKey][settings.theme];
+      : ACCENT_PALETTE[settings.accentKey][theme];
 
   const value = useMemo<SettingsContextValue>(
     () => ({
       settings,
+      theme,
       accentHex,
       setTheme,
       setAccentKey,
       setCustomColor,
       setLang,
       setChime,
+      setFocusMinutes,
+      setBreakMinutes,
+      setDailyGoal,
     }),
-    [settings, accentHex, setTheme, setAccentKey, setCustomColor, setLang, setChime],
+    [
+      settings,
+      theme,
+      accentHex,
+      setTheme,
+      setAccentKey,
+      setCustomColor,
+      setLang,
+      setChime,
+      setFocusMinutes,
+      setBreakMinutes,
+      setDailyGoal,
+    ],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
