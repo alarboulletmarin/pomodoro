@@ -45,7 +45,7 @@
 
 :global(html[data-layout='landscape']) .preset {
   flex: none;
-  min-height: 42px;
+  min-height: var(--hit-min);
   padding: 0 20px;
 }
 

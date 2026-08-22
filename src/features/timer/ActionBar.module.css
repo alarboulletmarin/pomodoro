@@ -16,7 +16,9 @@
 
 .primary {
   min-height: 58px;
-  font-size: 18px;
+  /* 19px/600 keeps the label in WCAG large-text territory, where the accent's
+     3:1 contrast is enough — the mockup's 18px would not clear the bar. */
+  font-size: 19px;
 }
 
 /* Pausing is not the loudest thing on screen: quiet fill, hairline ring, real text colour. */
@@ -48,7 +50,6 @@
   max-width: 250px;
   min-height: 52px;
   padding: 0 26px;
-  font-size: 17px;
 }
 
 :global(html[data-layout='landscape']) .secondary {
