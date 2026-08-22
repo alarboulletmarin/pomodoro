@@ -43,7 +43,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 48px 56px;
+        padding: 52px 60px;
         border-radius: 30px;
         background: #ffffff;
         box-shadow:
@@ -52,39 +52,43 @@
       }
 
       .name {
-        font-size: 20px;
+        font-family: 'Clash Display', sans-serif;
+        font-size: 26px;
         font-weight: 500;
-        letter-spacing: 1.2px;
+        letter-spacing: 1.6px;
         text-transform: uppercase;
         color: #6b625a;
       }
 
-      .middle {
+      /* The sentence is the message and has to survive being shown 350px wide in a
+         chat: it is the largest thing on the card, set in the text face, ranged left.
+         The clock is the illustration, not the headline. */
+      .lead {
+        font-family: 'Inter Variable', sans-serif;
+        max-width: 900px;
+        font-size: 76px;
+        font-weight: 600;
+        line-height: 1.14;
+        letter-spacing: -1.6px;
+      }
+
+      .device {
         display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 48px;
+        align-items: center;
+        gap: 32px;
       }
 
       .clock {
-        font-size: 168px;
+        flex: none;
+        font-size: 92px;
         font-weight: 600;
-        letter-spacing: -9px;
+        letter-spacing: -5px;
         line-height: 0.9;
       }
 
-      .lead {
-        max-width: 420px;
-        padding-bottom: 14px;
-        font-size: 34px;
-        font-weight: 600;
-        line-height: 1.15;
-        letter-spacing: -0.8px;
-        text-align: right;
-      }
-
       .bar {
-        height: 12px;
+        flex: 1;
+        height: 14px;
         border-radius: 999px;
         background: rgba(34, 30, 26, 0.09);
         overflow: hidden;
@@ -102,7 +106,7 @@
         display: flex;
         gap: 18px;
         font-family: 'Inter Variable', sans-serif;
-        font-size: 22px;
+        font-size: 27px;
         font-weight: 400;
         color: #6b625a;
       }
@@ -116,17 +120,17 @@
     <div class="card">
       <p class="name">pomodoro</p>
 
-      <div class="middle">
-        <p class="clock">25:00</p>
-        <p class="lead">Un minuteur de travail qui te laisse partir.</p>
-      </div>
+      <p class="lead">Un minuteur de travail<br />qui te laisse partir.</p>
 
-      <div class="bar"><div class="fill"></div></div>
+      <div class="device">
+        <p class="clock">25:00</p>
+        <div class="bar"><div class="fill"></div></div>
+      </div>
 
       <div class="foot">
         <span>pas de notification</span><span class="dot">·</span>
         <span>pas de compte</span><span class="dot">·</span>
-        <span>tout reste sur ton appareil</span>
+        <span>rien ne sort de ton appareil</span>
       </div>
     </div>
   </body>

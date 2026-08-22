@@ -94,9 +94,9 @@
 }
 
 [data-layout='tablet'] {
-  --digits-size: 150px;
+  --digits-size: clamp(104px, 14vw, 150px);
   --digits-tracking: -7px;
-  --ghost-size: 38px;
+  --ghost-size: clamp(30px, 3.6vw, 38px);
   --radius-card: var(--radius-card-lg);
   --radius-button: var(--radius-button-lg);
   --radius-chip: var(--radius-chip-lg);

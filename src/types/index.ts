@@ -295,7 +295,7 @@ export const INTRO_STORAGE_KEY = 'pomodoro.intro.v1';
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   accentKey: 'red',
-  customColor: '#7A4BD0',
+  customColor: '#8B5CF6',
   lang: 'fr',
   chime: true,
   focusMinutes: 25,

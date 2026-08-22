@@ -94,6 +94,12 @@ Open Graph and Twitter card tags and `public/og.png` is the 1200×630 card they 
 at. That PNG is rendered from `design/og-card.html` — open it at 1200×630 and
 screenshot it to regenerate.
 
+The card is laid out for the size it is actually seen at. A chat client draws it
+around 350px wide, so everything on it is sized against that: the sentence is the
+largest element and set in the text face, and nothing is smaller than 27px on the
+1200px canvas — under about 30px it arrives illegible. Check any change to it by
+looking at the PNG at 350px, not at full size.
+
 ## Verified
 
 257 unit tests, 8 end-to-end, on Chromium.
