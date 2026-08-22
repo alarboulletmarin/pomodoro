@@ -2,10 +2,14 @@ import { useId, useState } from 'react';
 import { useI18n } from '../../shared/i18n/i18n';
 import { useSettings } from '../../shared/settings/settings-provider';
 import { contrastRatio } from '../../shared/theme/contrast';
-import { THEME_BG } from './theme-colors';
+import { THEME_BG, THEME_SURFACE } from './theme-colors';
 import styles from './CustomAccent.module.css';
 
 const GRAPHIC_CONTRAST_MIN = 3;
+
+// Cards sit on --surface, which is the closer of the two backdrops in dark mode, so
+// checking --bg alone lets a colour through that disappears on the stats panel.
+const BACKDROPS: readonly string[] = [...Object.values(THEME_BG), ...Object.values(THEME_SURFACE)];
 
 export function CustomAccent(): JSX.Element {
   const { t } = useI18n();
@@ -14,8 +18,8 @@ export function CustomAccent(): JSX.Element {
   const panelId = useId();
 
   const { customColor, accentKey } = settings;
-  const legible = Object.values(THEME_BG).every(
-    (background) => contrastRatio(customColor, background) >= GRAPHIC_CONTRAST_MIN,
+  const legible = BACKDROPS.every(
+    (backdrop) => contrastRatio(customColor, backdrop) >= GRAPHIC_CONTRAST_MIN,
   );
 
   const pick = (hex: string): void => {
