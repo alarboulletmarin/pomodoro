@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
@@ -11,6 +12,25 @@ const DESCRIPTION =
 // Link previews want absolute URLs. Set SITE_URL at build time to get them; without it
 // the tags stay relative, which most unfurlers still resolve.
 const SITE_URL = (process.env.SITE_URL ?? '').replace(/\/$/, '');
+
+/**
+ * Une empreinte courte d'un fichier de `public/`, pour la coller en `?v=` derrière son
+ * adresse. Une icône est redessinée sans que son chemin bouge, et ni Safari ni le
+ * cache d'icônes d'iOS n'ont alors de raison de redemander le fichier : l'app posée
+ * sur l'écran d'accueil garde le dessin d'avant. L'empreinte fait changer l'adresse
+ * quand le dessin change, et jamais autrement — un numéro de version écrit à la main
+ * s'oublie exactement le jour où il compte.
+ */
+const stamp = (file: string): string => {
+  const path = new URL(`./public/${file}`, import.meta.url);
+  try {
+    return createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 8);
+  } catch {
+    // Un jeton qui ne nomme aucun fichier est une faute de frappe dans index.html.
+    // Le dire ici coûte moins qu'un ENOENT sans contexte au milieu d'un build.
+    throw new Error(`asset-stamp : public/${file} est introuvable.`);
+  }
+};
 
 // Read rather than imported so the manifest never lands in the client bundle.
 const { version } = JSON.parse(
@@ -31,6 +51,12 @@ export default defineConfig({
           '%SITE_URL%',
           SITE_URL,
         ),
+    },
+    {
+      name: 'asset-stamp',
+      // `%V:chemin%` dans index.html devient l'empreinte de `public/chemin`.
+      transformIndexHtml: (html: string) =>
+        html.replace(/%V:([^%]+)%/g, (_match, file: string) => stamp(file)),
     },
     react(),
     VitePWA({
@@ -80,6 +106,10 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
+        // Les icônes sont demandées avec le `?v=` qu'index.html porte. Sans cette
+        // ligne le paramètre ferait manquer l'entrée précachée, et une icône
+        // demandée hors ligne partirait au réseau pour rien.
+        ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^v$/],
         cleanupOutdatedCaches: true,
         // clientsClaim sans skipWaiting : le premier chargement prend la main
         // tout de suite (donc hors ligne dès la première visite), mais une
