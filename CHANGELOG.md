@@ -6,6 +6,13 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Changé — la pause se règle là où elle est proposée
+
+- **L'écran de fin arme la pause au lieu de l'annoncer.** Le bouton disait « pause de 10 min » et rien sur cet écran ne permettait de discuter le 10 : il fallait ouvrir les réglages, changer une valeur par défaut qu'on ne voulait changer que pour cette fois, et revenir. Les trois durées de pause et le cadran à glisser sont maintenant là, comme sur l'écran de départ, et le bouton suit ce qui est réglé.
+- **Les chiffres montrent la pause qui vient, plus le 00:00 de ce qui vient de finir.** Un compteur à zéro ne dit rien que le titre ne dise déjà ; le même emplacement porte donc la durée qu'on est en train de choisir, avec la minute au-dessus et celle en dessous, et la barre repart de zéro parce qu'elle décrit désormais la pause à venir.
+- **Le réglage vaut pour cette pause-là.** Allonger une pause depuis l'écran de fin ne touche pas à la durée gardée dans les réglages : la proposition suivante repart de celle-ci.
+- **Le clavier suit.** Les flèches règlent la proposition comme elles règlent une session, et l'indication sous les boutons le dit au lieu de rester muette.
+
 ### Ajouté — une marque, et des icônes qu'on voit une fois l'application installée
 
 - **L'application a un logo.** Un cadran, deux courses : la longue vaut les 25 minutes de travail, la courte les 5 minutes de pause, sur un tour de 30. Le rapport n'est pas décoratif, c'est le rythme que l'app arme au lancement — le dessin dit ce que fait le produit, sans légende et sans tomate. Il se tient à côté du nom, qui reste écrit en Clash Display, la police d'affichage de l'interface.

@@ -7,6 +7,7 @@ import {
 } from '../../domain/timer/durations';
 import { formatClock, formatMinutesClock } from '../../domain/timer/format-clock';
 import { useI18n } from '../../shared/i18n/i18n';
+import type { Mode } from '../../types';
 import styles from './ClockScrubber.module.css';
 
 const KEY_STEPS: Record<string, number> = {
@@ -19,7 +20,10 @@ const KEY_STEPS: Record<string, number> = {
 export interface ClockScrubberProps {
   minutes: number;
   remainingMs: number;
-  idle: boolean;
+  /** What the digits are the length of, for the label a screen reader announces. */
+  mode: Mode;
+  /** Settable only while a session is being armed — never while one is under way. */
+  editable: boolean;
   onChange(minutes: number): void;
   className?: string | undefined;
 }
@@ -36,7 +40,8 @@ function capture(element: Element, pointerId: number, take: boolean): void {
 export function ClockScrubber({
   minutes,
   remainingMs,
-  idle,
+  mode,
+  editable,
   onChange,
   className,
 }: ClockScrubberProps): JSX.Element {
@@ -47,7 +52,7 @@ export function ClockScrubber({
   // Registered by hand because React's onWheel is passive and cannot stop the scroll.
   useEffect(() => {
     const node = grab.current;
-    if (!node || !idle) return;
+    if (!node || !editable) return;
     const onWheel = (event: WheelEvent): void => {
       if (event.deltaY === 0) return;
       event.preventDefault();
@@ -55,10 +60,10 @@ export function ClockScrubber({
     };
     node.addEventListener('wheel', onWheel, { passive: false });
     return () => node.removeEventListener('wheel', onWheel);
-  }, [idle, minutes, onChange]);
+  }, [editable, minutes, onChange]);
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>): void => {
-    if (!idle) return;
+    if (!editable) return;
     capture(event.currentTarget, event.pointerId, true);
     drag.current = { pointerId: event.pointerId, startY: event.clientY, startMinutes: minutes };
   };
@@ -76,7 +81,7 @@ export function ClockScrubber({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    if (!idle) return;
+    if (!editable) return;
     if (event.key === 'Home' || event.key === 'End') {
       event.preventDefault();
       onChange(event.key === 'Home' ? MIN_MINUTES : MAX_MINUTES);
@@ -93,34 +98,34 @@ export function ClockScrubber({
       <div
         ref={grab}
         className={styles.grab}
-        data-idle={idle ? '' : undefined}
+        data-editable={editable ? '' : undefined}
         role="spinbutton"
-        tabIndex={idle ? 0 : -1}
-        aria-label={t('timer.scrubber.label')}
+        tabIndex={editable ? 0 : -1}
+        aria-label={t(`timer.scrubber.label.${mode}`)}
         aria-valuenow={minutes}
         aria-valuemin={MIN_MINUTES}
         aria-valuemax={MAX_MINUTES}
         aria-valuetext={t('timer.preset', { minutes })}
-        aria-disabled={idle ? undefined : true}
+        aria-disabled={editable ? undefined : true}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
       >
-        {idle ? (
+        {editable ? (
           <span className={styles.ghost} aria-hidden="true">
             {minutes < MAX_MINUTES ? formatMinutesClock(minutes + 1) : ''}
           </span>
         ) : null}
         <span className={styles.digits}>{formatClock(remainingMs)}</span>
-        {idle ? (
+        {editable ? (
           <span className={styles.ghost} aria-hidden="true">
             {minutes > MIN_MINUTES ? formatMinutesClock(minutes - 1) : ''}
           </span>
         ) : null}
       </div>
-      {idle ? <p className={styles.hint}>{t('timer.scrubHint')}</p> : null}
+      {editable ? <p className={styles.hint}>{t('timer.scrubHint')}</p> : null}
     </div>
   );
 }

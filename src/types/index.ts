@@ -117,6 +117,8 @@ export interface TimerContextValue {
   sessions: SessionEntry[];
   suggestion: Suggestion | null;
   setMinutes(minutes: number): void;
+  /** The length of the offered next session, for as long as it is being offered. */
+  setSuggestionMinutes(minutes: number): void;
   start(): void;
   pause(): void;
   resume(): void;
@@ -160,10 +162,12 @@ interface SingularMessages {
 
   'timer.preset': string;
   'timer.scrubHint': string;
-  'timer.scrubber.label': string;
+  'timer.scrubber.label.focus': string;
+  'timer.scrubber.label.break': string;
   'timer.shortcuts.idle': string;
   'timer.shortcuts.active': string;
   'timer.shortcuts.paused': string;
+  'timer.shortcuts.finished': string;
 
   'timer.action.start': string;
   'timer.action.startBreak': string;
