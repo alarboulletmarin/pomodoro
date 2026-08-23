@@ -1,0 +1,794 @@
+<!doctype html>
+<!-- Les stories : huit planches 1080×1920, dans l'ordre où on découvre l'application.
+
+     `cards.html` porte les visuels que l'app distribue d'elle-même — la carte d'un lien
+     collé, un post, une story. Une seule image, une seule phrase, et c'est son travail :
+     un lien n'a qu'un aperçu.
+
+     Ce fichier fait l'autre travail. Une story ne se colle pas, elle se fait défiler, et
+     une phrase seule sur du papier ne dit ni ce que l'app fait, ni à quoi elle ressemble,
+     ni quoi faire ensuite. Ces huit-là racontent : la promesse, le geste, la session, ce
+     que l'app refuse, où vont les données, le relevé, l'apparence, l'installation. Chacune
+     porte un fait vérifiable plutôt qu'une humeur, et son rang, pour qu'on sache où on en
+     est dans la série.
+
+     Les captures viennent de la vraie application, jouée par `npm run stories` et injectées
+     ici en data URI. Le papier des captures est le papier des planches, au jeton près : une
+     capture posée dessus n'a pas de bord, et il ne reste à l'écran que les cartes de l'app.
+     C'est le seul cadrage qui ne mente pas sur ce qu'on voit.
+
+     Le thème et l'accent sont posés de l'extérieur, comme pour `cards.html`.
+     `?guides` dessine les zones qu'Instagram recouvre — en-tête de compte en haut,
+     barre de réponse en bas. Rien de lisible ne doit y entrer. -->
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>pomodoro · stories 9:16</title>
+    <style>
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: 'Clash Display';
+        src: url('../../public/fonts/clash-display-500.woff2') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Inter Variable';
+        src: url('../../public/fonts/inter-variable.woff2') format('woff2');
+        font-weight: 400 600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Les mêmes jetons que src/styles/tokens.css, aux mêmes valeurs. Le script écrit
+         le thème et l'accent ; ceux-ci ne sont que les défauts du fichier ouvert seul. */
+      :root {
+        --paper: #fbf6ee;
+        --surface: #ffffff;
+        --ink: #221e1a;
+        --muted: #6b625a;
+        --hairline: rgba(34, 30, 26, 0.13);
+        --track: rgba(34, 30, 26, 0.09);
+        --quiet: rgba(34, 30, 26, 0.05);
+        --shadow: 0 2px 0 rgba(34, 30, 26, 0.05), 0 60px 90px -70px rgba(34, 30, 26, 0.9);
+        --accent: #d63e45;
+        --on-accent: #ffffff;
+      }
+
+      :root[data-theme='dark'] {
+        --paper: #151311;
+        --surface: #201d1a;
+        --ink: #f5f0e8;
+        --muted: #a79c90;
+        --hairline: rgba(245, 240, 232, 0.14);
+        --track: rgba(245, 240, 232, 0.1);
+        --quiet: rgba(245, 240, 232, 0.08);
+        /* Comme dans l'app : pas d'ombre portée sur fond sombre, une carte s'y détache
+           par sa clarté. */
+        --shadow: 0 1px 0 rgba(245, 240, 232, 0.05);
+        --accent: #ff6f6f;
+        --on-accent: #1a1310;
+      }
+
+      body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 48px;
+        padding: 48px;
+        background: #8b8279;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Une planche : le format d'Instagram, le papier de l'app, et une grille dont les
+         marges hautes et basses sont celles que le réseau recouvre — 240 px de nom de
+         compte en haut, 280 px de barre de réponse en bas. Rien qui se lit n'y entre. */
+      .board {
+        position: relative;
+        flex: none;
+        width: 1080px;
+        height: 1920px;
+        display: flex;
+        flex-direction: column;
+        padding: 262px 88px 280px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Inter Variable', sans-serif;
+      }
+
+      :root[data-guides] .board::before,
+      :root[data-guides] .board::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        background: rgba(214, 62, 69, 0.14);
+        border-block: 1px dashed rgba(214, 62, 69, 0.5);
+      }
+
+      :root[data-guides] .board::before {
+        top: 0;
+        height: 250px;
+      }
+
+      :root[data-guides] .board::after {
+        bottom: 0;
+        height: 280px;
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  Le mobilier commun                                                   */
+      /* -------------------------------------------------------------------- */
+
+      /* La signature en tête de planche : la marque, le nom, et le rang dans la série.
+         Le rang n'est pas décoratif — une story se regarde une à une, et savoir qu'il en
+         reste six est ce qui fait rester. */
+      .sign {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        color: var(--muted);
+      }
+
+      .mark {
+        flex: none;
+        width: 46px;
+        height: 46px;
+        color: var(--accent);
+      }
+
+      .name {
+        font-family: 'Clash Display', sans-serif;
+        font-size: 30px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .rank {
+        margin-left: auto;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .kicker {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .kicker::before {
+        content: '';
+        width: 34px;
+        height: 3px;
+        border-radius: 999px;
+        background: currentColor;
+      }
+
+      /* La phrase porte le message et se lit à bout de bras, en deux secondes, sur un
+         écran tenu à quatre-vingts centimètres. C'est le plus gros élément de la
+         planche, dans la police de texte : Clash est dessinée pour les titres courts,
+         pas pour trois lignes de phrase. */
+      .head {
+        font-size: 76px;
+        font-weight: 600;
+        line-height: 1.08;
+        letter-spacing: -0.028em;
+      }
+
+      .sub {
+        max-width: 830px;
+        font-size: 34px;
+        font-weight: 400;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+
+      .sub b {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .grow {
+        flex: 1;
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  Les captures                                                         */
+      /* -------------------------------------------------------------------- */
+
+      /* Une fenêtre ouverte sur la capture. `--top` dit quelle bande de l'image on
+         montre, en pixels de l'image ; la coupe tombe sur du papier vide, jamais dans
+         une carte, et comme les deux papiers sont le même jeton elle ne se voit pas.
+         Recadrer une planche, c'est changer ces deux nombres. */
+      .shot {
+        position: relative;
+        flex: none;
+        align-self: center;
+        width: var(--width, 820px);
+        height: var(--height);
+        overflow: hidden;
+      }
+
+      .shot img {
+        position: absolute;
+        top: calc(var(--top) * -1 * var(--scale, 0.9535));
+        left: 0;
+        width: calc(860px * var(--scale, 0.9535));
+        display: block;
+      }
+
+      /* Deux appareils côte à côte, le même écran dans les deux thèmes : c'est la seule
+         planche où le clair et le sombre doivent se voir ensemble, donc la seule qui ne
+         suive pas le thème de la planche. */
+      .pair {
+        display: flex;
+        justify-content: center;
+        gap: 34px;
+      }
+
+      .pair .shot {
+        --width: 435px;
+        --scale: 0.506;
+        border-radius: 34px;
+        box-shadow: var(--shadow);
+        outline: 1.5px solid var(--hairline);
+        outline-offset: -1.5px;
+      }
+
+      .pair .light {
+        background: #fbf6ee;
+      }
+
+      .pair .dark {
+        background: #151311;
+      }
+
+      .caption {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        font-size: 26px;
+        font-weight: 500;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .caption em {
+        font-style: normal;
+        color: var(--accent);
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  01 — la promesse                                                     */
+      /*  08 — l'installation                                                  */
+      /* -------------------------------------------------------------------- */
+
+      .opener {
+        justify-content: space-between;
+        gap: 56px;
+      }
+
+      .opener .mark {
+        width: 132px;
+        height: 132px;
+      }
+
+      .opener .name {
+        font-size: 56px;
+      }
+
+      .opener .head {
+        font-size: 96px;
+        letter-spacing: -0.032em;
+      }
+
+      .opener .sub {
+        max-width: 900px;
+        font-size: 38px;
+        color: var(--ink);
+      }
+
+      .rule {
+        width: 100%;
+        height: 2px;
+        background: var(--hairline);
+      }
+
+      /* La marque déroulée : vingt-cinq minutes de travail, cinq de pause, aux vraies
+         proportions. C'est le rythme que l'app arme au lancement, et la seule chose
+         qu'un logo en anneau ne peut pas dire en toutes lettres. */
+      .cycle {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .cycle-bar {
+        display: flex;
+        gap: 10px;
+        height: 26px;
+      }
+
+      .cycle-bar span:first-child {
+        flex: 25;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .cycle-bar span:last-child {
+        flex: 5;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      .cycle-legend {
+        display: flex;
+        font-size: 28px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+
+      .cycle-legend span:first-child {
+        flex: 25;
+        color: var(--ink);
+      }
+
+      .cycle-legend span:last-child {
+        flex: 5;
+        text-align: right;
+      }
+
+      .facts {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .facts span {
+        padding: 16px 30px;
+        border-radius: 999px;
+        background: var(--quiet);
+        font-size: 27px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  04 — ce qu'elle ne fait pas                                          */
+      /* -------------------------------------------------------------------- */
+
+      /* Une liste de refus ne dit rien toute seule : « pas de notification » est une
+         posture tant qu'on ne sait pas ce que ça change. Chaque ligne porte donc sa
+         conséquence, en clair, sous le refus. */
+      .refusals {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+      }
+
+      .refusals li {
+        display: grid;
+        grid-template-columns: 78px 1fr;
+        align-items: baseline;
+        gap: 8px 4px;
+        padding: 32px 0;
+        border-top: 2px solid var(--hairline);
+      }
+
+      .refusals li:last-child {
+        border-bottom: 2px solid var(--hairline);
+      }
+
+      .no {
+        grid-row: span 2;
+        font-family: 'Clash Display', sans-serif;
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+      }
+
+      .refusals .what {
+        font-size: 42px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+
+      .refusals .why {
+        font-size: 30px;
+        color: var(--muted);
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  05 — tes données                                                     */
+      /* -------------------------------------------------------------------- */
+
+      /* « Rien ne sort de ton appareil » est une promesse ; trois clés de stockage
+         sont une preuve. C'est tout ce que l'application écrit, nommé, dans la police
+         à chasse fixe dont l'app se sert déjà pour ses légendes de graphique. */
+      .ledger {
+        padding: 44px 46px 40px;
+        border-radius: 34px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .ledger h3 {
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .ledger ul {
+        margin: 30px 0 30px;
+        list-style: none;
+      }
+
+      .ledger li {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        padding: 22px 0;
+        border-top: 2px solid var(--hairline);
+      }
+
+      .ledger code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 28px;
+        color: var(--ink);
+      }
+
+      .ledger em {
+        margin-left: auto;
+        font-style: normal;
+        font-size: 27px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .ledger p {
+        font-size: 28px;
+        font-weight: 500;
+        color: var(--accent);
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  07 — l'apparence                                                     */
+      /* -------------------------------------------------------------------- */
+
+      .accents {
+        display: flex;
+        justify-content: center;
+        gap: 46px;
+      }
+
+      .accents div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        font-size: 26px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+
+      .swatch {
+        width: 74px;
+        height: 74px;
+        border-radius: 999px;
+      }
+
+      .swatch[data-accent='red'] {
+        background: #d63e45;
+      }
+
+      .swatch[data-accent='green'] {
+        background: #2c855e;
+      }
+
+      .swatch[data-accent='blue'] {
+        background: #2f6fe0;
+      }
+
+      :root[data-theme='dark'] .swatch[data-accent='red'] {
+        background: #ff6f6f;
+      }
+
+      :root[data-theme='dark'] .swatch[data-accent='green'] {
+        background: #5fcb92;
+      }
+
+      :root[data-theme='dark'] .swatch[data-accent='blue'] {
+        background: #7fa9ff;
+      }
+
+      /* La quatrième pastille n'est pas une couleur de plus, c'est le sélecteur : ce que
+         l'app propose, ce sont trois accents livrés et le reste de la palette. */
+      .swatch[data-accent='custom'] {
+        background: conic-gradient(
+          #d63e45,
+          #e08b2f,
+          #2c855e,
+          #2f6fe0,
+          #7a5af8,
+          #d63e45
+        );
+      }
+
+      /* -------------------------------------------------------------------- */
+      /*  08 — l'appel                                                         */
+      /* -------------------------------------------------------------------- */
+
+      .cta {
+        display: inline-flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 18px;
+        padding: 30px 52px;
+        border-radius: 30px;
+        background: var(--accent);
+        color: var(--on-accent);
+        font-family: 'Clash Display', sans-serif;
+        font-size: 42px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        word-spacing: 0.12em;
+      }
+
+      .licence {
+        font-size: 26px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- prettier-ignore -->
+    <template id="mark">
+      <svg class="mark" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="48.64" stroke-linecap="round" aria-hidden="true">
+        <path d="M 296.923 121.278 A 140.8 140.8 0 1 1 118.866 224.079" />
+        <path d="M 159.789 153.199 A 140.8 140.8 0 0 1 215.077 121.278" />
+      </svg>
+    </template>
+
+    <template id="sign">
+      <p class="sign"><span class="slot"></span><span class="name">pomodoro</span></p>
+    </template>
+
+    <!-- 01 · la promesse ---------------------------------------------------- -->
+    <section class="board opener" id="s1">
+      <p class="sign"><span class="slot"></span><span class="name">pomodoro</span></p>
+      <div class="stack">
+        <h1 class="head">Un minuteur de travail qui te laisse partir.</h1>
+        <p class="sub">
+          Tu choisis une durée. Tu travailles. Ça sonne une fois. Tu prends une pause.
+          <b>C’est tout ce que fait l’app.</b>
+        </p>
+      </div>
+      <div class="cycle">
+        <div class="cycle-bar"><span></span><span></span></div>
+        <p class="cycle-legend"><span>25 min de travail</span><span>5 min de pause</span></p>
+      </div>
+      <div class="facts">
+        <span>dans le navigateur</span><span>s’installe</span><span>hors ligne</span>
+      </div>
+    </section>
+
+    <!-- 02 · le geste ------------------------------------------------------- -->
+    <section class="board" id="s2">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">02/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">le réglage</p>
+        <h2 class="head">La durée se règle en glissant les chiffres.</h2>
+        <p class="sub">
+          La valeur suivante au-dessus, la précédente en dessous : ça se lit comme une
+          molette, pas comme un champ.
+        </p>
+      </div>
+      <div class="grow"></div>
+      <div class="shot" data-shot="idle" style="--top: 238px; --height: 797px"></div>
+      <p class="caption">
+        <em>9 px = 1 min</em><span>·</span><span>flèches</span><span>·</span><span>molette</span
+        ><span>·</span><span>3 préréglages</span>
+      </p>
+    </section>
+
+    <!-- 03 · la session ----------------------------------------------------- -->
+    <section class="board" id="s3">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">03/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">pendant la session</p>
+        <h2 class="head">Ça démarre, et l’écran se vide.</h2>
+        <p class="sub">
+          Les chiffres, la barre, deux boutons. L’app n’a plus rien à te proposer — c’est
+          le moment de reposer le téléphone.
+        </p>
+      </div>
+      <div class="grow"></div>
+      <div class="shot" data-shot="running" style="--top: 650px; --height: 590px; --width: 940px; --scale: 1.093"></div>
+      <div class="grow"></div>
+      <p class="caption"><span>25 min de focus, 5 de pause · réglables de 5 à 90 min</span></p>
+    </section>
+
+    <!-- 04 · ce qu'elle ne fait pas ------------------------------------------ -->
+    <section class="board" id="s4">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">04/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">ce qu’elle ne fait pas</p>
+        <h2 class="head">Rien ne te relance.</h2>
+      </div>
+      <div class="grow"></div>
+      <ul class="refusals">
+        <li>
+          <span class="no">01</span>
+          <p class="what">pas de notification</p>
+          <p class="why">une sonnerie à la fin de la session, et c’est tout</p>
+        </li>
+        <li>
+          <span class="no">02</span>
+          <p class="what">pas de série à tenir</p>
+          <p class="why">sauter un jour ne coûte rien, rien ne se remet à zéro</p>
+        </li>
+        <li>
+          <span class="no">03</span>
+          <p class="what">pas de compte</p>
+          <p class="why">rien à créer, rien à retenir, rien à confirmer</p>
+        </li>
+        <li>
+          <span class="no">04</span>
+          <p class="what">pas de pub, pas de traqueur</p>
+          <p class="why">personne ne regarde ce que tu fais de tes journées</p>
+        </li>
+      </ul>
+      <div class="grow"></div>
+    </section>
+
+    <!-- 05 · tes données ----------------------------------------------------- -->
+    <section class="board" id="s5">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">05/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">tes données</p>
+        <h2 class="head">Tes sessions restent sur ton appareil.</h2>
+        <p class="sub">
+          Elles sont écrites dans le navigateur et n’en sortent pas. Coupe le réseau :
+          l’app s’ouvre quand même, avec tout ce qu’elle a enregistré.
+        </p>
+      </div>
+      <div class="grow"></div>
+      <div class="ledger">
+        <h3>tout ce que l’app écrit</h3>
+        <ul>
+          <li><code>pomodoro.sessions.v1</code><em>tes sessions</em></li>
+          <li><code>pomodoro.settings.v1</code><em>tes réglages</em></li>
+          <li><code>pomodoro.timer.v1</code><em>la session en cours</em></li>
+        </ul>
+        <p>trois clés, sur cet appareil. Aucune adresse au bout.</p>
+      </div>
+      <div class="grow"></div>
+    </section>
+
+    <!-- 06 · le relevé ------------------------------------------------------- -->
+    <section class="board" id="s6">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">06/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">le relevé</p>
+        <h2 class="head">Un relevé, pas un score.</h2>
+        <p class="sub">
+          Ta semaine, ton mois, et le détail d’un jour quand tu appuies dessus. L’objectif
+          est un repère : rien ne se déclenche quand tu l’atteins.
+        </p>
+      </div>
+      <div class="grow"></div>
+      <div class="shot" data-shot="idle" style="--top: 1068px; --height: 584px; --width: 940px; --scale: 1.093"></div>
+      <div class="grow"></div>
+    </section>
+
+    <!-- 07 · l'apparence ----------------------------------------------------- -->
+    <section class="board" id="s7">
+      <p class="sign">
+        <span class="slot"></span><span class="name">pomodoro</span><span class="rank">07/08</span>
+      </p>
+      <div class="stack" style="margin-top: 54px">
+        <p class="kicker">l’apparence</p>
+        <h2 class="head">Clair, sombre, et la couleur que tu veux.</h2>
+        <p class="sub">
+          Le thème suit celui du téléphone et tourne avec lui, même en pleine session.
+          Français ou anglais.
+        </p>
+      </div>
+      <div class="grow"></div>
+      <div class="pair">
+        <div class="shot light" data-shot="idle-light" style="--top: 238px; --height: 689px"></div>
+        <div class="shot dark" data-shot="idle-dark" style="--top: 238px; --height: 689px"></div>
+      </div>
+      <div class="grow"></div>
+      <div class="accents">
+        <div><span class="swatch" data-accent="red"></span>rouge</div>
+        <div><span class="swatch" data-accent="green"></span>vert</div>
+        <div><span class="swatch" data-accent="blue"></span>bleu</div>
+        <div><span class="swatch" data-accent="custom"></span>la tienne</div>
+      </div>
+    </section>
+
+    <!-- 08 · l'installation -------------------------------------------------- -->
+    <section class="board opener" id="s8">
+      <p class="sign"><span class="slot"></span><span class="name">pomodoro</span></p>
+      <div class="stack">
+        <h1 class="head">Installe-le depuis ton navigateur.</h1>
+        <p class="sub">
+          Pas de store, pas de compte, pas d’attente. Une page qui s’ajoute à ton écran
+          d’accueil et s’ouvre hors ligne.
+        </p>
+      </div>
+      <div class="stack">
+        <p class="cta" data-cta>lien en bio</p>
+        <div class="rule"></div>
+        <p class="licence">libre et open source · AGPL-3.0</p>
+      </div>
+    </section>
+
+    <script>
+      // La marque est écrite une fois et clonée : trois copies d'un même chemin SVG
+      // finissent par ne plus être le même chemin.
+      const mark = document.getElementById('mark').content.firstElementChild;
+      for (const slot of document.querySelectorAll('.slot')) {
+        slot.replaceWith(mark.cloneNode(true));
+      }
+
+      // Les captures arrivent du script, en data URI, une par thème. Ouvert à la main,
+      // le fichier n'en a aucune : les fenêtres restent vides plutôt que cassées, et la
+      // mise en page se juge quand même.
+      globalThis.paintShots = (shots) => {
+        for (const window of document.querySelectorAll('.shot')) {
+          const source = shots[window.dataset.shot];
+          window.replaceChildren();
+          if (!source) continue;
+          const image = document.createElement('img');
+          image.src = source;
+          window.append(image);
+        }
+      };
+
+      // L'appel à l'action : « lien en bio » sur Instagram, le domaine partout ailleurs.
+      globalThis.paintCall = (url) => {
+        for (const call of document.querySelectorAll('[data-cta]')) {
+          call.textContent = url ?? 'lien en bio';
+        }
+      };
+    </script>
+  </body>
+</html>

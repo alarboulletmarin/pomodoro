@@ -6,10 +6,11 @@ import { ACCENT_PALETTE } from '../../types';
 import { THEME_BG, THEME_INK, THEME_SURFACE } from '../../features/settings/theme-colors';
 import { BREAK, WORK } from './Mark';
 
-// The mark exists in four places and must be one shape: this component, the favicon
-// and the icon PNGs that `scripts/generate-icons.mjs` prints, and the share boards.
-// The generator is a plain .mjs the app cannot import, so the agreement is checked
-// here — by reading the files, which needs no build step and no type declaration.
+// The mark exists in five places and must be one shape: this component, the favicon
+// and the icon PNGs that `scripts/generate-icons.mjs` prints, the share boards and the
+// story boards. The generator is a plain .mjs the app cannot import, so the agreement
+// is checked here — by reading the files, which needs no build step and no type
+// declaration.
 const read = (path: string): string => readFileSync(resolve(process.cwd(), path), 'utf8');
 
 const paths = (svg: string): string[] =>
@@ -22,6 +23,13 @@ describe('the mark', () => {
 
   it('draws the same two runs as the share boards', () => {
     expect(paths(read('design/social/cards.html'))).toEqual([WORK, BREAK]);
+  });
+
+  // Les stories portent la marque huit fois, clonée d'un seul gabarit : le fichier ne
+  // doit donc contenir qu'une paire de chemins, et ce sont ceux-là. Tout le reste de
+  // leur décor est dessiné en CSS, ce qui garde cette égalité vraie.
+  it('draws the same two runs as the story boards', () => {
+    expect(paths(read('design/social/stories.html'))).toEqual([WORK, BREAK]);
   });
 
   it('carries the ratio the app arms by default', () => {

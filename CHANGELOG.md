@@ -6,6 +6,17 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Ajouté — huit stories pour présenter l'application
+
+- **Une série, pas une affiche.** Le 9:16 existant est la carte de lien recadrée : une phrase, une horloge, quatre mentions. Collé dans une conversation, c'est son travail. Déroulé dans des stories, ça ne dit ni ce que l'app fait, ni à quoi elle ressemble, ni quoi faire ensuite. `npm run stories` tire huit planches qui portent l'argument dans l'ordre : la promesse, le geste, la session, ce que l'app refuse de faire, où restent les données, le relevé, l'apparence, l'installation.
+- **Chaque planche porte un fait, pas une humeur.** « Neuf pixels par minute. » « Une sonnerie à la fin, et c'est tout. » « Trois clés, sur cet appareil. » Une story se regarde deux secondes : ce qu'on y met doit se vérifier, pas s'admirer.
+- **Ce sont les vrais écrans.** Playwright joue l'application, une fois par thème, dans une fenêtre de téléphone au double de la définition. Le papier des captures étant le papier des planches, au jeton près, une capture posée dessus n'a pas de bord : il ne reste à l'écran que les cartes de l'app. Pas de cadre de téléphone, pas d'ombre d'un appareil que personne ne possède.
+- **La session à mi-course est semée, pas attendue.** L'application restaure une session en cours depuis son stockage : c'est un état qu'elle atteint vraiment, et le seul moyen de photographier un minuteur à quinze minutes de la fin sans rester dix minutes devant.
+- **La planche des données nomme les trois clés de stockage.** « Rien ne sort de ton appareil » est une promesse ; `pomodoro.sessions.v1` est une preuve.
+- **Clair et sombre**, seize fichiers, numérotés : un dossier trié par nom est la série dans le bon ordre.
+- **La grille laisse sa place à Instagram** — 250 px de nom de compte en haut, 280 px de barre de réponse en bas, et rien de lisible n'y entre. `?guides` les dessine dans le navigateur. L'appel à l'action dit « lien en bio », la convention d'un réseau où une story ne porte pas de lien ; `npm run stories -- --url ton.site` écrit l'adresse à la place.
+- **Le curseur de tournage prend les couleurs de l'application.** Il était écrit en dur dans l'encre du thème clair : sur un fond sombre, il n'existait pas. Il lit maintenant les jetons, aux mêmes valeurs qu'avant en clair.
+
 ### Changé — la pause se règle là où elle est proposée
 
 - **L'écran de fin arme la pause au lieu de l'annoncer.** Le bouton disait « pause de 10 min » et rien sur cet écran ne permettait de discuter le 10 : il fallait ouvrir les réglages, changer une valeur par défaut qu'on ne voulait changer que pour cette fois, et revenir. Les trois durées de pause et le cadran à glisser sont maintenant là, comme sur l'écran de départ, et le bouton suit ce qui est réglé.

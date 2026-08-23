@@ -50,8 +50,21 @@ export const ffmpeg = (args, options = {}) =>
 // Une capture n'enregistre pas le pointeur du système : sans ce disque, la
 // démonstration montre des chiffres qui défilent sans raison visible. Il se resserre
 // et prend l'accent à l'appui, comme un doigt qui se pose.
+//
+// Ses couleurs sont lues sur les jetons de l'application plutôt qu'écrites ici : en
+// clair elles valent exactement ce qu'elles valaient — `--text` est `#221E1A` et
+// `--accent` `#D63E45` —, et sur le thème sombre un disque d'encre foncée posé sur un
+// fond foncé n'existait tout simplement pas.
 export const CURSOR_SCRIPT = `
 (() => {
+  const channels = (name, fallback) => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const hex = /^#([0-9a-fA-F]{6})$/.exec(raw);
+    if (!hex) return fallback;
+    const value = parseInt(hex[1], 16);
+    return [(value >> 16) & 255, (value >> 8) & 255, value & 255].join(',');
+  };
+
   const install = () => {
     if (document.getElementById('__demo-cursor')) return;
     const dot = document.createElement('div');
@@ -60,8 +73,6 @@ export const CURSOR_SCRIPT = `
       'position: fixed', 'top: 0', 'left: 0',
       'width: 30px', 'height: 30px', 'margin: -15px 0 0 -15px',
       'border-radius: 50%',
-      'background: rgba(34, 30, 26, 0.14)',
-      'border: 2.5px solid rgba(34, 30, 26, 0.55)',
       'pointer-events: none', 'z-index: 2147483647',
       'transform: translate(-200px, -200px) scale(1)',
       'transition: transform 60ms linear, background-color 120ms linear',
@@ -70,9 +81,15 @@ export const CURSOR_SCRIPT = `
 
     let x = -200, y = -200, pressed = false;
     const render = () => {
+      const ink = channels('--text', '34,30,26');
+      const accent = channels('--accent', '214,62,69');
       dot.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (pressed ? 0.7 : 1) + ')';
-      dot.style.backgroundColor = pressed ? 'rgba(214, 62, 69, 0.35)' : 'rgba(34, 30, 26, 0.14)';
+      dot.style.border = '2.5px solid rgba(' + ink + ', 0.55)';
+      dot.style.backgroundColor = pressed
+        ? 'rgba(' + accent + ', 0.35)'
+        : 'rgba(' + ink + ', 0.14)';
     };
+    render();
     addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; render(); }, true);
     addEventListener('pointerdown', () => { pressed = true; render(); }, true);
     addEventListener('pointerup', () => { pressed = false; render(); }, true);
@@ -94,9 +111,15 @@ export const CURSOR_SCRIPT = `
  * l'application a à montrer. Le semis est calculé, pas tiré au sort : deux tournages
  * donnent la même semaine.
  *
+ * `settings` écrase les réglages semés — les stories ont besoin des deux thèmes, le
+ * film n'en veut qu'un. `timer` arme une session déjà en cours : l'application
+ * restaure un `running` depuis son stockage, donc c'est un état qu'elle atteint
+ * vraiment, et c'est le seul moyen de photographier un minuteur à mi-course sans
+ * attendre dix minutes devant.
+ *
  * Sérialisée par Playwright puis exécutée dans la page : elle ne peut fermer sur rien.
  */
-export function seedStorage() {
+export function seedStorage({ settings = {}, timer = null } = {}) {
   localStorage.setItem('pomodoro.intro.v1', '1');
   localStorage.setItem(
     'pomodoro.settings.v1',
@@ -108,8 +131,26 @@ export function seedStorage() {
       focusMinutes: 25,
       breakMinutes: 5,
       dailyGoal: 4,
+      ...settings,
     }),
   );
+
+  if (timer) {
+    const totalMs = timer.minutes * 60 * 1000;
+    const remainingMs = timer.remainingMinutes * 60 * 1000;
+    localStorage.setItem(
+      'pomodoro.timer.v1',
+      JSON.stringify({
+        phase: 'running',
+        mode: timer.mode ?? 'focus',
+        minutes: timer.minutes,
+        // Une marge de trois secondes absorbe le chargement : sans elle, la prise
+        // arrive une seconde après l'instant visé et l'horloge a déjà tourné.
+        endsAt: Date.now() + remainingMs + 3000,
+        remainingMs: Math.min(totalMs, remainingMs),
+      }),
+    );
+  }
 
   const DAY = 24 * 60 * 60 * 1000;
   const midnight = new Date();
@@ -135,13 +176,20 @@ export function seedStorage() {
 /**
  * Un contexte prêt à tourner : fenêtre fixée, français, thème clair, aucun réseau
  * sortant, curseur installé, stockage semé.
+ *
+ * Les valeurs par défaut sont celles du tournage — un film se tourne en clair, à
+ * l'échelle 1, sans session en cours. Les stories, elles, photographient : elles
+ * demandent le double de pixels, les deux thèmes, et parfois un minuteur déjà parti.
  */
-export async function openStage(browser, { viewport, recordVideo }) {
+export async function openStage(
+  browser,
+  { viewport, recordVideo, deviceScaleFactor = 1, colorScheme = 'light', seed = {}, cursor = true },
+) {
   const context = await browser.newContext({
     viewport,
-    deviceScaleFactor: 1,
+    deviceScaleFactor,
     locale: 'fr-FR',
-    colorScheme: 'light',
+    colorScheme,
     reducedMotion: 'no-preference',
     ...(recordVideo ? { recordVideo } : {}),
   });
@@ -153,8 +201,8 @@ export async function openStage(browser, { viewport, recordVideo }) {
     new URL(route.request().url()).origin === origin ? route.continue() : route.abort(),
   );
 
-  await context.addInitScript(seedStorage);
-  await context.addInitScript(CURSOR_SCRIPT);
+  await context.addInitScript(seedStorage, seed);
+  if (cursor) await context.addInitScript(CURSOR_SCRIPT);
 
   // L'enregistreur démarre avec la page, donc avant le chargement et la mise en
   // place. Cet horodatage est ce qui permettra de couper exactement ce qui les

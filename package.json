@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "icons": "node scripts/generate-icons.mjs",
     "social": "node scripts/generate-social.mjs",
+    "stories": "node scripts/generate-stories.mjs",
     "demo": "node scripts/record-demo.mjs",
     "film": "node scripts/make-film.mjs",
     "lint": "eslint .",

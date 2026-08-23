@@ -189,6 +189,41 @@ first — fill is elapsed, digits are remaining, as in the app. The first versio
 `25:00` above a bar already a third of the way across: a picture of something that never
 happens.
 
+## The stories
+
+`npm run stories` prints eight 1080×1920 boards, in both themes — sixteen files in
+`design/social/stories/`, named by rank so the folder, sorted, is the running order.
+
+They are not the 9:16 from `cards.html` with more words on it. That one is what a
+pasted link asks for: one image, one sentence, and it is done. A story is scrolled.
+It has two seconds to say what the app does, what it looks like, and what to do next
+— and a sentence alone on paper says none of the three. So the eight carry the
+argument in order: the promise, the gesture, the session, what the app refuses to do,
+where the data stays, the record, the appearance, the install. Each one states a fact
+that can be checked rather than a mood, and carries its rank, because knowing six are
+left is what keeps someone tapping.
+
+**The screens are the real app**, shot by Playwright against the running build, one
+pass per theme, in a phone window at twice the density. The paper behind them is the
+same token as the paper of the board, so a capture laid on it has no edge: what
+remains on screen is the app's own cards, floating on the story's ground. No device
+frame, no drop shadow of a phone nobody owns. Each board says which band of the
+capture it shows, in pixels of the capture, and the cut falls on empty paper — one
+number recomposes a frame.
+
+**The session on board 3 is seeded, not waited for.** A running timer is restored from
+storage when the app launches, so it is a state the app really reaches; there is no
+other way to photograph a timer at mid-course without sitting in front of it for ten
+minutes. Board 5 lists the three storage keys by name, because "nothing leaves your
+device" is a promise and `pomodoro.sessions.v1` is a proof.
+
+**The grid keeps out of Instagram's way.** 250px at the top for the account header,
+280px at the bottom for the reply bar; nothing that has to be read enters either.
+Opening the file with `?guides` draws both. The call to action reads `lien en bio`,
+the convention on a network where a story carries no link — `npm run stories -- --url
+your.host` prints the address instead, and `--accent '#7A5AF8'` swaps the colour the
+way the settings let anyone.
+
 ## The film
 
 `npm run film` cuts a thirty-second promotional film, in 16:9 and 9:16. It is an edit,
