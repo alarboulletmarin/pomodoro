@@ -82,24 +82,23 @@ export default defineConfig({
         orientation: 'any',
         background_color: BACKGROUND,
         theme_color: BACKGROUND,
-        // Three purposes, three drawings — see scripts/generate-icons.mjs. `any` keeps
-        // its corners, `maskable` bleeds to the edge with the dial inside the safe
-        // circle, `monochrome` is alpha only. Shipping one file under two purposes is
-        // what left the installed app looking cropped.
+        // Deux dessins — voir scripts/generate-icons.mjs. L'ordinaire est une tuile
+        // arrondie sur fond papier, opaque jusqu'aux coins parce qu'un écran d'accueil
+        // ne compose pas la transparence, il la remplit ; le `maskable` va à fond perdu
+        // avec le cadran dans la zone sûre. `purpose` n'est écrit que sur le second :
+        // omis, il vaut `any`, et un installateur n'a alors rien à interpréter.
+        //
+        // Pas d'icône `monochrome` : elle n'a que son alpha, un installateur qui la
+        // retient sans la teinter pose un carré noir ou vide, et aucune des autres
+        // applications de la maison n'en livre.
         icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
           {
             src: '/icons/icon-512-maskable.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
-          },
-          {
-            src: '/icons/icon-512-monochrome.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'monochrome',
           },
         ],
       },

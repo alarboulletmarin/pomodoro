@@ -39,10 +39,9 @@
     <meta name="apple-mobile-web-app-title" content="Pomodoro" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <!-- Le « v » est rempli au build par une empreinte du fichier lui-même, voir le
-         plugin `asset-stamp`. Le dessin d'une icône change sans que son chemin bouge,
-         et iOS garde alors l'image prise le jour de l'installation : l'empreinte fait
-         changer l'adresse à chaque redessin, et à ce moment-là seulement. -->
+    <!-- Le « v » des favicons est rempli au build par une empreinte du fichier, voir le
+         plugin `asset-stamp` : un onglet garderait sinon le dessin d'avant jusqu'à
+         expiration du cache. -->
     <link rel="icon" type="image/svg+xml" href="/icons/icon.svg?v=%V:icons/icon.svg%" />
     <link
       rel="icon"
@@ -50,11 +49,13 @@
       sizes="32x32"
       href="/icons/icon-32.png?v=%V:icons/icon-32.png%"
     />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/icons/apple-touch-icon.png?v=%V:icons/apple-touch-icon.png%"
-    />
+
+    <!-- Nu, et à la racine. iOS ne suit pas toujours la balise : quand il ne la lit
+         pas, il demande `/apple-touch-icon.png` de lui-même, et rien d'autre. C'est
+         aussi la seule adresse qu'il n'ait jamais mise en cache pour ce site, donc
+         un téléphone qui a déjà l'application reprend le dessin sans rien vider.
+         Pas de `?v=` ici : ce que va chercher le système, on le lui donne nu. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <link
       rel="preload"

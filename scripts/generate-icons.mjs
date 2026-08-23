@@ -16,6 +16,11 @@
  *   des lanceurs Android.
  * - Un `apple-touch-icon` **carré et sans transparence** : iOS ne compose pas, il
  *   pose l'image telle quelle et arrondit lui-même. Un coin transparent y devient noir.
+ *   Il est écrit **à la racine de `public/`**, donc servi sur `/apple-touch-icon.png` :
+ *   c'est le chemin que les quatre autres applications de la maison utilisent, et le
+ *   seul qu'iOS aille chercher de lui-même quand il ne lit pas la balise `<link>`.
+ * - Des icônes de manifeste **opaques**. Les coins transparents d'une tuile arrondie
+ *   sont composés sur du noir par iOS ; le fond papier les remplit.
  *
  * Usage : npm run icons
  */
@@ -27,11 +32,10 @@ import { fileURLToPath } from 'node:url';
 import { OUTER, PALETTE, RADIUS, RUNS, STROKE, TILE_RADIUS, arcPath } from './mark.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT_DIR = join(ROOT, 'public', 'icons');
+const PUBLIC_DIR = join(ROOT, 'public');
 
 const ACCENT = hex(PALETTE.accent);
 const PAPER = hex(PALETTE.paper);
-const INK = [0, 0, 0];
 
 function hex(value) {
   return [1, 3, 5].map((index) => parseInt(value.slice(index, index + 2), 16));
@@ -203,13 +207,18 @@ function encodePNG(canvas) {
 
 /**
  * @param size    côté en pixels
- * @param options.tile     'rounded' (coins transparents), 'square' (à fond perdu),
- *                         ou 'none' (fond transparent, pour le monochrome)
+ * @param options.tile     'rounded' (tuile arrondie) ou 'square' (à fond perdu)
  * @param options.scale    taille de la marque, 1 = la géométrie nominale
  * @param options.ink      couleur des deux courses
+ * @param options.ground   couleur posée sous la tuile, ou `null` pour laisser les
+ *                         coins transparents. Un onglet de navigateur veut la
+ *                         transparence ; un écran d'accueil ne la compose pas, il la
+ *                         remplit de noir.
  */
-function drawIcon(size, { tile = 'rounded', scale = 1, ink = PAPER } = {}) {
+function drawIcon(size, { tile = 'rounded', scale = 1, ink = PAPER, ground = null } = {}) {
   const canvas = createCanvas(size);
+
+  if (ground) canvas.fill(ground);
 
   if (tile === 'square') canvas.fill(ACCENT);
   else if (tile === 'rounded') {
@@ -241,28 +250,29 @@ ${runs.join('\n')}
 `;
 }
 
-mkdirSync(OUT_DIR, { recursive: true });
-
 const outputs = [
-  // `any` : coins transparents, la plateforme pose la tuile telle quelle.
-  ['icon-32.png', drawIcon(32)],
-  ['icon-192.png', drawIcon(192)],
-  ['icon-512.png', drawIcon(512)],
+  // Les favicons vivent dans un onglet, sur le fond du navigateur : là, des coins
+  // transparents sont ce qu'il faut.
+  ['icons/icon-32.png', drawIcon(32)],
+  ['icons/icon.svg', Buffer.from(drawFavicon(), 'utf8')],
+
+  // Les icônes du manifeste finissent sur un écran d'accueil, qui ne compose pas la
+  // transparence — il la remplit. Le fond papier tient les coins de la tuile.
+  ['icons/icon-192.png', drawIcon(192, { ground: PAPER })],
+  ['icons/icon-512.png', drawIcon(512, { ground: PAPER })],
 
   // `maskable` : fond perdu, marque rentrée sous les 80 % de la zone sûre.
-  ['icon-512-maskable.png', drawIcon(512, { tile: 'square', scale: 0.86 })],
+  ['icons/icon-512-maskable.png', drawIcon(512, { tile: 'square', scale: 0.86 })],
 
-  // `monochrome` : Android n'en garde que l'alpha, et le teinte lui-même.
-  ['icon-512-monochrome.png', drawIcon(512, { tile: 'none', scale: 0.86, ink: INK })],
-
-  // iOS : carré, opaque, il arrondit lui-même.
+  // iOS : carré, opaque, il arrondit lui-même — et à la racine, parce que c'est le
+  // seul chemin qu'il aille chercher tout seul.
   ['apple-touch-icon.png', drawIcon(180, { tile: 'square' })],
-
-  ['icon.svg', Buffer.from(drawFavicon(), 'utf8')],
 ];
 
 for (const [name, data] of outputs) {
-  writeFileSync(join(OUT_DIR, name), data);
+  const file = join(PUBLIC_DIR, name);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, data);
   console.log(`${name} (${(data.length / 1024).toFixed(1)} Ko)`);
 }
 

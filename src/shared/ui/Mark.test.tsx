@@ -63,32 +63,39 @@ describe('the generator palette', () => {
 });
 
 describe('the icon links', () => {
-  // Une icône redessinée garde son chemin, et iOS garde alors l'image qu'il a prise
-  // le jour où l'app a été posée sur l'écran d'accueil — c'est ce qui a fait durer
-  // le carré vide bien après que le dessin ait été corrigé. Le `?v=` que le plugin
-  // `asset-stamp` remplit au build est ce qui fait redemander le fichier. Enlever
-  // le jeton d'un href ne casse rien de visible, et ne se voit qu'un an plus tard.
   const html = read('index.html');
-  const links = [...html.matchAll(/<link[^>]*?href="\/([^"?]+)\?v=%V:([^%]+)%"/gs)].map(
+
+  const stamped = [...html.matchAll(/<link[^>]*?href="\/([^"?]+)\?v=%V:([^%]+)%"/gs)].map(
     ([, href, token]) => ({ href, token }),
   );
 
-  it('stamps the favicon, the PNG favicon and the apple-touch-icon', () => {
-    expect(links.map(({ href }) => href)).toEqual([
-      'icons/icon.svg',
-      'icons/icon-32.png',
-      'icons/apple-touch-icon.png',
-    ]);
+  // Un onglet garderait le dessin d'avant jusqu'à expiration de son cache. Le `?v=`
+  // que le plugin `asset-stamp` remplit au build est ce qui fait redemander le
+  // fichier ; enlever le jeton ne casse rien de visible, et ne se verrait qu'au
+  // redessin suivant.
+  it('stamps both favicons, and only them', () => {
+    expect(stamped.map(({ href }) => href)).toEqual(['icons/icon.svg', 'icons/icon-32.png']);
   });
 
-  it.each(['icons/icon.svg', 'icons/icon-32.png', 'icons/apple-touch-icon.png'])(
+  it.each(['icons/icon.svg', 'icons/icon-32.png'])(
     'stamps %s from the file it actually serves',
     (href) => {
-      const link = links.find((candidate) => candidate.href === href);
       // Le jeton nomme le fichier dont l'empreinte est prise : s'il désigne autre
       // chose que l'icône servie, l'adresse ne bouge pas quand le dessin change.
-      expect(link?.token).toBe(href);
+      expect(stamped.find((candidate) => candidate.href === href)?.token).toBe(href);
       expect(existsSync(resolve(process.cwd(), 'public', href))).toBe(true);
     },
   );
+
+  // Les trois règles qu'iOS impose et qui ne se voient sur aucun écran de
+  // développement : l'icône est à la racine, parce que c'est le chemin qu'il demande
+  // de lui-même quand il ne lit pas la balise ; elle est nue, parce qu'on ne donne
+  // pas de paramètre à un fetch système ; et le fichier est bien là. Les quatre
+  // autres applications de la maison livrent exactement cette forme.
+  it('points the apple-touch-icon at the site root, bare', () => {
+    const link = html.match(/<link[^>]*rel="apple-touch-icon"[^>]*>/s)?.[0];
+    expect(link).toBeDefined();
+    expect(link).toContain('href="/apple-touch-icon.png"');
+    expect(existsSync(resolve(process.cwd(), 'public/apple-touch-icon.png'))).toBe(true);
+  });
 });

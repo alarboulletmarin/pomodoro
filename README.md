@@ -143,16 +143,25 @@ favicon and the share boards off disk and fails the build when any of them stops
 agreeing with `ACCENT_PALETTE`, the theme colours or the two paths.
 
 The icons are rasterised by hand and encoded with `zlib` — no image dependency for a
-rounded square and two arcs. Three drawings, because three purposes want different
-things, and shipping one file under two of them is what left the installed app looking
-wrong:
+rounded square and two arcs. What separates the drawings is where each one lands, and
+every rule below is one an installed app taught us the hard way:
 
-- **`any`** (192, 512, plus a 32 for the tab) keeps its rounded corners transparent.
+- **The manifest icons** (192, 512) are rounded tiles on an opaque paper ground. A home
+  screen does not composite transparency, it fills it — so corners left transparent
+  arrive black, and the ground is what keeps them from it.
 - **`maskable`** (512) bleeds the tile to all four edges and pulls the dial inside the
   80% safe circle, so a launcher's round or squircle mask crops background, not mark.
-- **`monochrome`** (512) is alpha only, for the Android launchers that tint it.
-- **`apple-touch-icon`** (180) is square and fully opaque: iOS does not composite what
-  you hand it, so a transparent corner arrives black.
+- **`apple-touch-icon`** (180) is square, fully opaque, and lives at the **root** —
+  `/apple-touch-icon.png`. iOS does not composite what you hand it, and when it does
+  not read the `<link>` tag it asks the root for that exact name and nothing else. The
+  tag is written bare, with no `?v=`: what the system fetches, it gets unadorned.
+- **The favicons** (a 32 and the SVG) are the one place transparent corners are right —
+  they sit in a browser tab, on the browser's own ground. They carry a `?v=` stamped
+  from their own bytes, so a redraw reaches a tab that already has one.
+
+No `monochrome` icon. It carries only its alpha, an installer that keeps it without
+tinting it lays down a black or empty square, and none of the neighbouring apps ship
+one.
 
 ## The link, and what gets posted
 
