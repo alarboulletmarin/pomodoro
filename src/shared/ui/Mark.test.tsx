@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -60,4 +60,35 @@ describe('the generator palette', () => {
     expect(muted).toHaveLength(2);
     for (const value of muted) expect(script).toContain(value.toLowerCase());
   });
+});
+
+describe('the icon links', () => {
+  // Une icône redessinée garde son chemin, et iOS garde alors l'image qu'il a prise
+  // le jour où l'app a été posée sur l'écran d'accueil — c'est ce qui a fait durer
+  // le carré vide bien après que le dessin ait été corrigé. Le `?v=` que le plugin
+  // `asset-stamp` remplit au build est ce qui fait redemander le fichier. Enlever
+  // le jeton d'un href ne casse rien de visible, et ne se voit qu'un an plus tard.
+  const html = read('index.html');
+  const links = [...html.matchAll(/<link[^>]*?href="\/([^"?]+)\?v=%V:([^%]+)%"/gs)].map(
+    ([, href, token]) => ({ href, token }),
+  );
+
+  it('stamps the favicon, the PNG favicon and the apple-touch-icon', () => {
+    expect(links.map(({ href }) => href)).toEqual([
+      'icons/icon.svg',
+      'icons/icon-32.png',
+      'icons/apple-touch-icon.png',
+    ]);
+  });
+
+  it.each(['icons/icon.svg', 'icons/icon-32.png', 'icons/apple-touch-icon.png'])(
+    'stamps %s from the file it actually serves',
+    (href) => {
+      const link = links.find((candidate) => candidate.href === href);
+      // Le jeton nomme le fichier dont l'empreinte est prise : s'il désigne autre
+      // chose que l'icône servie, l'adresse ne bouge pas quand le dessin change.
+      expect(link?.token).toBe(href);
+      expect(existsSync(resolve(process.cwd(), 'public', href))).toBe(true);
+    },
+  );
 });
