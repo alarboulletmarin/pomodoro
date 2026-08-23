@@ -165,8 +165,6 @@ describe('the primary action', () => {
     act(() => void vi.advanceTimersByTime(60_300));
 
     expect(screen.getByRole('heading', { name: 'session done' })).toBeInTheDocument();
-    // The duration is no longer settable once the session is over: no dead presets.
-    expect(screen.queryByRole('button', { name: '15 min' })).toBeNull();
 
     fireEvent.click(action('5 min break'));
     expect(screen.getByRole('heading', { name: 'break time' })).toBeInTheDocument();
@@ -197,6 +195,64 @@ describe('the primary action', () => {
 
     expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '25');
+  });
+});
+
+describe('the offered break', () => {
+  function finishAMinuteOfFocus(): void {
+    fireEvent.click(action('start'));
+    act(() => void vi.advanceTimersByTime(60_300));
+  }
+
+  beforeEach(() => {
+    seedTimer('idle', 'focus', 1, 60_000);
+    renderTimer();
+    finishAMinuteOfFocus();
+  });
+
+  it('is what the panel describes, at the length the settings hold', () => {
+    const scrubber = screen.getByRole('spinbutton');
+
+    // The digits carry the break about to run, not the 00:00 of the session that ended.
+    expect(scrubber).toHaveAttribute('aria-valuenow', '5');
+    expect(scrubber).toHaveAttribute('aria-label', 'break length in minutes');
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+
+    // The presets are the break ones, so none of them is a dead button.
+    expect(screen.getByRole('button', { name: '10 min' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '25 min' })).toBeNull();
+  });
+
+  it('takes a preset, and starts at the length that was set', () => {
+    fireEvent.click(action('15 min'));
+
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '15');
+    expect(screen.getByText('15:00')).toBeInTheDocument();
+
+    fireEvent.click(action('15 min break'));
+
+    expect(screen.getByRole('heading', { name: 'break time' })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '15');
+  });
+
+  it('takes the arrows, on the scrubber and from the page', () => {
+    fireEvent.keyDown(screen.getByRole('spinbutton'), { key: 'PageUp' });
+    expect(action('10 min break')).toBeInTheDocument();
+
+    fireEvent.keyDown(document.body, { key: 'ArrowDown' });
+    expect(action('9 min break')).toBeInTheDocument();
+  });
+
+  it('forgets the adjustment once the offer is gone', () => {
+    fireEvent.keyDown(document.body, { key: 'ArrowUp' });
+    expect(action('6 min break')).toBeInTheDocument();
+
+    fireEvent.click(action('done for today'));
+    fireEvent.keyDown(screen.getByRole('spinbutton'), { key: 'Home' });
+    finishAMinuteOfFocus();
+
+    // The settings still hold five: the longer break was for that break only.
+    expect(action('5 min break')).toBeInTheDocument();
   });
 });
 

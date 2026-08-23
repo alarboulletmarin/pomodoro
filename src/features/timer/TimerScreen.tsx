@@ -1,3 +1,4 @@
+import { MS_PER_MINUTE } from '../../domain/timer/durations';
 import { isSessionUnderway } from '../../domain/timer/timer-machine';
 import type { MessageKey, Phase } from '../../types';
 import { useMediaLayout } from '../../shared/hooks/use-media-layout';
@@ -23,7 +24,7 @@ const SHORTCUT_HINTS = {
   idle: 'timer.shortcuts.idle',
   running: 'timer.shortcuts.active',
   paused: 'timer.shortcuts.paused',
-  finished: 'timer.shortcuts.idle',
+  finished: 'timer.shortcuts.finished',
 } as const satisfies Record<Phase, MessageKey>;
 
 export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
@@ -33,8 +34,13 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
   const { phase, mode, minutes } = timer.state;
 
   const active = isSessionUnderway(phase);
-  // No shortcut applies once the session is over, so the hint says nothing rather than lying.
-  const shortcutHint = phase === 'finished' ? null : t(SHORTCUT_HINTS[phase]);
+  // Once the session is over the panel arms the next one: the presets, the digits and the bar
+  // all describe the offer, so its length is settable here instead of only in the settings.
+  const offer = timer.suggestion;
+  const armedMode = offer?.mode ?? mode;
+  const armedMinutes = offer?.minutes ?? minutes;
+  const settable = phase === 'idle' || offer !== null;
+  const setArmedMinutes = offer === null ? timer.setMinutes : timer.setSuggestionMinutes;
   const copy = timerCopy(phase, mode);
   const announcement = usePhaseAnnouncement(phase, mode);
   // Tablet and desktop expose the gear in the shell top bar instead.
@@ -54,10 +60,10 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
 
   useTimerShortcuts({
     phase,
-    minutes,
+    minutes: armedMinutes,
     toggle: onPrimary,
     end: timer.end,
-    setMinutes: timer.setMinutes,
+    setMinutes: setArmedMinutes,
   });
 
   return (
@@ -84,28 +90,29 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
       )}
 
       <div className={styles.panel}>
-        {phase === 'idle' ? (
+        {settable ? (
           <PresetRow
             className={styles.presets}
-            mode={mode}
-            minutes={minutes}
-            onSelect={timer.setMinutes}
+            mode={armedMode}
+            minutes={armedMinutes}
+            onSelect={setArmedMinutes}
           />
         ) : null}
         <ClockScrubber
           className={styles.scrubber}
-          minutes={minutes}
-          remainingMs={timer.remainingMs}
-          idle={phase === 'idle'}
-          onChange={timer.setMinutes}
+          minutes={armedMinutes}
+          remainingMs={offer === null ? timer.remainingMs : armedMinutes * MS_PER_MINUTE}
+          mode={armedMode}
+          editable={settable}
+          onChange={setArmedMinutes}
         />
-        <ProgressBar className={styles.progress} ratio={timer.progressRatio} />
+        <ProgressBar className={styles.progress} ratio={offer === null ? timer.progressRatio : 0} />
         <ActionBar
           className={styles.actions}
-          primaryLabel={t(copy.primary, { minutes: timer.suggestion?.minutes ?? minutes })}
+          primaryLabel={t(copy.primary, { minutes: armedMinutes })}
           secondaryLabel={copy.secondary === null ? null : t(copy.secondary)}
           quietPrimary={phase === 'running'}
-          hint={shortcutHint}
+          hint={t(SHORTCUT_HINTS[phase])}
           onPrimary={onPrimary}
           onSecondary={onSecondary}
         />

@@ -19,7 +19,7 @@
   -webkit-user-select: none;
 }
 
-.grab[data-idle] {
+.grab[data-editable] {
   cursor: ns-resize;
 }
 

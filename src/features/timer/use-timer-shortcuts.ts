@@ -41,7 +41,8 @@ export function useTimerShortcuts(shortcuts: TimerShortcuts): void {
         return;
       }
 
-      if (phase !== 'idle') return;
+      // Both phases that arm a session take the arrows: idle, and the offer after one ends.
+      if (phase !== 'idle' && phase !== 'finished') return;
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         event.preventDefault();
         setMinutes(clampMinutes(minutes + (event.key === 'ArrowUp' ? 1 : -1)));

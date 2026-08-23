@@ -25,9 +25,11 @@ export const en: Messages = {
 
   'timer.preset': '{minutes} min',
   'timer.scrubHint': 'swipe to set',
-  'timer.scrubber.label': 'session length in minutes',
+  'timer.scrubber.label.focus': 'session length in minutes',
+  'timer.scrubber.label.break': 'break length in minutes',
   'timer.shortcuts.idle': '↑ ↓ or drag to set · space to start',
   'timer.shortcuts.paused': 'space to resume · esc to end',
+  'timer.shortcuts.finished': '↑ ↓ or drag to set · space to continue',
   'timer.shortcuts.active': 'space to pause · esc to end',
 
   'timer.action.start': 'start',
