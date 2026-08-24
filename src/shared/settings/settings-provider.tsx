@@ -4,6 +4,7 @@ import {
   DEFAULT_SETTINGS,
   SETTINGS_STORAGE_KEY,
   type AccentKey,
+  type ChimeVolume,
   type Locale,
   type Settings,
   type SettingsContextValue,
@@ -20,6 +21,7 @@ import { useSystemTheme } from '../theme/use-system-theme';
 const THEMES: readonly ThemeChoice[] = ['system', 'light', 'dark'];
 const ACCENT_KEYS: readonly AccentKey[] = ['red', 'green', 'blue', 'custom'];
 const LOCALES: readonly Locale[] = ['fr', 'en'];
+const CHIME_VOLUMES: readonly ChimeVolume[] = ['soft', 'normal', 'loud'];
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
@@ -44,6 +46,7 @@ export function normaliseSettings(raw: unknown, defaults: Settings): Settings | 
     customColor: customColor ?? defaults.customColor,
     lang: oneOf(LOCALES, source.lang, defaults.lang),
     chime: typeof source.chime === 'boolean' ? source.chime : defaults.chime,
+    chimeVolume: oneOf(CHIME_VOLUMES, source.chimeVolume, defaults.chimeVolume),
     focusMinutes: number(
       source.focusMinutes,
       (input) => clampDuration('focus', input),
@@ -90,6 +93,10 @@ export function SettingsProvider({ children }: { children: ReactNode }): JSX.Ele
     (chime: boolean) => setSettings((prev) => ({ ...prev, chime })),
     [setSettings],
   );
+  const setChimeVolume = useCallback(
+    (chimeVolume: ChimeVolume) => setSettings((prev) => ({ ...prev, chimeVolume })),
+    [setSettings],
+  );
   const setFocusMinutes = useCallback(
     (minutes: number) =>
       setSettings((prev) => ({ ...prev, focusMinutes: clampDuration('focus', minutes) })),
@@ -121,6 +128,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): JSX.Ele
       setCustomColor,
       setLang,
       setChime,
+      setChimeVolume,
       setFocusMinutes,
       setBreakMinutes,
       setDailyGoal,
@@ -134,6 +142,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): JSX.Ele
       setCustomColor,
       setLang,
       setChime,
+      setChimeVolume,
       setFocusMinutes,
       setBreakMinutes,
       setDailyGoal,
