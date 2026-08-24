@@ -23,7 +23,7 @@ import {
 import { useInterval } from '../../shared/hooks/use-interval';
 import { useWakeLock } from '../../shared/hooks/use-wake-lock';
 import { useSettings } from '../../shared/settings/settings-provider';
-import { playChime } from './chime';
+import { playChime, primeChime } from './chime';
 
 const TICK_MS = 250;
 
@@ -53,6 +53,7 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
   const previousPhase = useRef(state.phase);
   const awayClaimed = useRef(false);
   const chime = settings.chime;
+  const chimeVolume = settings.chimeVolume;
 
   const logSession = useCallback((entry: SessionEntry): void => {
     const next = appendSession(sessionsRef.current, entry, Date.now());
@@ -86,8 +87,8 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
       minutes: state.minutes,
       mode: state.mode,
     });
-    if (chime) playChime();
-  }, [state, chime, logSession]);
+    if (chime) playChime(chimeVolume);
+  }, [state, chime, chimeVolume, logSession]);
 
   // Derived from the deadline rather than counted down, so a frozen tab lands exact.
   const sync = useCallback(() => {
@@ -136,9 +137,16 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
       suggestion,
       setMinutes: (minutes) => dispatch({ type: 'setMinutes', minutes }),
       setSuggestionMinutes: (minutes) => setSuggestedMinutes(clampMinutes(minutes)),
-      start: () => dispatch({ type: 'start', now: Date.now() }),
+      start: () => {
+        // Starting is a user gesture — the one moment iOS lets the chime be unlocked.
+        if (chime) primeChime(chimeVolume);
+        dispatch({ type: 'start', now: Date.now() });
+      },
       pause: () => dispatch({ type: 'pause', now: Date.now() }),
-      resume: () => dispatch({ type: 'resume', now: Date.now() }),
+      resume: () => {
+        if (chime) primeChime(chimeVolume);
+        dispatch({ type: 'resume', now: Date.now() });
+      },
       end: () => dispatch({ type: 'end' }),
       acceptSuggestion: () => {
         if (!suggestion) return;
@@ -147,7 +155,7 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
       dismissSuggestion: () =>
         dispatch({ type: 'setMode', mode: 'focus', minutes: durations.focus }),
     };
-  }, [state, sessions, focusMinutes, breakMinutes, suggestedMinutes]);
+  }, [state, sessions, focusMinutes, breakMinutes, suggestedMinutes, chime, chimeVolume]);
 
   return <TimerContext.Provider value={value}>{children}</TimerContext.Provider>;
 }

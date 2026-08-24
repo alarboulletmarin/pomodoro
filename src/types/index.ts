@@ -7,6 +7,7 @@ export type Theme = 'light' | 'dark';
 export type ThemeChoice = Theme | 'system';
 export type AccentKey = 'red' | 'green' | 'blue' | 'custom';
 export type PresetAccentKey = Exclude<AccentKey, 'custom'>;
+export type ChimeVolume = 'soft' | 'normal' | 'loud';
 
 export interface Settings {
   theme: ThemeChoice;
@@ -14,6 +15,7 @@ export interface Settings {
   customColor: string;
   lang: Locale;
   chime: boolean;
+  chimeVolume: ChimeVolume;
   focusMinutes: number;
   breakMinutes: number;
   dailyGoal: number;
@@ -96,6 +98,7 @@ export interface SettingsContextValue {
   setCustomColor(hex: string): void;
   setLang(lang: Locale): void;
   setChime(enabled: boolean): void;
+  setChimeVolume(volume: ChimeVolume): void;
   setFocusMinutes(minutes: number): void;
   setBreakMinutes(minutes: number): void;
   setDailyGoal(sessions: number): void;
@@ -231,6 +234,11 @@ interface SingularMessages {
   'settings.language.en': string;
   'settings.sound.title': string;
   'settings.sound.chime': string;
+  'settings.sound.volume': string;
+  'settings.sound.volume.soft': string;
+  'settings.sound.volume.normal': string;
+  'settings.sound.volume.loud': string;
+  'settings.sound.preview': string;
   'settings.sound.hint': string;
   'settings.install.title': string;
   'settings.install.hint': string;
@@ -311,6 +319,7 @@ export const DEFAULT_SETTINGS: Settings = {
   customColor: '#8B5CF6',
   lang: 'fr',
   chime: true,
+  chimeVolume: 'normal',
   focusMinutes: 25,
   breakMinutes: 5,
   dailyGoal: 4,

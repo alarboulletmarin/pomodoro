@@ -109,6 +109,44 @@ describe('the daily goal', () => {
   });
 });
 
+describe('the sound', () => {
+  it('offers the volume only while the chime is on', () => {
+    renderSettings();
+
+    expect(screen.getByRole('switch', { name: 'end chime' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    expect(button('normal')).toHaveAttribute('aria-pressed', 'true');
+
+    fireEvent.click(screen.getByRole('switch', { name: 'end chime' }));
+
+    expect(stored().chime).toBe(false);
+    expect(screen.queryByRole('button', { name: 'normal' })).toBeNull();
+  });
+
+  it('plays the level being picked, so the choice can be heard', () => {
+    const play = vi.spyOn(window.HTMLMediaElement.prototype, 'play');
+    renderSettings();
+
+    fireEvent.click(button('loud'));
+
+    expect(stored().chimeVolume).toBe('loud');
+    expect(button('loud')).toHaveAttribute('aria-pressed', 'true');
+    expect(play).toHaveBeenCalled();
+  });
+
+  it('replays the kept level on demand', () => {
+    const play = vi.spyOn(window.HTMLMediaElement.prototype, 'play');
+    renderSettings({ chimeVolume: 'soft' });
+
+    fireEvent.click(button('listen'));
+
+    expect(play).toHaveBeenCalled();
+    expect(stored().chimeVolume).toBe('soft');
+  });
+});
+
 describe('the method page', () => {
   it('opens from the root, and comes back', () => {
     const { onClose } = renderSettings();

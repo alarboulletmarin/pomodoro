@@ -6,6 +6,16 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Corrigé — le signal de fin sonne aussi sur un iPhone installé
+
+- **Le son sort d'un lecteur audio, plus d'un synthétiseur.** Le signal était fabriqué par Web Audio à l'instant où la session se termine — l'instant exact où iOS l'interdit : un contexte audio né hors d'un geste reste suspendu dans une app installée, et même débloqué, Web Audio est coupé par le bouton sonnerie/silence du téléphone. Le même timbre est maintenant rendu en fichier son et joué par un élément audio ordinaire, que iOS traite comme de la lecture de média : il passe, silencieux ou pas.
+- **Démarrer la session débloque le son.** iOS ne laisse une page sonner que depuis un élément qu'un geste a déjà fait jouer. Le geste qui lance la session joue donc le signal une fois, muet, et le rembobine ; la sonnerie, des minutes plus tard, n'est qu'une relecture — qui n'a besoin de personne.
+
+### Ajouté — le volume du signal, et un moyen de l'entendre
+
+- **Trois niveaux : doux, normal, fort.** L'ancien signal n'en avait qu'un, et il était discret. « Normal » sonne désormais nettement plus qu'avant ; « doux » retrouve à peu près l'ancien niveau, pour les bureaux partagés. Le niveau est gravé dans l'échantillon lui-même, parce qu'iOS ignore le réglage de volume d'un élément audio.
+- **Choisir un niveau le fait entendre.** Pas besoin d'attendre la fin d'une session pour savoir à quoi s'attendre : chaque niveau se joue quand on le touche, et un bouton « écouter » rejoue celui qui est retenu.
+
 ### Changé — la pause se règle là où elle est proposée
 
 - **L'écran de fin arme la pause au lieu de l'annoncer.** Le bouton disait « pause de 10 min » et rien sur cet écran ne permettait de discuter le 10 : il fallait ouvrir les réglages, changer une valeur par défaut qu'on ne voulait changer que pour cette fois, et revenir. Les trois durées de pause et le cadran à glisser sont maintenant là, comme sur l'écran de départ, et le bouton suit ce qui est réglé.

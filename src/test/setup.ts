@@ -15,6 +15,12 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
     }) as MediaQueryList;
 }
 
+// jsdom loads no media either; the chime plays through an HTMLAudioElement.
+if (typeof window !== 'undefined' && window.HTMLMediaElement) {
+  window.HTMLMediaElement.prototype.play = () => Promise.resolve();
+  window.HTMLMediaElement.prototype.pause = () => undefined;
+}
+
 interface JsdomHandle {
   window: { localStorage: Storage; sessionStorage: Storage };
 }
