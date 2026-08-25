@@ -6,6 +6,13 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Ajouté — les licences de ce qui voyage dans l'application
+
+- **Les mentions légales donnent les licences à lire, au lieu de les citer.** La rubrique nommait deux polices en une phrase et s'arrêtait là ; elle mène maintenant à `licences-tierces.txt`, où le texte intégral de chaque licence est reproduit, avec celle de Pomodoro et l'adresse de sa source. C'est ce que l'AGPL demande d'un programme atteint par le réseau, et ce que les deux fontes demandent de qui les distribue.
+- **Clash Display voyageait sans sa licence.** Le fichier de la police partait dans chaque visite, sa notice restait chez son fondeur : elle est désormais livrée à côté d'elle, dans la version officielle de Fontshare, comme celle d'Inter l'était déjà.
+- **Les licences restent lisibles hors ligne.** L'application emporte ses polices dans son cache dès la première visite ; laisser leur licence au réseau, c'était les distribuer sans elle à la première coupure. Les trois fichiers sont précachés avec le reste, et le lien des mentions légales répond dans un avion.
+- **La liste est produite, jamais recopiée.** `npm run licences` la relit depuis les paquets installés et les polices servies, la construction la rafraîchit, et la vérification échoue si la version commitée a pris du retard. Une liste de licences écrite à la main est fausse au premier `npm update`, et c'est celle-là qu'on ne relit jamais.
+
 ### Corrigé — le signal de fin sonne aussi sur un iPhone installé
 
 - **Le son sort d'un lecteur audio, plus d'un synthétiseur.** Le signal était fabriqué par Web Audio à l'instant où la session se termine — l'instant exact où iOS l'interdit : un contexte audio né hors d'un geste reste suspendu dans une app installée, et même débloqué, Web Audio est coupé par le bouton sonnerie/silence du téléphone. Le même timbre est maintenant rendu en fichier son et joué par un élément audio ordinaire, que iOS traite comme de la lecture de média : il passe, silencieux ou pas.

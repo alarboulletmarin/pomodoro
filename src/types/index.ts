@@ -285,6 +285,7 @@ interface SingularMessages {
   'legal.data.body': string;
   'legal.licences.title': string;
   'legal.licences.body': string;
+  'legal.licences.link': string;
 
   'update.ready': string;
   'update.reload': string;

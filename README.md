@@ -366,8 +366,18 @@ Strong copyleft. In plain terms:
 The point is not to stop anyone earning a living with it. It is to stop anyone closing
 it. What leaves here stays open.
 
-That covers this repository. The two typefaces keep their own terms: Inter's licence
-ships beside its woff2 in [`public/fonts/inter-LICENSE.txt`](public/fonts/inter-LICENSE.txt),
-and Clash Display's does not yet — it is bundled without its notice, which is a gap to
-close before anything is published. `react` and `react-dom`, the only two runtime
+That covers this repository. The two typefaces keep their own terms, and both licences
+now ship beside their woff2: Inter's SIL Open Font License 1.1 in
+[`public/fonts/inter-LICENSE.txt`](public/fonts/inter-LICENSE.txt), Clash Display's ITF
+Free Font License in
+[`public/fonts/clash-display-LICENSE.txt`](public/fonts/clash-display-LICENSE.txt), copied
+from the official Fontshare distribution. `react` and `react-dom`, the only two runtime
 dependencies, are MIT.
+
+`npm run licences` collects all of it into
+[`public/licences-tierces.txt`](public/licences-tierces.txt): the full text of every
+licence that travels in the build, plus this repository's own AGPL notice and the address
+of its source, which is what article 13 asks a networked program to offer. The file is
+generated, never edited, `npm run build` refreshes it, and `npm run licences:check` fails
+in CI when the committed copy falls behind. It is served as `.txt` so a browser shows it
+rather than downloading it, and the service worker's navigation fallback lets it through.
