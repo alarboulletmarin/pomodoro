@@ -105,6 +105,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
+        // Ouvrir /licences-tierces.txt est une navigation, et le repli servirait
+        // l'app à sa place : les mentions légales renverraient sur elles-mêmes.
+        // Les .txt sont servis tels quels, ce qui est bien ce que l'OFL et la FFL
+        // demandent de la licence qui accompagne une fonte.
+        navigateFallbackDenylist: [/\.txt$/],
         // Les icônes sont demandées avec le `?v=` qu'index.html porte. Sans cette
         // ligne le paramètre ferait manquer l'entrée précachée, et une icône
         // demandée hors ligne partirait au réseau pour rien.

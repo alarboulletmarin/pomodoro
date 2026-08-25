@@ -24,6 +24,11 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # Avant la construction, qui régénère le fichier : ici, un retard se voit
+      # et fait échouer ; là, il serait rattrapé sans que personne le sache.
+      - name: Licences
+        run: npm run licences:check
+
       - name: Test
         run: npm test
 

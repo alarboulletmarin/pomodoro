@@ -22,3 +22,23 @@
   line-height: 1.55;
   color: var(--text);
 }
+
+/* La hauteur minimale est celle du doigt, pas celle du texte : le lien vit au
+   milieu d'un paragraphe et resterait une cible de 18px sans elle. */
+.link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.link:focus-visible {
+  outline: none;
+  border-radius: var(--radius-chip);
+  box-shadow: var(--focus-ring);
+}

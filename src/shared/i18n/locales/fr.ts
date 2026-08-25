@@ -165,7 +165,8 @@ export const fr: Messages = {
     'Les sessions sont stockées localement sur cet appareil. Aucune collecte, aucun traceur, aucun compte.',
   'legal.licences.title': 'Licences',
   'legal.licences.body':
-    'Clash Display (Fontshare), sous licence Fontshare. Inter (rsms.me/inter), sous licence SIL Open Font 1.1.',
+    'Deux fontes, Clash Display et Inter, et une poignée de composants npm autour de react voyagent dans l’app. Chacun garde sa licence : toutes sont reproduites en entier dans le fichier ci-dessous, avec la licence de Pomodoro et l’adresse de sa source.',
+  'legal.licences.link': 'lire les licences',
 
   'update.ready': 'Une nouvelle version est prête.',
   'update.reload': 'recharger',

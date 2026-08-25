@@ -6,6 +6,12 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Ajouté — les licences de ce qui voyage dans l'application
+
+- **Les mentions légales donnent les licences à lire, au lieu de les citer.** La rubrique nommait deux polices en une phrase et s'arrêtait là ; elle mène maintenant à `licences-tierces.txt`, où le texte intégral de chaque licence est reproduit, avec celle de Pomodoro et l'adresse de sa source. C'est ce que l'AGPL demande d'un programme atteint par le réseau, et ce que les deux fontes demandent de qui les distribue.
+- **Clash Display voyageait sans sa licence.** Le fichier de la police partait dans chaque visite, sa notice restait chez son fondeur : elle est désormais livrée à côté d'elle, dans la version officielle de Fontshare, comme celle d'Inter l'était déjà.
+- **La liste est produite, jamais recopiée.** `npm run licences` la relit depuis les paquets installés et les polices servies, la construction la rafraîchit, et la vérification échoue si la version commitée a pris du retard. Une liste de licences écrite à la main est fausse au premier `npm update`, et c'est celle-là qu'on ne relit jamais.
+
 ### Changé — la pause se règle là où elle est proposée
 
 - **L'écran de fin arme la pause au lieu de l'annoncer.** Le bouton disait « pause de 10 min » et rien sur cet écran ne permettait de discuter le 10 : il fallait ouvrir les réglages, changer une valeur par défaut qu'on ne voulait changer que pour cette fois, et revenir. Les trois durées de pause et le cadran à glisser sont maintenant là, comme sur l'écran de départ, et le bouton suit ce qui est réglé.

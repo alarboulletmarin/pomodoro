@@ -3,14 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alarboulletmarin/pomodoro.git"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "npm run typecheck && vite build",
+    "build": "npm run licences && npm run typecheck && vite build",
     "preview": "vite preview",
     "icons": "node scripts/generate-icons.mjs",
     "social": "node scripts/generate-social.mjs",
     "demo": "node scripts/record-demo.mjs",
     "film": "node scripts/make-film.mjs",
+    "licences": "node scripts/licences.mjs",
+    "licences:check": "node scripts/licences.mjs --check",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
     "test": "vitest run",
