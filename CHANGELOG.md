@@ -10,6 +10,7 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 - **Les mentions légales donnent les licences à lire, au lieu de les citer.** La rubrique nommait deux polices en une phrase et s'arrêtait là ; elle mène maintenant à `licences-tierces.txt`, où le texte intégral de chaque licence est reproduit, avec celle de Pomodoro et l'adresse de sa source. C'est ce que l'AGPL demande d'un programme atteint par le réseau, et ce que les deux fontes demandent de qui les distribue.
 - **Clash Display voyageait sans sa licence.** Le fichier de la police partait dans chaque visite, sa notice restait chez son fondeur : elle est désormais livrée à côté d'elle, dans la version officielle de Fontshare, comme celle d'Inter l'était déjà.
+- **Les licences restent lisibles hors ligne.** L'application emporte ses polices dans son cache dès la première visite ; laisser leur licence au réseau, c'était les distribuer sans elle à la première coupure. Les trois fichiers sont précachés avec le reste, et le lien des mentions légales répond dans un avion.
 - **La liste est produite, jamais recopiée.** `npm run licences` la relit depuis les paquets installés et les polices servies, la construction la rafraîchit, et la vérification échoue si la version commitée a pris du retard. Une liste de licences écrite à la main est fausse au premier `npm update`, et c'est celle-là qu'on ne relit jamais.
 
 ### Changé — la pause se règle là où elle est proposée

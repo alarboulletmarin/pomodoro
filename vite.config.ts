@@ -103,12 +103,18 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // `txt` couvre licences-tierces.txt et les deux notices de fontes. Une
+        // application qui marche hors ligne emporte les fontes dans son cache ;
+        // laisser leur licence au réseau, c'est les distribuer sans elle dès la
+        // première coupure, ce que ni l'OFL ni la FFL n'autorisent.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,txt,woff2}'],
         navigateFallback: '/index.html',
-        // Ouvrir /licences-tierces.txt est une navigation, et le repli servirait
-        // l'app à sa place : les mentions légales renverraient sur elles-mêmes.
-        // Les .txt sont servis tels quels, ce qui est bien ce que l'OFL et la FFL
-        // demandent de la licence qui accompagne une fonte.
+        // Les `.txt` sont des documents, pas des routes : ouvrir
+        // /licences-tierces.txt est une navigation, et le repli servirait l'app
+        // à sa place. Le précache les sert déjà, mais il ne les sert que tant
+        // que `txt` reste dans `globPatterns` au-dessus ; sans cette ligne,
+        // retirer l'extension là-haut ferait répondre l'application à la place
+        // des licences, sans qu'aucun test ne le dise.
         navigateFallbackDenylist: [/\.txt$/],
         // Les icônes sont demandées avec le `?v=` qu'index.html porte. Sans cette
         // ligne le paramètre ferait manquer l'entrée précachée, et une icône
