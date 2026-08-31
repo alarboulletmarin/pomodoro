@@ -6,6 +6,14 @@ Rien n'est encore publié : tout ce qui suit est sous « Non publié », et le r
 
 ## Non publié
 
+### Corrigé — la pause n'est plus un cul-de-sac
+
+- **On peut refuser une pause, ou en sortir.** Une fois la pause armée, l'écran ne proposait plus qu'une chose : la démarrer. « Terminer la session » pendant une pause réarmait la même pause, et le retour au travail ne s'obtenait qu'en la subissant jusqu'au bout. Les trois écrans de pause — armée, en cours, suspendue — portent maintenant la sortie à côté du bouton principal, et elle ramène sur une session à la durée des réglages.
+- **La pause proposée en fin de session se décline.** Le bouton discret disait « c'est bon pour aujourd'hui » alors qu'il armait une nouvelle session : il dit désormais « reprendre sans pause », c'est-à-dire ce qu'il fait.
+- **Terminer une session en garde la durée.** Abandonner une session de 45 minutes en réarme une de 45 ; c'est seulement la pause dont on sort qui ramène à la durée des réglages.
+- **Fin de pause : un seul bouton.** L'écran en offrait deux qui menaient au même endroit — la nouvelle session. Le second est parti.
+- **Échap fait ce que fait le bouton discret**, sur tous les écrans qui en ont un : quitter une session en cours, sortir d'une pause, ignorer celle qu'on propose. Aucune sortie affichée n'est désormais hors de portée du clavier.
+
 ### Ajouté — les licences de ce qui voyage dans l'application
 
 - **Les mentions légales donnent les licences à lire, au lieu de les citer.** La rubrique nommait deux polices en une phrase et s'arrêtait là ; elle mène maintenant à `licences-tierces.txt`, où le texte intégral de chaque licence est reproduit, avec celle de Pomodoro et l'adresse de sa source. C'est ce que l'AGPL demande d'un programme atteint par le réseau, et ce que les deux fontes demandent de qui les distribue.

@@ -9,7 +9,8 @@ export interface TimerShortcuts {
   phase: Phase;
   minutes: number;
   toggle(): void;
-  end(): void;
+  /** Whatever the quiet button does here, or `null` where the screen offers none. */
+  escape: (() => void) | null;
   setMinutes(minutes: number): void;
 }
 
@@ -24,11 +25,11 @@ export function useTimerShortcuts(shortcuts: TimerShortcuts): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
-      const { phase, minutes, toggle, end, setMinutes } = latest.current;
+      const { phase, minutes, toggle, escape, setMinutes } = latest.current;
 
       if (event.key === 'Escape') {
         if (matches(event.target, FIELDS)) return;
-        if (phase === 'running' || phase === 'paused') end();
+        escape?.();
         return;
       }
 
