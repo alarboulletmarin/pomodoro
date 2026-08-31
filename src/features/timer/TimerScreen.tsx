@@ -1,6 +1,5 @@
 import { MS_PER_MINUTE } from '../../domain/timer/durations';
 import { isSessionUnderway } from '../../domain/timer/timer-machine';
-import type { MessageKey, Phase } from '../../types';
 import { useMediaLayout } from '../../shared/hooks/use-media-layout';
 import { useI18n } from '../../shared/i18n/i18n';
 import { GearIcon } from '../../shared/ui/GearIcon';
@@ -10,7 +9,7 @@ import { ActionBar } from './ActionBar';
 import { ClockScrubber } from './ClockScrubber';
 import { PresetRow } from './PresetRow';
 import { ProgressBar } from './ProgressBar';
-import { timerCopy } from './timer-copy';
+import { timerCopy, type SecondaryAction } from './timer-copy';
 import { useTimer } from './timer-provider';
 import { usePhaseAnnouncement } from './use-phase-announcement';
 import { useTimerShortcuts } from './use-timer-shortcuts';
@@ -19,13 +18,6 @@ import styles from './TimerScreen.module.css';
 export interface TimerScreenProps {
   onOpenSettings(): void;
 }
-
-const SHORTCUT_HINTS = {
-  idle: 'timer.shortcuts.idle',
-  running: 'timer.shortcuts.active',
-  paused: 'timer.shortcuts.paused',
-  finished: 'timer.shortcuts.finished',
-} as const satisfies Record<Phase, MessageKey>;
 
 export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
   const layout = useMediaLayout();
@@ -53,16 +45,20 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
     else timer.acceptSuggestion();
   };
 
-  const onSecondary = (): void => {
-    if (phase === 'finished') timer.dismissSuggestion();
-    else timer.end();
+  // One quiet button per screen, one meaning: the way out of whatever is on it. Escape is
+  // bound to that same action, so no screen offers a way out the keyboard cannot take.
+  const exits: Record<SecondaryAction, () => void> = {
+    end: timer.end,
+    reset: timer.reset,
+    skipBreak: timer.dismissSuggestion,
   };
+  const onSecondary = copy.secondaryAction === null ? null : exits[copy.secondaryAction];
 
   useTimerShortcuts({
     phase,
     minutes: armedMinutes,
     toggle: onPrimary,
-    end: timer.end,
+    escape: onSecondary,
     setMinutes: setArmedMinutes,
   });
 
@@ -112,7 +108,7 @@ export function TimerScreen({ onOpenSettings }: TimerScreenProps): JSX.Element {
           primaryLabel={t(copy.primary, { minutes: armedMinutes })}
           secondaryLabel={copy.secondary === null ? null : t(copy.secondary)}
           quietPrimary={phase === 'running'}
-          hint={t(SHORTCUT_HINTS[phase])}
+          hint={t(copy.hint)}
           onPrimary={onPrimary}
           onSecondary={onSecondary}
         />

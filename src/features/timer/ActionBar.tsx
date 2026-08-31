@@ -7,7 +7,8 @@ export interface ActionBarProps {
   quietPrimary: boolean;
   hint: string;
   onPrimary(): void;
-  onSecondary(): void;
+  /** `null` on the screens whose primary is the only step worth offering. */
+  onSecondary: (() => void) | null;
   className?: string | undefined;
 }
 
@@ -30,7 +31,7 @@ export function ActionBar({
         >
           {primaryLabel}
         </Button>
-        {secondaryLabel === null ? null : (
+        {secondaryLabel === null || onSecondary === null ? null : (
           <Button variant="quiet" className={styles.secondary} onClick={onSecondary}>
             {secondaryLabel}
           </Button>

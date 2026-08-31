@@ -185,13 +185,13 @@ describe('the primary action', () => {
     expect(action('start')).toBeInTheDocument();
   });
 
-  it('drops the suggestion when the secondary action is taken', () => {
+  it('drops the suggestion when the break is skipped', () => {
     seedTimer('idle', 'focus', 1, 60_000);
     renderTimer();
 
     fireEvent.click(action('start'));
     act(() => void vi.advanceTimersByTime(60_300));
-    fireEvent.click(action('done for today'));
+    fireEvent.click(action('skip the break'));
 
     expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '25');
@@ -247,12 +247,78 @@ describe('the offered break', () => {
     fireEvent.keyDown(document.body, { key: 'ArrowUp' });
     expect(action('6 min break')).toBeInTheDocument();
 
-    fireEvent.click(action('done for today'));
+    fireEvent.click(action('skip the break'));
     fireEvent.keyDown(screen.getByRole('spinbutton'), { key: 'Home' });
     finishAMinuteOfFocus();
 
     // The settings still hold five: the longer break was for that break only.
     expect(action('5 min break')).toBeInTheDocument();
+  });
+});
+
+describe('the way back to a session', () => {
+  it('offers one from an armed break, and takes it to focus', () => {
+    seedTimer('idle', 'break', 15, 900_000);
+    renderTimer();
+
+    expect(screen.getByRole('heading', { name: 'break time' })).toBeInTheDocument();
+
+    fireEvent.click(action('skip the break'));
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+    expect(action('start')).toBeInTheDocument();
+    // The 15 minutes were the break's, not a length to carry into the session.
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '25');
+  });
+
+  it.each<Phase>(['running', 'paused'])('offers one from a %s break', (phase) => {
+    seedTimer(phase, 'break', 5, 120_000);
+    renderTimer();
+
+    fireEvent.click(action('end the break'));
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '25');
+  });
+
+  it('keeps the length of a focus session it gave up on', () => {
+    seedTimer('running', 'focus', 45, 600_000);
+    renderTimer();
+
+    fireEvent.click(action('end session'));
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-valuenow', '45');
+  });
+
+  it('skips the break straight from the session that just ended', () => {
+    seedTimer('finished', 'focus', 25, 0);
+    renderTimer();
+
+    fireEvent.click(action('skip the break'));
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+    expect(action('start')).toBeInTheDocument();
+  });
+
+  it('offers a single next step once the break is over', () => {
+    seedTimer('finished', 'break', 5, 0);
+    renderTimer();
+
+    // The old second button armed the very session the first one offers.
+    expect(action('new 25 min session')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'skip the break' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'end session' })).toBeNull();
+  });
+
+  it('survives a reload sitting on a break', () => {
+    seedTimer('idle', 'break', 5, 300_000);
+    renderTimer();
+
+    fireEvent.click(action('skip the break'));
+
+    // Whatever the reload restored, the exit is on screen and it lands on focus.
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
   });
 });
 
@@ -265,6 +331,34 @@ describe('global shortcuts', () => {
 
     fireEvent.keyDown(document.body, { key: 'Escape' });
     expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+  });
+
+  it('takes escape out of an armed break', () => {
+    seedTimer('idle', 'break', 5, 300_000);
+    renderTimer();
+
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+  });
+
+  it('takes escape past the offered break', () => {
+    seedTimer('finished', 'focus', 25, 0);
+    renderTimer();
+
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+
+    expect(screen.getByRole('heading', { name: 'ready to start' })).toBeInTheDocument();
+    expect(action('start')).toBeInTheDocument();
+  });
+
+  it('leaves escape alone where the screen offers no way out', () => {
+    seedTimer('finished', 'break', 5, 0);
+    renderTimer();
+
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+
+    expect(screen.getByRole('heading', { name: 'break over' })).toBeInTheDocument();
   });
 
   it('adjusts the duration with the arrows while idle', () => {

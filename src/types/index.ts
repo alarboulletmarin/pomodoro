@@ -47,7 +47,8 @@ export type TimerEvent =
   | { type: 'pause'; now: number }
   | { type: 'resume'; now: number }
   | { type: 'sync'; now: number }
-  | { type: 'end' };
+  | { type: 'end'; focusMinutes: number }
+  | { type: 'reset'; focusMinutes: number };
 
 export interface DayStat {
   date: string;
@@ -125,7 +126,10 @@ export interface TimerContextValue {
   start(): void;
   pause(): void;
   resume(): void;
+  /** Give up on the session underway and come back to a focus one. */
   end(): void;
+  /** Back to square one: a focus session at the configured length, from any phase. */
+  reset(): void;
   acceptSuggestion(): void;
   dismissSuggestion(): void;
 }
@@ -167,10 +171,12 @@ interface SingularMessages {
   'timer.scrubHint': string;
   'timer.scrubber.label.focus': string;
   'timer.scrubber.label.break': string;
-  'timer.shortcuts.idle': string;
-  'timer.shortcuts.active': string;
+  'timer.shortcuts.idle.focus': string;
+  'timer.shortcuts.idle.break': string;
+  'timer.shortcuts.running': string;
   'timer.shortcuts.paused': string;
-  'timer.shortcuts.finished': string;
+  'timer.shortcuts.finished.focus': string;
+  'timer.shortcuts.finished.break': string;
 
   'timer.action.start': string;
   'timer.action.startBreak': string;
@@ -179,7 +185,8 @@ interface SingularMessages {
   'timer.action.nextBreak': string;
   'timer.action.nextFocus': string;
   'timer.action.end': string;
-  'timer.action.doneForToday': string;
+  'timer.action.endBreak': string;
+  'timer.action.skipBreak': string;
 
   'timer.announce.finished.focus': string;
   'timer.announce.finished.break': string;

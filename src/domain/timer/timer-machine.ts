@@ -60,7 +60,16 @@ export function timerReducer(state: TimerState, event: TimerEvent): TimerState {
       return { ...state, remainingMs };
     }
 
+    // Ending is a way back to work, never back into the break that was just walked out
+    // of: re-arming it left `idle/break`, `running/break` and `paused/break` with no exit
+    // to a session short of sitting the whole break out.
     case 'end':
-      return armed(state.mode, state.minutes);
+      return state.mode === 'break'
+        ? armed('focus', clampMinutes(event.focusMinutes))
+        : armed('focus', state.minutes);
+
+    // Square one, from any phase and whatever length was scrubbed on the way.
+    case 'reset':
+      return initialTimerState(event.focusMinutes);
   }
 }

@@ -215,7 +215,7 @@ describe('sync', () => {
 });
 
 describe('end', () => {
-  it('re-arms the same mode and duration from anywhere', () => {
+  it('re-arms the focus session it gave up on, at its own length', () => {
     const active = running(T0, 45);
     const expected: TimerState = {
       phase: 'idle',
@@ -225,29 +225,168 @@ describe('end', () => {
       remainingMs: 45 * MINUTE,
     };
 
-    expect(timerReducer(active, { type: 'end' })).toEqual(expected);
+    expect(timerReducer(active, { type: 'end', focusMinutes: 25 })).toEqual(expected);
     expect(
-      timerReducer(timerReducer(active, { type: 'pause', now: T0 + MINUTE }), { type: 'end' }),
+      timerReducer(timerReducer(active, { type: 'pause', now: T0 + MINUTE }), {
+        type: 'end',
+        focusMinutes: 25,
+      }),
     ).toEqual(expected);
     expect(
-      timerReducer(timerReducer(active, { type: 'sync', now: T0 + 45 * MINUTE }), { type: 'end' }),
+      timerReducer(timerReducer(active, { type: 'sync', now: T0 + 45 * MINUTE }), {
+        type: 'end',
+        focusMinutes: 25,
+      }),
     ).toEqual(expected);
   });
 
-  it('keeps the break mode', () => {
-    const state = at(
-      initialTimerState(),
-      { type: 'setMode', mode: 'break', minutes: 5 },
-      { type: 'start', now: T0 },
-      { type: 'end' },
-    );
-    expect(state).toEqual({
-      phase: 'idle',
+  it('leaves a break for a focus session, so the break branch is never a dead end', () => {
+    const armedBreak = timerReducer(initialTimerState(), {
+      type: 'setMode',
       mode: 'break',
       minutes: 5,
-      endsAt: null,
-      remainingMs: 5 * MINUTE,
     });
+    const expected: TimerState = {
+      phase: 'idle',
+      mode: 'focus',
+      minutes: 30,
+      endsAt: null,
+      remainingMs: 30 * MINUTE,
+    };
+
+    expect(timerReducer(armedBreak, { type: 'end', focusMinutes: 30 })).toEqual(expected);
+
+    const runningBreak = timerReducer(armedBreak, { type: 'start', now: T0 });
+    expect(timerReducer(runningBreak, { type: 'end', focusMinutes: 30 })).toEqual(expected);
+
+    const pausedBreak = timerReducer(runningBreak, { type: 'pause', now: T0 + MINUTE });
+    expect(timerReducer(pausedBreak, { type: 'end', focusMinutes: 30 })).toEqual(expected);
+  });
+
+  it('clamps the focus length it falls back to', () => {
+    const armedBreak = timerReducer(initialTimerState(), {
+      type: 'setMode',
+      mode: 'break',
+      minutes: 5,
+    });
+    expect(timerReducer(armedBreak, { type: 'end', focusMinutes: 0 }).minutes).toBe(1);
+    expect(timerReducer(armedBreak, { type: 'end', focusMinutes: 900 }).minutes).toBe(90);
+  });
+});
+
+describe('reset', () => {
+  it('lands on a fresh focus session from every phase', () => {
+    const expected: TimerState = {
+      phase: 'idle',
+      mode: 'focus',
+      minutes: 25,
+      endsAt: null,
+      remainingMs: 25 * MINUTE,
+    };
+    const active = running(T0, 45);
+    const states: TimerState[] = [
+      initialTimerState(45),
+      timerReducer(initialTimerState(), { type: 'setMode', mode: 'break', minutes: 5 }),
+      active,
+      timerReducer(active, { type: 'pause', now: T0 + MINUTE }),
+      timerReducer(active, { type: 'sync', now: T0 + 45 * MINUTE }),
+    ];
+
+    for (const state of states) {
+      expect(timerReducer(state, { type: 'reset', focusMinutes: 25 })).toEqual(expected);
+    }
+  });
+
+  it('drops the length that was scrubbed on the way', () => {
+    const scrubbed = timerReducer(initialTimerState(), { type: 'setMinutes', minutes: 73 });
+    expect(timerReducer(scrubbed, { type: 'reset', focusMinutes: 25 }).minutes).toBe(25);
+  });
+
+  it('clamps the length it is handed', () => {
+    expect(timerReducer(initialTimerState(), { type: 'reset', focusMinutes: 0 }).minutes).toBe(1);
+    expect(timerReducer(initialTimerState(), { type: 'reset', focusMinutes: 900 }).minutes).toBe(
+      90,
+    );
+  });
+});
+
+/**
+ * Walks every state the UI can reach, over the edges it actually wires, and checks each one
+ * offers a way back to work. The break branch used to be a trap: `end` re-armed the break,
+ * so the only exit was sitting the whole thing out.
+ */
+describe('the reachable flow', () => {
+  const FOCUS = 25;
+  const BREAK = 5;
+
+  function exits(state: TimerState): TimerEvent[] {
+    switch (state.phase) {
+      case 'idle':
+        return state.mode === 'focus'
+          ? [{ type: 'start', now: T0 }]
+          : [
+              { type: 'start', now: T0 },
+              { type: 'reset', focusMinutes: FOCUS },
+            ];
+      case 'running':
+        return [
+          { type: 'pause', now: T0 + MINUTE },
+          { type: 'end', focusMinutes: FOCUS },
+          { type: 'sync', now: T0 + 99 * MINUTE },
+        ];
+      case 'paused':
+        return [
+          { type: 'resume', now: T0 + MINUTE },
+          { type: 'end', focusMinutes: FOCUS },
+        ];
+      case 'finished':
+        return state.mode === 'focus'
+          ? [
+              { type: 'setMode', mode: 'break', minutes: BREAK },
+              { type: 'setMode', mode: 'focus', minutes: FOCUS },
+            ]
+          : [{ type: 'setMode', mode: 'focus', minutes: FOCUS }];
+    }
+  }
+
+  const label = (state: TimerState): string => `${state.phase}/${state.mode}`;
+
+  function walk(): Map<string, string[]> {
+    const graph = new Map<string, string[]>();
+    const queue: TimerState[] = [initialTimerState(FOCUS)];
+    while (queue.length > 0) {
+      const state = queue.shift() as TimerState;
+      if (graph.has(label(state))) continue;
+      const nexts = exits(state).map((event) => timerReducer(state, event));
+      graph.set(
+        label(state),
+        nexts.map(label).filter((next) => next !== label(state)),
+      );
+      queue.push(...nexts);
+    }
+    return graph;
+  }
+
+  it('reaches all eight states', () => {
+    expect([...walk().keys()].sort()).toEqual([
+      'finished/break',
+      'finished/focus',
+      'idle/break',
+      'idle/focus',
+      'paused/break',
+      'paused/focus',
+      'running/break',
+      'running/focus',
+    ]);
+  });
+
+  it('leaves every state one press away from a focus session', () => {
+    const graph = walk();
+    const stuck = [...graph]
+      .filter(([from, tos]) => from !== 'idle/focus' && !tos.includes('idle/focus'))
+      .map(([from]) => from);
+
+    expect(stuck).toEqual([]);
   });
 });
 

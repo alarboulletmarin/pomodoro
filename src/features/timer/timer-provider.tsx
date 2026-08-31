@@ -147,7 +147,8 @@ export function TimerProvider({ children }: { children: ReactNode }): JSX.Elemen
         if (chime) primeChime(chimeVolume);
         dispatch({ type: 'resume', now: Date.now() });
       },
-      end: () => dispatch({ type: 'end' }),
+      end: () => dispatch({ type: 'end', focusMinutes }),
+      reset: () => dispatch({ type: 'reset', focusMinutes }),
       acceptSuggestion: () => {
         if (!suggestion) return;
         dispatch({ type: 'setMode', mode: suggestion.mode, minutes: suggestion.minutes });
